@@ -38,8 +38,7 @@ SOURCES += main.cpp\
     ../DMIDataStruct/dms_dmi_protocol.cpp \
     DMISignal.cpp \
     Casco_dmi.cpp \
-    Dialogwarningbox.cpp \
-    Tool.cpp
+    Dialogwarningbox.cpp
 
 HEADERS  += \
     ../DMIDataStruct/els_dmi_protocol.h \
@@ -65,7 +64,7 @@ HEADERS  += \
     DMISignal.h \
     Casco_dmi.h \
     Dialogwarningbox.h \
-    Tool.h
+    Public_Variable.h
 
 LIBS += -L$$PWD/ -lmsc
 

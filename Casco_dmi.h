@@ -7,6 +7,7 @@
 #ifndef CASCO_DMI_H
 #define CASCO_DMI_H
 
+#include "Public_Variable.h"
 #include <QObject>
 #include <QWidget>
 #include <QFile>
@@ -63,7 +64,7 @@
 
 #include "TLEevents.h"
 #include "../DMIDataStruct/dms_dmi_protocol.h"
-#include "Tool.h"
+
 #include "sys/time.h"
 
 class Casco_DMI:public QObject

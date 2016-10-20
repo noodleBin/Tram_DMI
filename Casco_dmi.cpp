@@ -1364,6 +1364,7 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
                     initMainWindow("UI");
                     refreshAlarmQue(8,"[车载] ");
                 }
+//                qDebug()<<"before refresh UI"<<els_dmi_data->ELS_Service_Mode;
                 refreshUI();
 
             }
@@ -1887,9 +1888,10 @@ void Casco_DMI::refreshATP()
         }
         break;
     }
-
+//    qDebug()<<"servicemode"<<els_dmi_data->ELS_Service_Mode;
     switch(els_dmi_data->ELS_Service_Mode)
     {
+
 
     case 0:
         lblServiceMode->setText(tr("timetable"));

@@ -13,7 +13,7 @@
 #include <QDateTime>
 #include <QObject>
 #include "sys/statfs.h"
-#include "Tool.h"
+
 class DMI_Log:public QObject
 {
     Q_OBJECT
