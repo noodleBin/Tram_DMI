@@ -2853,6 +2853,8 @@ void Casco_DMI::smsPromte(QString txt)
     else
         return;
     list_sms->enqueue(txt);
+    if(displayno!=1)
+        return;
     listSMS->clear();
 
     int listsize=list_sms->size();
