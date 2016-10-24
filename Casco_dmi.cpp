@@ -677,6 +677,15 @@ void Casco_DMI::initDefaultValue()
     m_writecount =1000;
 
     m_checktime=15;
+    m_sendTime =255;
+    m_cp_sendtime=m_elsmode_sendtime=m_driverid_sendtime=m_timeshift_sendtime
+            =m_scheduleid_sendtime=m_serviceid_sendtime
+            =m_tripid_sendtime=m_pathid_sendtime
+            =m_desid_sendtime=m_sendTime;
+    is_cp_send=is_elsmode_send=is_driverid_send=is_timeshift_send=
+            is_scheduleid_send=is_serviceid_send
+            =is_tripid_send=is_pathid_send
+            =is_desid_send=false;
 }
 /**************/
 /* 时间转换函数*/
@@ -709,11 +718,16 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
     {
         if(event->type()==QEvent::MouseButtonRelease)
         {
-
-            dialversion->setValue(m_appversion,m_dataversion);
-            dialversion->exec();
-
-            //            delete dialversion;
+            if(isLogin)
+            {
+                dialversion->setValue(m_appversion,m_dataversion);
+                dialversion->exec();
+            }
+            else
+            {
+                msbox->setValue("请登陆后操作");
+                msbox->exec();
+            }
             return true;
         }
         else
@@ -754,6 +768,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                 qint16 i=  diallogin->driverID.toInt();
 
                 dmi_els_data->Driver_Id=i;
+                is_driverid_send=true;
                 if(i!=0)
                     isLogin=true;
                 else
@@ -784,6 +799,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                 if(dialtimeshift->exec()==QDialog::Accepted)
                 {
                     dmi_els_data->Time_Shift_Request=1;
+                    is_timeshift_send=true;
                 }
                 else
                 {
@@ -939,12 +955,13 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                     {
                         dmi_els_data->Destination_Id=chosen_value;
                         dmi_els_data->Path_Id=-1;
-
+                        is_desid_send=true;
 
                     }
                     else if(desorpath==2)
                     {
                         dmi_els_data->Path_Id=chosen_value;
+                        is_pathid_send=true;
                         dmi_els_data->Destination_Id=-1;
                     }
 
@@ -970,18 +987,19 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
         {
             if(isLogin)
             {
-                quint8 elsmode=els_dmi_data->ELS_Service_Mode;
-//                if(elsmode==0||elsmode==1)
-//                {
-//                    msbox->setValue("请在车载独立或者手工控制模式下操作");
-//                    msbox->exec();
-//                    return true;
-//                }
+                //                quint8 elsmode=els_dmi_data->ELS_Service_Mode;
+                //                if(elsmode==0||elsmode==1)
+                //                {
+                //                    msbox->setValue("请在车载独立或者手工控制模式下操作");
+                //                    msbox->exec();
+                //                    return true;
+                //                }
                 operateType="modify ServiceMode";
                 if(dialelsmode->exec()==QDialog::Accepted)
                 {
                     quint8 i= dialelsmode->modevalue;
                     dmi_els_data->ELS_Mode_Selection=i;
+                    is_elsmode_send=true;
                     if(isDebug)
                     {
                         alarmPromte("ELS mode 选择为 "+QString::number(i));
@@ -1104,15 +1122,25 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
     //media play
     else if(obj==btnMute)
     {
+
         if(event->type()==QEvent::MouseButtonRelease)
         {
-            ToggleMute();
+            if(isLogin)
+            {
+                ToggleMute();
+
+            }
+            else
+            {
+                msbox->setValue("请登陆后操作");
+                msbox->exec();
+            }
             return true;
         }
         else
-        {
             return false;
-        }
+
+
     }
     //RRCP
     else if(obj==btnleft)
@@ -1122,7 +1150,8 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Left";
-                dmi_els_data->RR_Left_Button=1;
+//                dmi_els_data->RR_Left_Button=1;
+
             }
             else
             {
@@ -1143,7 +1172,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Straight";
-                dmi_els_data->RR_Straight_Button=1;
+//                dmi_els_data->RR_Straight_Button=1;
             }
             else
             {
@@ -1164,7 +1193,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Right";
-                dmi_els_data->RR_Right_Button=1;
+//                dmi_els_data->RR_Right_Button=1;
             }
             else
             {
@@ -1186,6 +1215,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             {
                 operateType="CP Request";
                 dmi_els_data->Crossing_Priority_Request=1;
+                is_cp_send=true;
             }
             else
             {
@@ -1364,7 +1394,7 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
                     initMainWindow("UI");
                     refreshAlarmQue(8,"[车载] ");
                 }
-//                qDebug()<<"before refresh UI"<<els_dmi_data->ELS_Service_Mode;
+                //                qDebug()<<"before refresh UI"<<els_dmi_data->ELS_Service_Mode;
                 refreshUI();
 
             }
@@ -1888,7 +1918,7 @@ void Casco_DMI::refreshATP()
         }
         break;
     }
-//    qDebug()<<"servicemode"<<els_dmi_data->ELS_Service_Mode;
+    //    qDebug()<<"servicemode"<<els_dmi_data->ELS_Service_Mode;
     switch(els_dmi_data->ELS_Service_Mode)
     {
 
@@ -2971,18 +3001,21 @@ void Casco_DMI::checkTimeWithELS(quint64 time)
 void Casco_DMI::setScheduleId(qint8 scheduleid)
 {
     dmi_els_data->Schedule_Id=scheduleid;
+    is_scheduleid_send=true;
     //    qDebug()<<"set sch"<<dmi_els_data->Schedule_Id;
 }
 
 void Casco_DMI::setServiceId(qint8 serviceid)
 {
     dmi_els_data->Service_Id=serviceid;
+    is_serviceid_send=true;
     //    qDebug()<<"set service"<<dmi_els_data->Service_Id;
 }
 
 void Casco_DMI::setTripId(qint8 tripid)
 {
     dmi_els_data->Trip_Id=tripid;
+    is_tripid_send=true;
     //    qDebug()<<"set trip"<<dmi_els_data->Trip_Id;
 }
 
@@ -3051,15 +3084,113 @@ void Casco_DMI::sendMsgToELS()
 {
     QByteArray qsend;
 
-    //    if(els_dmi_data->ELS_Service_Mode==0||els_dmi_data->ELS_Service_Mode==1)
-    //    {
-    //        dmi_els_data->resetDefault();
-    //        dmi_els_data->Schedule_Id=-1;
-    //        dmi_els_data->Service_Id=-1;
-    //        dmi_els_data->Trip_Id=-1;
-    //        dmi_els_data->Path_Id=-1;
-    //        dmi_els_data->Destination_Id=-1;
-    //    }
+    if(m_sendTime!=255)
+    {
+        if(is_cp_send)
+        {
+            if(m_cp_sendtime>0)
+                m_cp_sendtime--;
+            else
+            {
+                is_cp_send=false;
+                m_cp_sendtime=m_sendTime;
+                dmi_els_data->Crossing_Priority_Request=0;
+            }
+        }
+        if(is_elsmode_send)
+        {
+            if(m_elsmode_sendtime>0)
+                m_elsmode_sendtime--;
+            else
+            {
+                is_elsmode_send=false;
+                m_elsmode_sendtime=m_sendTime;
+                dmi_els_data->ELS_Mode_Selection=0;
+            }
+        }
+        if(is_driverid_send)
+        {
+            if(m_driverid_sendtime>0)
+                m_driverid_sendtime--;
+            else
+            {
+                is_driverid_send=false;
+                m_driverid_sendtime=m_sendTime;
+                dmi_els_data->Driver_Id=-1;
+            }
+        }
+        if(is_timeshift_send)
+        {
+            if(m_timeshift_sendtime>0)
+                m_timeshift_sendtime--;
+            else
+            {
+                is_timeshift_send=false;
+                m_timeshift_sendtime=m_sendTime;
+                dmi_els_data->Time_Shift_Request=0;
+            }
+        }
+        if(is_scheduleid_send)
+        {
+            if(m_scheduleid_sendtime>0)
+            {
+                m_scheduleid_sendtime--;
+            }
+            else
+            {
+                is_scheduleid_send=false;
+                m_scheduleid_sendtime=m_sendTime;
+                dmi_els_data->Schedule_Id=-1;
+            }
+        }
+        if(is_serviceid_send)
+        {
+            if(m_serviceid_sendtime>0)
+                m_serviceid_sendtime--;
+            else
+            {
+                is_serviceid_send=false;
+                m_serviceid_sendtime=m_sendTime;
+                dmi_els_data->Service_Id=-1;
+            }
+        }
+        if(is_tripid_send)
+        {
+            if(m_tripid_sendtime>0)
+            {
+                m_tripid_sendtime--;
+            }
+            else
+            {
+                is_tripid_send=false;
+                m_tripid_sendtime=m_sendTime;
+                dmi_els_data->Trip_Id=-1;
+            }
+        }
+        if(is_pathid_send)
+        {
+            if(m_pathid_sendtime>0)
+                m_pathid_sendtime--;
+            else
+            {
+                is_pathid_send=false;
+                m_pathid_sendtime=m_sendTime;
+                dmi_els_data->Path_Id=-1;
+            }
+        }
+        if(is_desid_send)
+        {
+            if(m_desid_sendtime>0)
+                m_desid_sendtime--;
+            else
+            {
+                is_desid_send=false;
+                m_desid_sendtime=m_sendTime;
+                dmi_els_data->Destination_Id=-1;
+            }
+        }
+    }
+
 
     int t= sizeof(DMI_ELS_Protocol)+sizeof(quint8)*dmi_els_data->OCC_Message_Length-sizeof(dmi_els_data->OCC_Message_Text)
             +sizeof(quint8)*dmi_els_data->OSS_Message_Length-sizeof(dmi_els_data->OSS_Message_Text);
@@ -3074,7 +3205,8 @@ void Casco_DMI::sendMsgToELS()
                     "serviceid="+QString::number(dmi_els_data->Service_Id)+
                     "tripid="+QString::number(dmi_els_data->Trip_Id)+
                     "pathid="+QString::number(dmi_els_data->Path_Id)+
-                    "destinationid="+QString::number(dmi_els_data->Destination_Id));
+                    "destinationid="+QString::number(dmi_els_data->Destination_Id)+
+                    "elsmode="+QString::number(dmi_els_data->ELS_Mode_Selection));
     }
     //    qDebug()<<"sendtime"<<tmpsendtimeseconds;
     dmi_els_data->DMI_Message_Time_Stamp=(quint64)(tmpsendtimeseconds)<<32;
@@ -3453,8 +3585,8 @@ int Casco_DMI::initOther(QString path)
     QDomElement promotesizemb=itemlist.at(5).toElement();
     QDomElement clearsizemb=itemlist.at(6).toElement();
     QDomElement splitsizemb=itemlist.at(7).toElement();
-    QDomElement checktime=itemlist.at(7).toElement();
-
+    QDomElement checktime=itemlist.at(8).toElement();
+    QDomElement sendtime=itemlist.at(9).toElement();
 
     m_diffflash=diffFlash.attribute("Value").toUInt();
     m_discontime = disConnection.attribute("Time").toUInt();
@@ -3469,7 +3601,13 @@ int Casco_DMI::initOther(QString path)
     m_promotesizeMB=promotesizemb.attribute("PromotesizeMB").toUInt();
     m_clearsizeMB =clearsizemb.attribute("ClearsizeMB").toUInt();
     m_writecount =splitsizemb.attribute("SplitsizeMB").toUInt();
-    m_checktime = checktime.attribute("Time").toUInt();
+    m_checktime = checktime.attribute("time").toUInt();
+    m_sendTime= sendtime.attribute("time").toUInt();
+    m_cp_sendtime=m_elsmode_sendtime=m_driverid_sendtime=m_timeshift_sendtime
+            =m_scheduleid_sendtime=m_serviceid_sendtime
+            =m_tripid_sendtime=m_pathid_sendtime
+            =m_desid_sendtime=m_sendTime;
+    //    qDebug()<<"check send"<<m_checktime<<m_sendTime;
     if(m_checktime>25)
     {
         m_checktime=25; //at most 25 minute check time

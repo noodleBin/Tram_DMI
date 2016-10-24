@@ -277,6 +277,18 @@ private:
     quint64 m_writecount;
 
     quint8 m_checktime;
+    quint8 m_sendTime;
+    quint8 m_cp_sendtime,m_elsmode_sendtime,m_timeshift_sendtime,
+    m_driverid_sendtime,
+    m_scheduleid_sendtime,
+    m_serviceid_sendtime,
+    m_tripid_sendtime,
+    m_pathid_sendtime,
+    m_desid_sendtime;
+
+    bool is_cp_send,is_elsmode_send,is_driverid_send,is_timeshift_send,
+    is_scheduleid_send,is_serviceid_send,is_tripid_send,
+    is_pathid_send,is_desid_send;
 
     QMap<quint8,Alarm_Record>* m_Alarm_Record_map;
 
