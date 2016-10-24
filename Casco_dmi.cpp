@@ -21,6 +21,8 @@ Casco_DMI::Casco_DMI()
 
 
 
+
+
     translateAll();
     initSocket();
 
@@ -75,7 +77,7 @@ void Casco_DMI::initMainWindow(QString type)
 
     if(type=="UI")
     {
-        screenmode=4;
+//        screenmode=4;
         switch (screenmode)
         {
         case 1:
@@ -295,7 +297,7 @@ void Casco_DMI::initialControl()
     //atp area
     lblCurrentSpeed=  wid->findChild<QLabel*>("lbl_speed");
     lblAuthoritySpeed =  wid->findChild<QLabel*>("lbl_limitspeed");
-    if(screenmode==2||screenmode==3)
+    if(screenmode==2||screenmode==3||screenmode==4)
     {
         widDashboard=wid->findChild<QWidget*>("widget_dashboard");
         //        if(mydashboard!=NULL)
@@ -322,7 +324,7 @@ void Casco_DMI::initialControl()
     lblRunningType=wid->findChild<QLabel*>("pic_runningtype");
     lblSystemOK=wid->findChild<QLabel*>("pic_pantostatus");
 
-    lblShutdownStatus=wid->findChild<QLabel*>("pic_working");
+//    lblShutdownStatus=wid->findChild<QLabel*>("pic_working");
     lblActiveEnd=wid->findChild<QLabel*>("pic_activeend");
     lblEb=wid->findChild<QLabel*>("pic_eb");
     lblSb=wid->findChild<QLabel*>("pic_sb");
@@ -383,11 +385,11 @@ void Casco_DMI::initialControl()
 //    widGeo=wid->findChild<QWidget*>("widget_geo");
 //    widGeo->setVisible(false);
 
-//    widDMS=wid->findChild<QWidget*>("widget_DMS");
+    widDMS=wid->findChild<QWidget*>("widget_DMS");
 
 
 //    mygeoevents = new MyGeoEvents(screenmode,widGeo);
-//    mytleevents=new TLEEvents(screenmode,widDMS);
+    mytleevents=new TLEEvents(3,widDMS);
 //    widDMS->setHidden(true);
     //tab maintence
     listAlarm=wid->findChild<QTextEdit*>("tblwdg_fault");
@@ -1806,6 +1808,7 @@ void Casco_DMI::refreshATP()
         break;
     case 2:
     case 3:
+    case 4:
         if(tmpcurspeed>100)
         {
             mydashboard->setValue(100,tmplimitspeed,tmpcurspeed);
@@ -1821,74 +1824,74 @@ void Casco_DMI::refreshATP()
     }
 
 
-    switch(els_dmi_data->Train_Protection_Control_Status)
-    {
-    case 0:
-        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
-        break;
-    case 1:
-        lblAtpProtection->setPixmap(resPath+"Train_Ptotect1.png");
-        break;
-    case 2:
-        lblAtpProtection->setPixmap(resPath+"Train_Ptotect2.png");
-        break;
-    case 3:
-        lblAtpProtection->setPixmap(resPath+"Train_Ptotect3.png");
-        break;
-    case 4:
-        lblAtpProtection->setPixmap(resPath+"Train_Ptotect4.png");
-        break;
-    case 255:
-        lblAtpProtection->setPixmap(QPixmap());
-        break;
-    default:
-        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
-        if(!log->writeLog("recv Train_Protection_Control_Status error value "+els_dmi_data->Train_Protection_Control_Status))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-        break;
-    }
+//    switch(els_dmi_data->Train_Protection_Control_Status)
+//    {
+//    case 0:
+//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
+//        break;
+//    case 1:
+//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect1.png");
+//        break;
+//    case 2:
+//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect2.png");
+//        break;
+//    case 3:
+//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect3.png");
+//        break;
+//    case 4:
+//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect4.png");
+//        break;
+//    case 255:
+//        lblAtpProtection->setPixmap(QPixmap());
+//        break;
+//    default:
+//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
+//        if(!log->writeLog("recv Train_Protection_Control_Status error value "+els_dmi_data->Train_Protection_Control_Status))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//        break;
+//    }
 
-    switch(els_dmi_data->ATP_Inhibition_Status)
-    {
-    case 0:
-        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi0.png");
-        break;
-    case 1:
-        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
-        break;
-    case 2:
-        lblAtpInhibited->setPixmap(QPixmap());
-        break;
-    default:
-        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
-        if(!log->writeLog("recv ATP_inhibition_Status error value "+els_dmi_data->ATP_Inhibition_Status))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-    }
+//    switch(els_dmi_data->ATP_Inhibition_Status)
+//    {
+//    case 0:
+//        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi0.png");
+//        break;
+//    case 1:
+//        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
+//        break;
+//    case 2:
+//        lblAtpInhibited->setPixmap(QPixmap());
+//        break;
+//    default:
+//        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
+//        if(!log->writeLog("recv ATP_inhibition_Status error value "+els_dmi_data->ATP_Inhibition_Status))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//    }
 
-    switch(els_dmi_data->ATP_Warning)
-    {
-    case 0:
-    case 3:
-        needatpwarning=false;
-        lblAtpWarning->setPixmap(QPixmap());
-        break;
-    case 1:
-    case 2:
-        needatpwarning=true;
-        break;
-    default:
-        needatpwarning=false;
-        lblAtpWarning->setPixmap(QPixmap());
-        if(!log->writeLog("recv ATP_Warning error value "+els_dmi_data->ATP_Warning))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-        break;
-    }
+//    switch(els_dmi_data->ATP_Warning)
+//    {
+//    case 0:
+//    case 3:
+//        needatpwarning=false;
+//        lblAtpWarning->setPixmap(QPixmap());
+//        break;
+//    case 1:
+//    case 2:
+//        needatpwarning=true;
+//        break;
+//    default:
+//        needatpwarning=false;
+//        lblAtpWarning->setPixmap(QPixmap());
+//        if(!log->writeLog("recv ATP_Warning error value "+els_dmi_data->ATP_Warning))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//        break;
+//    }
     //    qDebug()<<"servicemode"<<els_dmi_data->ELS_Service_Mode;
     switch(els_dmi_data->ELS_Service_Mode)
     {
@@ -2155,27 +2158,27 @@ void Casco_DMI::refreshMission()
         break;
     }
 
-    switch(els_dmi_data->ELS_RR_CP_Shutdown)
-    {
-    case 0:
-        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
-        break;
-    case 1:
-        lblShutdownStatus->setMovie(movieshutdown);
-        movieshutdown->start();
-        break;
-    case 2:
-        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown2.png");
-        break;
-    default:
-        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
-        QString content=QString("recv ELS_RR_CP_Shutdown error value ")+QString::number(els_dmi_data->ELS_RR_CP_Shutdown);
-        if(! log->writeLog(content))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-        break;
-    }
+//    switch(els_dmi_data->ELS_RR_CP_Shutdown)
+//    {
+//    case 0:
+//        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
+//        break;
+//    case 1:
+//        lblShutdownStatus->setMovie(movieshutdown);
+//        movieshutdown->start();
+//        break;
+//    case 2:
+//        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown2.png");
+//        break;
+//    default:
+//        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
+//        QString content=QString("recv ELS_RR_CP_Shutdown error value ")+QString::number(els_dmi_data->ELS_RR_CP_Shutdown);
+//        if(! log->writeLog(content))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//        break;
+//    }
 
     switch(els_dmi_data->Emergency_Braking_Applied)
     {
@@ -2327,30 +2330,30 @@ void Casco_DMI::refreshRRCP()
         lblBarName->setPalette(tmp);
 
     }
-    else if(els_dmi_data->CP_Area_Status==1)   //if previous statement is true, this statement will not be judged
-    {
-        quint8 cptotal=els_dmi_data->CP_Length_Preselection_Area;
-        qint16 cpremain=els_dmi_data->CP_Distance_To_End_Preselection_Area;
-        RRCPbar->setMaximum(cptotal);
-        if(cpremain!=-1)
-        {
-            if(cpremain<cptotal)
-            {
-                RRCPbar->setValue(cpremain);
-            }
-            else
-            {
-                RRCPbar->setValue(cptotal);
-            }
-        }
-        else
-        {
-            RRCPbar->setValue(cptotal);//recv -1, indicates that not in cp zone.
-        }
-        lblBarTotalValue->setText(QString::number(cptotal));
-        lblBarRemainValue->setText(QString::number(cpremain));
-        lblBarName->setText("路口区域");
-    }
+//    else if(els_dmi_data->CP_Area_Status==1)   //if previous statement is true, this statement will not be judged
+//    {
+//        quint8 cptotal=els_dmi_data->CP_Length_Preselection_Area;
+//        qint16 cpremain=els_dmi_data->CP_Distance_To_End_Preselection_Area;
+//        RRCPbar->setMaximum(cptotal);
+//        if(cpremain!=-1)
+//        {
+//            if(cpremain<cptotal)
+//            {
+//                RRCPbar->setValue(cpremain);
+//            }
+//            else
+//            {
+//                RRCPbar->setValue(cptotal);
+//            }
+//        }
+//        else
+//        {
+//            RRCPbar->setValue(cptotal);//recv -1, indicates that not in cp zone.
+//        }
+//        lblBarTotalValue->setText(QString::number(cptotal));
+//        lblBarRemainValue->setText(QString::number(cpremain));
+//        lblBarName->setText("路口区域");
+//    }
     else
     {
         //无操作
@@ -2446,26 +2449,26 @@ void Casco_DMI::refreshRRCP()
 
     }
 
-    switch(els_dmi_data->Route_Request_Area_Status)
-    {
+//    switch(els_dmi_data->Route_Request_Area_Status)
+//    {
 
-    case 0:
-        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
-        break;
-    case 1:
-        frameRR->setPalette(QPalette(QPalette::Window,Qt::yellow));
-        break;
-    case 2:
-        frameRR->setPalette(QPalette(QPalette::Window,Qt::green));
-    default:
-        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
-        QString content=QString("recv Route_Request_Area_Status error value ")+QString::number(els_dmi_data->Route_Request_Area_Status);
-        if(!log->writeLog(content))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-        break;
-    }
+//    case 0:
+//        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
+//        break;
+//    case 1:
+//        frameRR->setPalette(QPalette(QPalette::Window,Qt::yellow));
+//        break;
+//    case 2:
+//        frameRR->setPalette(QPalette(QPalette::Window,Qt::green));
+//    default:
+//        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
+//        QString content=QString("recv Route_Request_Area_Status error value ")+QString::number(els_dmi_data->Route_Request_Area_Status);
+//        if(!log->writeLog(content))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//        break;
+//    }
 }
 
 void Casco_DMI::refreshOperation()
@@ -2773,9 +2776,9 @@ void Casco_DMI::refreshTLE()
 
         }
 
-//        mytleevents->setvalue(dms_dmi_data->Signal_ID,1,
-//                              1,
-//                              1,1,1);
+        mytleevents->setvalue(dms_dmi_data->Signal_ID,1,
+                              1,
+                              1,1,1);
         //        mytleevents->setvalue(backgroud,type,
         //                              position,
         //                              status,restricpos,restricstaus);

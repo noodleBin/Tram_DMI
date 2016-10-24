@@ -24,6 +24,10 @@ QSize MyDashboard::sizeHint() const
     {
         return QSize(320,320);
     }
+    else if(m_size==4)
+    {
+        return QSize(265,265);
+    }
     return QSize(100,100);
 }
 void MyDashboard::setValue(quint8 curvalue, quint8 limitvalue,quint8 lblvalue)
@@ -32,6 +36,7 @@ void MyDashboard::setValue(quint8 curvalue, quint8 limitvalue,quint8 lblvalue)
     m_limitSpeedValue=limitvalue;
     m_lblvalue=lblvalue; //lbl_txt的显示值
 
+//    qDebug()<<"in dashborad setvalue"<<m_currentValue<<m_limitSpeedValue<<m_lblvalue;
     update();
 }
 
@@ -47,7 +52,7 @@ void MyDashboard::paintEvent(QPaintEvent *)
     drawIndicator(&painter);
     drawLimitSpeed(&painter);
     drawCoverBall(&painter);
-    drawTextRect(&painter);
+//    drawTextRect(&painter);
     painter.end();
 }
 
@@ -193,6 +198,23 @@ void MyDashboard::drawCoverBall(QPainter *painter)
     painter->setBrush(ballGradient);
     painter->setPen(Qt::NoPen);
     painter->drawEllipse(m_center,ballRadius,ballRadius);
+
+
+    QRectF textRect(m_center.x()-ballRadius,m_center.y()-ballRadius,
+                    2*ballRadius,
+                    2*ballRadius);
+
+
+    qreal fontSize=textRect.height()/2;
+    QFont font;
+    font.setPointSize(fontSize);
+    painter->setFont(font);
+
+    painter->setOpacity(1.0);
+    painter->setPen(Qt::white);
+    QString strValue;
+    strValue=tr("%1").arg(m_currentValue);
+    painter->drawText(textRect,Qt::AlignHCenter|Qt::AlignVCenter,strValue);
 
     painter->restore();
 }
