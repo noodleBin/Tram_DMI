@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     ../DMIDataStruct/dms_dmi_protocol.cpp \
     DMISignal.cpp \
     Casco_dmi.cpp \
-    Dialogwarningbox.cpp
+    Dialogwarningbox.cpp \
+    Limitspeed.cpp
 
 HEADERS  += \
     ../DMIDataStruct/els_dmi_protocol.h \
@@ -64,7 +65,8 @@ HEADERS  += \
     DMISignal.h \
     Casco_dmi.h \
     Dialogwarningbox.h \
-    Public_Variable.h
+    Public_Variable.h \
+    Limitspeed.h
 
 LIBS += -L$$PWD/ -lmsc
 

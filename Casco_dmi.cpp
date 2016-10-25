@@ -77,7 +77,7 @@ void Casco_DMI::initMainWindow(QString type)
 
     if(type=="UI")
     {
-//        screenmode=4;
+        screenmode=4;
         switch (screenmode)
         {
         case 1:
@@ -193,7 +193,7 @@ void Casco_DMI::initialNormalControl()
 {
     wid->findChild<QLabel*>("lbl_namedriverid")->setText(tr("driverid"));
     wid->findChild<QLabel*>("lbl_nameserviceid")->setText(tr("serviceid"));
-//    wid->findChild<QLabel*>("lbl_namenextstaid")->setText(tr("nextstaid"));
+    //    wid->findChild<QLabel*>("lbl_namenextstaid")->setText(tr("nextstaid"));
     //    wid->findChild<QLabel*>("lbl_namearrtime")->setText(tr("arrtime"));
     wid->findChild<QLabel*>("lbl_namedelay")->setText(tr("delay"));
     //    wid->findChild<QLabel*>("lbl_delayunit")->setText(tr("delayunit"));
@@ -215,11 +215,11 @@ void Casco_DMI::initialNormalControl()
     }
 
 
-//    wid->findChild<QLabel*>("lbl_CPArea")->setText(tr("cparea"));
-//    wid->findChild<QLabel*>("lbl_CPTotal")->setText(tr("cptotal"));
-//    wid->findChild<QLabel*>("lbl_CPUnit")->setText(tr("meter"));
-//    wid->findChild<QLabel*>("lbl_CPRemain")->setText(tr("cpremain"));
-//    wid->findChild<QLabel*>("lbl_CPRemainUnit")->setText(tr("meter"));
+    //    wid->findChild<QLabel*>("lbl_CPArea")->setText(tr("cparea"));
+    //    wid->findChild<QLabel*>("lbl_CPTotal")->setText(tr("cptotal"));
+    //    wid->findChild<QLabel*>("lbl_CPUnit")->setText(tr("meter"));
+    //    wid->findChild<QLabel*>("lbl_CPRemain")->setText(tr("cpremain"));
+    //    wid->findChild<QLabel*>("lbl_CPRemainUnit")->setText(tr("meter"));
 
     //Tab mission
     //    if(screenmode==3)
@@ -230,11 +230,11 @@ void Casco_DMI::initialNormalControl()
     //    }
     //    else
     {
-//        wid->findChild<QTabWidget*>("tabWidget")->setTabText(0,tr("missionInfo"));
+        //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(0,tr("missionInfo"));
         //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(1,tr("geoInfo"));
-//        wid->findChild<QTabWidget*>("tabWidget")->removeTab(1);
+        //        wid->findChild<QTabWidget*>("tabWidget")->removeTab(1);
 
-//        wid->findChild<QTabWidget*>("tabWidget")->setTabText(2,tr("maintenceInfo"));
+        //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(2,tr("maintenceInfo"));
     }
     wid->findChild<QLabel*>("lbl_namesch")->setText(tr("sch"));
     wid->findChild<QLabel*>("lbl_namedes")->setText(tr("des"));
@@ -261,12 +261,12 @@ void Casco_DMI::initialControl()
     lblDriverId->setText(tr("unknown"));
     lblServiceId=wid->findChild<QLabel*>("lbl_serviceid");
     lblServiceId->setText(tr("unknown"));
-//    lblNextstaId =wid->findChild<QLabel*>("lbl_nextstaid");
-//    lblNextstaId->setText(tr("unknown"));
+    //    lblNextstaId =wid->findChild<QLabel*>("lbl_nextstaid");
+    //    lblNextstaId->setText(tr("unknown"));
     lblNextstaId2 =wid->findChild<QLabel*>("lbl_nextstaid_2");
     lblNextstaId2->setText(tr("unknown"));
-//    lblArrTime=wid->findChild<QLabel*>("lbl_arrtime");
-//    lblArrTime->setText(QTime::currentTime().toString("hh:mm:ss"));
+    //    lblArrTime=wid->findChild<QLabel*>("lbl_arrtime");
+    //    lblArrTime->setText(QTime::currentTime().toString("hh:mm:ss"));
     lblArrTime2=wid->findChild<QLabel*>("lbl_arrtime_2");
     lblArrTime2->setText(QTime::currentTime().toString("hh:mm:ss"));
     lblNameDelay=wid->findChild<QLabel*>("lbl_namedelay");
@@ -317,14 +317,31 @@ void Casco_DMI::initialControl()
 
 
 
-//    lblObsStatus=wid->findChild<QLabel*>("pic_obsstatus");
-//    lblELSDMSStatus=wid->findChild<QLabel*>("pic_dmsels");
+    //    lblObsStatus=wid->findChild<QLabel*>("pic_obsstatus");
+
+    lblELSDMSStatus=wid->findChild<QLabel*>("pic_dmsels");
+
+#ifdef Baseline_2_0
+    lblWifi=wid->findChild<QLabel*>("pic_wifi");
+    lblBCM=wid->findChild<QLabel*>("lbl_BCM");
+    lblRadar=wid->findChild<QLabel*>("lbl_Radar");
+    lblGPS=wid->findChild<QLabel*>("lbl_GPS");
+
+    lblRR=wid->findChild<QLabel*>("pic_RRstatus");
+    lblRRDis=wid->findChild<QLabel*>("lbl_RRdistance");
+
+    lblSig=wid->findChild<QLabel*>("pic_signalstatus");
+    lblSigDis=wid->findChild<QLabel*>("lbl_signaldistance");
+    lblNextPsrDis=wid->findChild<QLabel*>("lbl_nextpsrdis");
+    lblNextPsrName=wid->findChild<QLabel*>("lbl_nextpsrname");
+#endif
+
     lblLocStatus=wid->findChild<QLabel*>("pic_traloc");
     lblPassengerType=wid->findChild<QLabel*>("pic_passertype");
     lblRunningType=wid->findChild<QLabel*>("pic_runningtype");
     lblSystemOK=wid->findChild<QLabel*>("pic_pantostatus");
 
-//    lblShutdownStatus=wid->findChild<QLabel*>("pic_working");
+    //    lblShutdownStatus=wid->findChild<QLabel*>("pic_working");
     lblActiveEnd=wid->findChild<QLabel*>("pic_activeend");
     lblEb=wid->findChild<QLabel*>("pic_eb");
     lblSb=wid->findChild<QLabel*>("pic_sb");
@@ -332,8 +349,8 @@ void Casco_DMI::initialControl()
     lblSkip=wid->findChild<QLabel*>("pic_skip");
     lblHold=wid->findChild<QLabel*>("pic_hold");
 
-//    lblObsStatus->installEventFilter(this);
-//    lblELSDMSStatus->installEventFilter(this);
+    //    lblObsStatus->installEventFilter(this);
+    //    lblELSDMSStatus->installEventFilter(this);
 
     //RRCP area
     RRCPbar = wid->findChild<QProgressBar*>("probar_CP");
@@ -382,15 +399,21 @@ void Casco_DMI::initialControl()
     refreshMute();
 
     //tab geo
-//    widGeo=wid->findChild<QWidget*>("widget_geo");
-//    widGeo->setVisible(false);
+    //    widGeo=wid->findChild<QWidget*>("widget_geo");
+    //    widGeo->setVisible(false);
 
     widDMS=wid->findChild<QWidget*>("widget_DMS");
 
+#ifdef Baseline_2_0
+    widcurrentpsr=wid->findChild<QWidget*>("widget_currentpsr");
+    widnextpsr=wid->findChild<QWidget*>("widget_nextpsr");
+    currentpsr=new LimitSpeed(widcurrentpsr);
+    nextpsr=new LimitSpeed(widnextpsr);
+#endif
 
-//    mygeoevents = new MyGeoEvents(screenmode,widGeo);
+    //    mygeoevents = new MyGeoEvents(screenmode,widGeo);
     mytleevents=new TLEEvents(3,widDMS);
-//    widDMS->setHidden(true);
+    //    widDMS->setHidden(true);
     //tab maintence
     listAlarm=wid->findChild<QTextEdit*>("tblwdg_fault");
 
@@ -598,7 +621,7 @@ void Casco_DMI::initialVariable()
 
     timerdisconnect=0;
     exePath=QDir::currentPath();
-    resPath = exePath+"/res/";
+    resPath = exePath+"/res2/";
 
     timer1s=0;
     smsCount=0;
@@ -621,6 +644,8 @@ void Casco_DMI::initialVariable()
     displayno=1;
     isDebug=false; //not debug mode
     stepOneMsg=false;
+
+
 
     els_dmi_data=new ELS_DMI_Protocol();
     dms_dmi_data=new DMS_DMI_Protocol();
@@ -655,6 +680,15 @@ void Casco_DMI::initialVariable()
     time_checked=false;
 
     timediff= QDateTime(QDate(1970,1,1)).secsTo(QDateTime(QDate(2000,1,1)));
+
+#ifdef Baseline_2_0
+    needinfri=false;
+    isinfri=false;
+    needcurpsrflash=false;
+    iscurpsrflash=false;
+    neednextpsrflash=false;
+    isnextpsrflash=false;
+#endif
 
 }
 
@@ -831,41 +865,41 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             return false;
         }
     }
-//    else if(obj==lblObsStatus)
-//    {
-//        if(event->type()==QEvent::MouseButtonRelease)
-//        {
-//            //            dialobs = new DialogOBSStatus(wid);
-//            //            dialobs->setGeometry(xpos,ypos+wid->height()/2,dialobs->width(),dialobs->height());
-//            isdialobspop=true;
-//            dialobs->exec();
+    //    else if(obj==lblObsStatus)
+    //    {
+    //        if(event->type()==QEvent::MouseButtonRelease)
+    //        {
+    //            //            dialobs = new DialogOBSStatus(wid);
+    //            //            dialobs->setGeometry(xpos,ypos+wid->height()/2,dialobs->width(),dialobs->height());
+    //            isdialobspop=true;
+    //            dialobs->exec();
 
-//            isdialobspop=false;
+    //            isdialobspop=false;
 
-//            return true;
-//        }
-//        else
-//        {
-//            return false;
-//        }
-//    }
-//    else if(obj==lblELSDMSStatus)
-//    {
-//        if(event->type()==QEvent::MouseButtonRelease)
-//        {
-//            dialcommstatus = new DialogCommstatus(wid);
-//            dialcommstatus->setGeometry(xpos,ypos+wid->height()/2,dialcommstatus->width(),dialcommstatus->height());
-//            isdialcommstatuspop=true;
-//            dialcommstatus->exec();
-//            isdialcommstatuspop=false;
+    //            return true;
+    //        }
+    //        else
+    //        {
+    //            return false;
+    //        }
+    //    }
+    //    else if(obj==lblELSDMSStatus)
+    //    {
+    //        if(event->type()==QEvent::MouseButtonRelease)
+    //        {
+    //            dialcommstatus = new DialogCommstatus(wid);
+    //            dialcommstatus->setGeometry(xpos,ypos+wid->height()/2,dialcommstatus->width(),dialcommstatus->height());
+    //            isdialcommstatuspop=true;
+    //            dialcommstatus->exec();
+    //            isdialcommstatuspop=false;
 
-//            return true;
-//        }
-//        else
-//        {
-//            return false;
-//        }
-//    }
+    //            return true;
+    //        }
+    //        else
+    //        {
+    //            return false;
+    //        }
+    //    }
     else if((obj==lblDesId)|(obj==lblNamedes))
     {
         if((event->type()==QEvent::MouseButtonRelease))
@@ -1342,7 +1376,20 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
             {
                 last_els_dmi_data=que_els_dmi->dequeue();
 
+
             }
+
+            //            QString s,txt;
+            //            char *c = last_els_dmi_data.data();
+            //            txt+="size is "+ QString::number(last_els_dmi_data.count());
+            //            txt+="\n";
+            //            for(int i=0;i<last_els_dmi_data.size();i++)
+            //            {
+            //                txt+=" 0x"+QString::number( (quint8)c[i],16);
+            //            }
+
+            //            qDebug()<<"txt"<<txt;
+
 
             setRecvDataFromSocket(last_els_dmi_data); //只用最新的
             //            if(m_isdebug)
@@ -1526,8 +1573,8 @@ void Casco_DMI::refreshUI()
     refreshOperation();
     refreshTabMission();
     refreshGeoEvents();
-    refreshMaintence();
-    refreshSMS();
+    //    refreshMaintence();
+    //    refreshSMS();
     flashUI();
 }
 
@@ -1635,6 +1682,46 @@ void Casco_DMI::flashUI()
             }
         }
 
+#ifdef Baseline_2_0
+        if(needinfri)
+        {
+            isinfri=!isinfri;
+            if(isinfri)
+            {
+                lblSig->setPixmap(resPath+"Signal_Restr.png");
+            }
+            else
+            {
+                lblSig->setPixmap(QPixmap());
+            }
+        }
+
+        if(needcurpsrflash)
+        {
+            iscurpsrflash=!iscurpsrflash;
+            if(iscurpsrflash)
+            {
+                currentpsr->setVisible(true);
+            }
+            else
+            {
+                currentpsr->setVisible(false);
+            }
+        }
+        if(neednextpsrflash)
+        {
+            isnextpsrflash=!isnextpsrflash;
+            if(isnextpsrflash)
+            {
+                nextpsr->setVisible(true);
+            }
+            else
+            {
+                nextpsr->setVisible(false);
+            }
+        }
+#endif
+
     }
     else
     {
@@ -1682,12 +1769,12 @@ void Casco_DMI::refreshTop()
 
     if(SSAIdMap->contains(els_dmi_data->Next_SSA_Id))
     {
-//        lblNextstaId->setText(SSAIdMap->value(els_dmi_data->Next_SSA_Id));
+        //        lblNextstaId->setText(SSAIdMap->value(els_dmi_data->Next_SSA_Id));
         lblNextstaId2->setText(SSAIdMap->value(els_dmi_data->Next_SSA_Id));
     }
     else
     {
-//        lblNextstaId->setText(QString::number(els_dmi_data->Next_SSA_Id));
+        //        lblNextstaId->setText(QString::number(els_dmi_data->Next_SSA_Id));
         lblNextstaId2->setText(QString::number(els_dmi_data->Next_SSA_Id));
         //        if(!log->writeLog("recv Next_SSA_Id error value "+els_dmi_data->Next_SSA_Id))
         //        {
@@ -1697,7 +1784,7 @@ void Casco_DMI::refreshTop()
 
     QDateTime tmpnextarrtime;
     tmpnextarrtime.setTime_t(timeConvertDisplay(els_dmi_data->Next_SSA_Arrival_Time));
-//    lblArrTime->setText(tmpnextarrtime.toString("hh:mm:ss"));
+    //    lblArrTime->setText(tmpnextarrtime.toString("hh:mm:ss"));
     lblArrTime2->setText(tmpnextarrtime.toString("hh:mm:ss"));
     qint16 temp=els_dmi_data->Advance_Delay_Time;
     QPalette tmp;
@@ -1824,74 +1911,74 @@ void Casco_DMI::refreshATP()
     }
 
 
-//    switch(els_dmi_data->Train_Protection_Control_Status)
-//    {
-//    case 0:
-//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
-//        break;
-//    case 1:
-//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect1.png");
-//        break;
-//    case 2:
-//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect2.png");
-//        break;
-//    case 3:
-//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect3.png");
-//        break;
-//    case 4:
-//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect4.png");
-//        break;
-//    case 255:
-//        lblAtpProtection->setPixmap(QPixmap());
-//        break;
-//    default:
-//        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
-//        if(!log->writeLog("recv Train_Protection_Control_Status error value "+els_dmi_data->Train_Protection_Control_Status))
-//        {
-//            popFaultBox("fail to write log, now exit");
-//        }
-//        break;
-//    }
+    //    switch(els_dmi_data->Train_Protection_Control_Status)
+    //    {
+    //    case 0:
+    //        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
+    //        break;
+    //    case 1:
+    //        lblAtpProtection->setPixmap(resPath+"Train_Ptotect1.png");
+    //        break;
+    //    case 2:
+    //        lblAtpProtection->setPixmap(resPath+"Train_Ptotect2.png");
+    //        break;
+    //    case 3:
+    //        lblAtpProtection->setPixmap(resPath+"Train_Ptotect3.png");
+    //        break;
+    //    case 4:
+    //        lblAtpProtection->setPixmap(resPath+"Train_Ptotect4.png");
+    //        break;
+    //    case 255:
+    //        lblAtpProtection->setPixmap(QPixmap());
+    //        break;
+    //    default:
+    //        lblAtpProtection->setPixmap(resPath+"Train_Ptotect0.png");
+    //        if(!log->writeLog("recv Train_Protection_Control_Status error value "+els_dmi_data->Train_Protection_Control_Status))
+    //        {
+    //            popFaultBox("fail to write log, now exit");
+    //        }
+    //        break;
+    //    }
 
-//    switch(els_dmi_data->ATP_Inhibition_Status)
-//    {
-//    case 0:
-//        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi0.png");
-//        break;
-//    case 1:
-//        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
-//        break;
-//    case 2:
-//        lblAtpInhibited->setPixmap(QPixmap());
-//        break;
-//    default:
-//        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
-//        if(!log->writeLog("recv ATP_inhibition_Status error value "+els_dmi_data->ATP_Inhibition_Status))
-//        {
-//            popFaultBox("fail to write log, now exit");
-//        }
-//    }
+    //    switch(els_dmi_data->ATP_Inhibition_Status)
+    //    {
+    //    case 0:
+    //        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi0.png");
+    //        break;
+    //    case 1:
+    //        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
+    //        break;
+    //    case 2:
+    //        lblAtpInhibited->setPixmap(QPixmap());
+    //        break;
+    //    default:
+    //        lblAtpInhibited->setPixmap(resPath+"ATP_Inhi1.png");
+    //        if(!log->writeLog("recv ATP_inhibition_Status error value "+els_dmi_data->ATP_Inhibition_Status))
+    //        {
+    //            popFaultBox("fail to write log, now exit");
+    //        }
+    //    }
 
-//    switch(els_dmi_data->ATP_Warning)
-//    {
-//    case 0:
-//    case 3:
-//        needatpwarning=false;
-//        lblAtpWarning->setPixmap(QPixmap());
-//        break;
-//    case 1:
-//    case 2:
-//        needatpwarning=true;
-//        break;
-//    default:
-//        needatpwarning=false;
-//        lblAtpWarning->setPixmap(QPixmap());
-//        if(!log->writeLog("recv ATP_Warning error value "+els_dmi_data->ATP_Warning))
-//        {
-//            popFaultBox("fail to write log, now exit");
-//        }
-//        break;
-//    }
+    //    switch(els_dmi_data->ATP_Warning)
+    //    {
+    //    case 0:
+    //    case 3:
+    //        needatpwarning=false;
+    //        lblAtpWarning->setPixmap(QPixmap());
+    //        break;
+    //    case 1:
+    //    case 2:
+    //        needatpwarning=true;
+    //        break;
+    //    default:
+    //        needatpwarning=false;
+    //        lblAtpWarning->setPixmap(QPixmap());
+    //        if(!log->writeLog("recv ATP_Warning error value "+els_dmi_data->ATP_Warning))
+    //        {
+    //            popFaultBox("fail to write log, now exit");
+    //        }
+    //        break;
+    //    }
     //    qDebug()<<"servicemode"<<els_dmi_data->ELS_Service_Mode;
     switch(els_dmi_data->ELS_Service_Mode)
     {
@@ -2016,11 +2103,12 @@ void Casco_DMI::refreshMission()
 {
     //Mission Information
 
+
     if(els_dmi_data->ELS_Function_Detailed_Status<=0x0f)
     {
         if(els_dmi_data->ELS_Function_Detailed_Status==0x0f)
         {
-//            lblObsStatus->setPixmap(resPath+"OBS_OK.png");
+            //            lblObsStatus->setPixmap(resPath+"OBS_OK.png");
         }
         else
         {
@@ -2042,7 +2130,7 @@ void Casco_DMI::refreshMission()
                 refreshAlarmQue(6,"[车载] ","A T P");
             }
 
-//            lblObsStatus->setPixmap(resPath+"OBS_Error.png");
+            //            lblObsStatus->setPixmap(resPath+"OBS_Error.png");
         }
         if(isdialobspop)
         {
@@ -2051,28 +2139,211 @@ void Casco_DMI::refreshMission()
     }
     else
     {
-//        lblObsStatus->setPixmap(resPath+"OBS_Error.png");
+        //        lblObsStatus->setPixmap(resPath+"OBS_Error.png");
     }
 
 
-    if(els_dmi_data->Communication_ELS_DMS_Status!=1||els_dmi_data->Radio_Coverage_ELS_DMS!=1
-            ||els_dmi_data->Radio_Status!=1)
+    //    if(els_dmi_data->Communication_ELS_DMS_Status!=1||els_dmi_data->Radio_Coverage_ELS_DMS!=1
+    //            ||els_dmi_data->Radio_Status!=1)
+    //    {
+    ////        lblELSDMSStatus->setPixmap(resPath+"Communication_fault.png");
+    //        //        qDebug()<<"fault"<<els_dmi_data->Communication_ELS_DMS_Status<<els_dmi_data->Radio_Coverage_ELS_DMS<<els_dmi_data->Radio_Status;
+    //    }
+    //    else
+    //    {
+    ////        lblELSDMSStatus->setPixmap(resPath+"Communication_good.png");
+    //        //         qDebug()<<"good"<<els_dmi_data->Communication_ELS_DMS_Status<<els_dmi_data->Radio_Coverage_ELS_DMS<<els_dmi_data->Radio_Status;
+    //    }
+
+    //    if(isdialcommstatuspop)
+    //    {
+    //        dialcommstatus->setPicCommDMSELS(els_dmi_data->Communication_ELS_DMS_Status);
+    //        dialcommstatus->setPicRadioDMSELS(els_dmi_data->Radio_Status);
+    //        dialcommstatus->setPicRadioCoverDMSELS(els_dmi_data->Radio_Coverage_ELS_DMS);
+    //    }
+
+    switch(els_dmi_data->Communication_ELS_DMS_Status)
     {
-//        lblELSDMSStatus->setPixmap(resPath+"Communication_fault.png");
-        //        qDebug()<<"fault"<<els_dmi_data->Communication_ELS_DMS_Status<<els_dmi_data->Radio_Coverage_ELS_DMS<<els_dmi_data->Radio_Status;
+    case 0:
+        lblELSDMSStatus->setPixmap(resPath+"ELS_DMS_Status0.png");
+        break;
+    case 1:
+        lblELSDMSStatus->setPixmap(resPath+"ELS_DMS_Status1.png");
+        break;
+    default:
+        lblELSDMSStatus->setPixmap(resPath+"ELS_DMS_Status0.png");
+        break;
+
+    }
+
+    switch(els_dmi_data->Radio_Coverage_ELS_DMS)
+    {
+    case 0:
+        lblWifi->setPixmap(resPath+"RadioCoverage_Status0.png");
+        break;
+    case 1:
+        lblWifi->setPixmap(resPath+"RadioCoverage_Status1.png");
+        break;
+    case 2:
+        lblWifi->setPixmap(resPath+"RadioCoverage_Status2.png");
+        break;
+    default:
+        lblWifi->setPixmap(resPath+"RadioCoverage_Status0.png");
+        break;
+
+    }
+#ifdef Baseline_2_0
+    //    qDebug()<<"2.0"<<els_dmi_data->BCM_Status<<els_dmi_data->Radar_Status
+    //           <<els_dmi_data->GPS_Status<<els_dmi_data->Distance_To_Signal
+    //          <<els_dmi_data->Signal_Status<<els_dmi_data->Warning_Signal_Anticipation
+    //         <<els_dmi_data->Warning_Signal_Infringement
+    //        <<els_dmi_data->Distance_To_Next_Restrictive_PSR
+    //       <<els_dmi_data->Next_Restrictive_PSR_Speed
+    //      <<els_dmi_data->Warning_PSR_Slowdown_Overspeed
+    //     <<els_dmi_data->Current_PSR_Speed<<els_dmi_data->Warning_PSR_Overspeed
+    //    <<els_dmi_data->RS_Max_Speed<<els_dmi_data->Warning_RS_Speed_Overspeed
+    //    <<els_dmi_data->Radar_Speed<<els_dmi_data->Risk_Level
+    //    <<els_dmi_data->Size_Of_Additional_Data<<els_dmi_data->Obstacle_Total_Num;
+
+    currentpsr->setSpeed(els_dmi_data->Current_PSR_Speed);
+    nextpsr->setSpeed(els_dmi_data->Next_Restrictive_PSR_Speed);
+    if(els_dmi_data->Warning_PSR_Overspeed==2)
+    {
+        needcurpsrflash=true;
     }
     else
     {
-//        lblELSDMSStatus->setPixmap(resPath+"Communication_good.png");
-        //         qDebug()<<"good"<<els_dmi_data->Communication_ELS_DMS_Status<<els_dmi_data->Radio_Coverage_ELS_DMS<<els_dmi_data->Radio_Status;
+        needcurpsrflash=false;
+    }
+    if(els_dmi_data->Warning_PSR_Slowdown_Overspeed==3)
+    {
+        neednextpsrflash=true;
+    }
+    else
+    {
+        neednextpsrflash=false;
     }
 
-    if(isdialcommstatuspop)
+    if(els_dmi_data->Distance_To_Next_Restrictive_PSR>0)
     {
-        dialcommstatus->setPicCommDMSELS(els_dmi_data->Communication_ELS_DMS_Status);
-        dialcommstatus->setPicRadioDMSELS(els_dmi_data->Radio_Status);
-        dialcommstatus->setPicRadioCoverDMSELS(els_dmi_data->Radio_Coverage_ELS_DMS);
+        nextpsr->setVisible(true);
+        lblNextPsrDis->setVisible(true);
+        lblNextPsrName->setVisible(true);
+        lblNextPsrDis->setText(QString::number(els_dmi_data->Distance_To_Next_Restrictive_PSR)+tr("m"));
     }
+    else
+    {
+        lblNextPsrName->setVisible(false);
+        nextpsr->setVisible(false);
+        lblNextPsrDis->setVisible(false);
+    }
+
+
+    if(els_dmi_data->Warning_Signal_Infringement==2)
+    {
+        needinfri=true;
+    }
+    else
+    {
+        needinfri=false;
+
+        if(els_dmi_data->Distance_To_Signal>0)
+        {
+            lblSigDis->setVisible(true);
+            lblSig->setVisible(true);
+            lblSigDis->setText(QString::number(els_dmi_data->Distance_To_Signal)+tr("m"));
+            switch(els_dmi_data->Signal_Status)
+            {
+            case 0:
+            case 1:
+                lblSig->setPixmap(resPath+"Signal_Restr.png");
+                break;
+            case 2:
+                lblSig->setPixmap(resPath+"Signal_Left.png");
+                break;
+            case 3:
+                lblSig->setPixmap(resPath+"Signal_Right.png");
+                break;
+            case 4:
+                lblSig->setPixmap(resPath+"Signal_Straight.png");
+                break;
+            default:
+                lblSig->setPixmap(resPath+"Signal_Restr.png");
+                break;
+            }
+        }
+        else
+        {
+            lblSigDis->setVisible(false);
+            lblSig->setVisible(false);
+        }
+    }
+
+
+    if(els_dmi_data->Distance_To_End_Selection_Area>0)
+    {
+        lblRR->setVisible(true);
+        lblRRDis->setVisible(true);
+        lblRRDis->setText(QString::number(els_dmi_data->Distance_To_End_Selection_Area)+tr("m"));
+        lblRR->setPixmap(resPath+"RR_Status.png");
+
+    }
+    else
+    {
+        lblRR->setVisible(false);
+        lblRRDis->setVisible(false);
+    }
+
+    switch(els_dmi_data->BCM_Status)
+    {
+    case 0:
+        lblBCM->setPixmap(resPath+"BCM_Status0.png");
+        break;
+    case 1:
+        lblBCM->setPixmap(resPath+"BCM_Status1.png");
+        break;
+    case 2:
+        lblBCM->setPixmap(resPath+"BCM_Status2.png");
+        break;
+    default:
+        lblBCM->setPixmap(resPath+"BCM_Unknown.png");
+        break;
+
+    }
+    switch(els_dmi_data->Radar_Status)
+    {
+    case 0:
+        lblRadar->setPixmap(resPath+"Radar_Status0.png");
+        break;
+    case 1:
+        lblRadar->setPixmap(resPath+"Radar_Status1.png");
+        break;
+    case 2:
+        lblRadar->setPixmap(resPath+"Radar_Status2.png");
+        break;
+    default:
+        lblRadar->setPixmap(resPath+"Radar_Status0.png");
+        break;
+
+    }
+    switch(els_dmi_data->GPS_Status)
+    {
+    case 0:
+        lblGPS->setPixmap(resPath+"GPS_Status0.png");
+        break;
+    case 1:
+        lblGPS->setPixmap(resPath+"GPS_Status1.png");
+        break;
+    case 2:
+        lblGPS->setPixmap(resPath+"GPS_Status2.png");
+        break;
+    default:
+        lblGPS->setPixmap(resPath+"GPS_Status0.png");
+        break;
+
+    }
+#endif
+
     switch(els_dmi_data->Running_Type)
     {
 
@@ -2158,27 +2429,27 @@ void Casco_DMI::refreshMission()
         break;
     }
 
-//    switch(els_dmi_data->ELS_RR_CP_Shutdown)
-//    {
-//    case 0:
-//        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
-//        break;
-//    case 1:
-//        lblShutdownStatus->setMovie(movieshutdown);
-//        movieshutdown->start();
-//        break;
-//    case 2:
-//        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown2.png");
-//        break;
-//    default:
-//        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
-//        QString content=QString("recv ELS_RR_CP_Shutdown error value ")+QString::number(els_dmi_data->ELS_RR_CP_Shutdown);
-//        if(! log->writeLog(content))
-//        {
-//            popFaultBox("fail to write log, now exit");
-//        }
-//        break;
-//    }
+    //    switch(els_dmi_data->ELS_RR_CP_Shutdown)
+    //    {
+    //    case 0:
+    //        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
+    //        break;
+    //    case 1:
+    //        lblShutdownStatus->setMovie(movieshutdown);
+    //        movieshutdown->start();
+    //        break;
+    //    case 2:
+    //        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown2.png");
+    //        break;
+    //    default:
+    //        lblShutdownStatus->setPixmap(resPath+"ELS_RR_CP_Shutdown0.png");
+    //        QString content=QString("recv ELS_RR_CP_Shutdown error value ")+QString::number(els_dmi_data->ELS_RR_CP_Shutdown);
+    //        if(! log->writeLog(content))
+    //        {
+    //            popFaultBox("fail to write log, now exit");
+    //        }
+    //        break;
+    //    }
 
     switch(els_dmi_data->Emergency_Braking_Applied)
     {
@@ -2330,30 +2601,30 @@ void Casco_DMI::refreshRRCP()
         lblBarName->setPalette(tmp);
 
     }
-//    else if(els_dmi_data->CP_Area_Status==1)   //if previous statement is true, this statement will not be judged
-//    {
-//        quint8 cptotal=els_dmi_data->CP_Length_Preselection_Area;
-//        qint16 cpremain=els_dmi_data->CP_Distance_To_End_Preselection_Area;
-//        RRCPbar->setMaximum(cptotal);
-//        if(cpremain!=-1)
-//        {
-//            if(cpremain<cptotal)
-//            {
-//                RRCPbar->setValue(cpremain);
-//            }
-//            else
-//            {
-//                RRCPbar->setValue(cptotal);
-//            }
-//        }
-//        else
-//        {
-//            RRCPbar->setValue(cptotal);//recv -1, indicates that not in cp zone.
-//        }
-//        lblBarTotalValue->setText(QString::number(cptotal));
-//        lblBarRemainValue->setText(QString::number(cpremain));
-//        lblBarName->setText("路口区域");
-//    }
+    //    else if(els_dmi_data->CP_Area_Status==1)   //if previous statement is true, this statement will not be judged
+    //    {
+    //        quint8 cptotal=els_dmi_data->CP_Length_Preselection_Area;
+    //        qint16 cpremain=els_dmi_data->CP_Distance_To_End_Preselection_Area;
+    //        RRCPbar->setMaximum(cptotal);
+    //        if(cpremain!=-1)
+    //        {
+    //            if(cpremain<cptotal)
+    //            {
+    //                RRCPbar->setValue(cpremain);
+    //            }
+    //            else
+    //            {
+    //                RRCPbar->setValue(cptotal);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            RRCPbar->setValue(cptotal);//recv -1, indicates that not in cp zone.
+    //        }
+    //        lblBarTotalValue->setText(QString::number(cptotal));
+    //        lblBarRemainValue->setText(QString::number(cpremain));
+    //        lblBarName->setText("路口区域");
+    //    }
     else
     {
         //无操作
@@ -2449,26 +2720,26 @@ void Casco_DMI::refreshRRCP()
 
     }
 
-//    switch(els_dmi_data->Route_Request_Area_Status)
-//    {
+    //    switch(els_dmi_data->Route_Request_Area_Status)
+    //    {
 
-//    case 0:
-//        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
-//        break;
-//    case 1:
-//        frameRR->setPalette(QPalette(QPalette::Window,Qt::yellow));
-//        break;
-//    case 2:
-//        frameRR->setPalette(QPalette(QPalette::Window,Qt::green));
-//    default:
-//        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
-//        QString content=QString("recv Route_Request_Area_Status error value ")+QString::number(els_dmi_data->Route_Request_Area_Status);
-//        if(!log->writeLog(content))
-//        {
-//            popFaultBox("fail to write log, now exit");
-//        }
-//        break;
-//    }
+    //    case 0:
+    //        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
+    //        break;
+    //    case 1:
+    //        frameRR->setPalette(QPalette(QPalette::Window,Qt::yellow));
+    //        break;
+    //    case 2:
+    //        frameRR->setPalette(QPalette(QPalette::Window,Qt::green));
+    //    default:
+    //        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
+    //        QString content=QString("recv Route_Request_Area_Status error value ")+QString::number(els_dmi_data->Route_Request_Area_Status);
+    //        if(!log->writeLog(content))
+    //        {
+    //            popFaultBox("fail to write log, now exit");
+    //        }
+    //        break;
+    //    }
 }
 
 void Casco_DMI::refreshOperation()
@@ -2687,7 +2958,7 @@ void Casco_DMI::refreshGeoEvents()
 
         }
 
-//        mygeoevents->setvalue(t,eventidarray,outputarray,beginarray,endarray);
+        //        mygeoevents->setvalue(t,eventidarray,outputarray,beginarray,endarray);
 
         //        qDebug()<<"content";
         //        qDebug()<<dms_dmi_data->Signal_ID<<dms_dmi_data->RTU_Type
@@ -2719,12 +2990,12 @@ void Casco_DMI::refreshTLE()
     {
         if(dms_dmi_data->Signal_ID==0)
         {
-//            widDMS->setHidden(true);
+            //            widDMS->setHidden(true);
             return;
         }
         else
         {
-//            widDMS->setHidden(false);
+            //            widDMS->setHidden(false);
         }
 
         switch(dms_dmi_data->RTU_ID)

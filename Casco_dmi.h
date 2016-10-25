@@ -62,6 +62,10 @@
 #include "DMISMS.h"
 #include "Dialogwarningbox.h"
 
+#ifdef Baseline_2_0
+#include "Limitspeed.h"
+#endif
+
 #include "TLEevents.h"
 #include "../DMIDataStruct/dms_dmi_protocol.h"
 
@@ -210,8 +214,11 @@ private:
     *lblNameServiceMode,*lblServiceMode;
     QWidget* widDashboard;
     //mission area
-    QLabel *lblObsStatus,*lblELSDMSStatus,*lblLocStatus,*lblPassengerType,*lblRunningType,*lblSystemOK,
-    *lblShutdownStatus,*lblActiveEnd,*lblEb,*lblSb,*lblTurnback,*lblSkip,*lblHold;
+    QLabel *lblObsStatus,*lblELSDMSStatus,*lblWifi,
+    *lblBCM,*lblRadar,*lblGPS,*lblLocStatus,*lblPassengerType,*lblRunningType,*lblSystemOK,
+    *lblShutdownStatus,*lblActiveEnd,*lblEb,*lblSb,*lblTurnback,*lblSkip,*lblHold,
+    *lblRR,*lblRRDis,*lblSig,*lblSigDis,*lblNextPsrDis,*lblNextPsrName;
+
 
 
     //RRCP area
@@ -228,9 +235,17 @@ private:
     *lblCurStaId,*lblDepTime,*btnMute,    *lblNameCurSta,*lblNameDepTime;
     QSlider *btnSlider;
     //tab geo
-    QWidget *widGeo,*widTLE,*widDMS;
+    QWidget *widGeo,*widTLE,*widDMS,*widcurrentpsr,*widnextpsr;
     MyGeoEvents* mygeoevents;
     TLEEvents* mytleevents;
+
+#ifdef Baseline_2_0
+    LimitSpeed* currentpsr;
+    LimitSpeed* nextpsr;
+    bool  needinfri,isinfri,
+    needcurpsrflash,iscurpsrflash,
+    neednextpsrflash,isnextpsrflash;
+#endif
     //tab maintence
     //    QTableWidget* tblwidgetMaintance;
     QTextEdit* listAlarm;
@@ -309,6 +324,7 @@ private:
     bool needspeedflash,needatpwarning,
     needleftflash,needstraflash,needrightflash,
     isatpwarningflash,isspeedflash,isleftflash,isrightflash,isstraflash;
+
 
 
     bool isLogin,isDiscon,time_checked;
