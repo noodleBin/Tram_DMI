@@ -16,6 +16,7 @@ TARGET = Casco_Tram_DMI
 TEMPLATE = app
 
 
+
 SOURCES += main.cpp\
     ../DMIDataStruct/els_dmi_protocol.cpp \
     DialogSmstodriver.cpp \

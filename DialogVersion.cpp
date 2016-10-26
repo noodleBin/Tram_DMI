@@ -8,7 +8,7 @@
 #include "ui_DialogVersion.h"
 #include <QDebug>
 
-DialogVersion::DialogVersion(QMediaPlayer *player, QWidget *parent) :
+DialogVersion::DialogVersion(QMediaPlayer *player,QString version, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogVersion)
 {
@@ -34,7 +34,7 @@ DialogVersion::DialogVersion(QMediaPlayer *player, QWidget *parent) :
 
     this->setWindowFlags(Qt::FramelessWindowHint|Qt::CoverWindow);
 
-
+    ui->lbl_date->setText(version);
 
     connect(ui->volumeslider,SIGNAL(sliderMoved(int)),this,SLOT(on_volumeslider_sliderMoved(int)));
 

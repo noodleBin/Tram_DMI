@@ -86,7 +86,7 @@ QSize TLEEvents::sizeHint() const
     }
     else if(m_size==3)
     {
-        return QSize(400,400);
+        return QSize(500,500);
     }
     return QSize(100,100);
 }

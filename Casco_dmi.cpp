@@ -22,6 +22,8 @@ Casco_DMI::Casco_DMI()
 
 
 
+    buildtime=__TIME__;
+    builddate=__DATE__;
 
     translateAll();
     initSocket();
@@ -424,7 +426,7 @@ void Casco_DMI::initialControl()
 
 void Casco_DMI::initDialog()
 {
-    dialversion = new DialogVersion(player,wid);
+    dialversion = new DialogVersion(player,builddate+" "+buildtime, wid);
     dialversion->setGeometry(xpos+(wid->width()-dialversion->width())/2,
                              ypos+(wid->height()-dialversion->height())/2
                              ,dialversion->width(),dialversion->height());
@@ -3552,60 +3554,6 @@ int Casco_DMI::initNet(QString path)
     return 1;
 }
 
-int Casco_DMI::initSignal(QString path, quint8 type)
-{
-    QFile* localFile = new QFile();
-    QDomDocument* dom=new QDomDocument();
-    QDomNode node;
-    QDomNodeList itemlist;
-    QString strfilename= path;
-    if(!OpenAndSetFile(strfilename,localFile,dom))
-        return 0;
-    node=dom->elementsByTagName("Signal_Info").at(0);
-    itemlist= node.childNodes();
-
-    switch(type)
-    {
-    case 1:
-        for(int i=0;i<itemlist.count();i++)
-        {
-            DMS_Signal_Info value;
-
-            QDomElement elenet=itemlist.at(i).toElement();
-            value.signalid =elenet.attribute("Id").toInt();
-            value.type=elenet.attribute("Type").toInt();
-            value.scene=elenet.attribute("Scene").toInt();
-            value.location=elenet.attribute("Location").toInt();
-            value.restricid=elenet.attribute("RestricId").toInt();
-            value.restricloc=elenet.attribute("RestricLocation").toInt();
-
-            map_CBI_Signal->insert(value.signalid,value);
-        }
-        break;
-    case 2:
-        for(int i=0;i<itemlist.count();i++)
-        {
-            DMS_Signal_Info value;
-
-            QDomElement elenet=itemlist.at(i).toElement();
-            value.signalid =elenet.attribute("Id").toInt();
-            value.type=elenet.attribute("Type").toInt();
-            value.scene=elenet.attribute("Scene").toInt();
-            value.location=elenet.attribute("Location").toInt();
-
-            map_OLC_Signal->insert(value.signalid,value);
-        }
-        break;
-    }
-
-
-
-
-    localFile->close();
-    delete localFile;  //清理资源，避免内存泄露
-    delete dom;
-    return 1;
-}
 
 int Casco_DMI::initCBIBitmap(QString path)
 {
@@ -3768,6 +3716,37 @@ int Casco_DMI::initAlarm(QString path)
         return 0;
 
     node=dom->elementsByTagName("Alarm_Info").at(0);//唯一的一条station_info记录
+    itemlist= node.childNodes();
+    for(int i=0;i<itemlist.size();i++)
+    {
+        QDomElement e=itemlist.at(i).toElement();
+        Alarm_Record value;
+        value.couldplay=true;
+        value.id=e.attribute("ID").toUInt();
+        value.current_playtick= value.playtick=e.attribute("PlayTick").toUInt();
+        value.priority=e.attribute("Priority").toUInt();
+        value.str=e.attribute("PlayText");
+        m_Alarm_Record_map->insert(value.id,value);
+    }
+
+
+    localFile->close();
+    delete localFile;  //清理资源，避免内存泄露
+    delete dom;
+    return 1;
+}
+
+int Casco_DMI::initSignal(QString path)
+{
+    QFile* localFile = new QFile();
+    QDomDocument* dom=new QDomDocument();
+    QDomNode node;
+    QDomNodeList itemlist;
+    QString strfilename = path;
+    if(!OpenAndSetFile(strfilename,localFile,dom))
+        return 0;
+
+    node=dom->elementsByTagName("Signal_Info").at(0);//唯一的一条station_info记录
     itemlist= node.childNodes();
     for(int i=0;i<itemlist.size();i++)
     {

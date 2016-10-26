@@ -121,7 +121,7 @@ private :
     int initSchedule(QMap<int,QString> *map,QString);
     int initDriverPassword(QString);
     int initNet(QString);
-    int initSignal(QString path,quint8 type);
+    int initSignal(QString path);
     int initFault(QString);
 
     int initScreenmode(QString);
@@ -199,6 +199,8 @@ private:
     quint32 timediff;
     quint32 currentSecondsFromELS ;//recv ELS Time
 
+    QString buildtime;
+    QString builddate;
 
     QString warning_msg;
     quint8 warning_index;

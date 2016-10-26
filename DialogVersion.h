@@ -20,7 +20,7 @@ class DialogVersion : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogVersion(QMediaPlayer* player,QWidget *parent = 0);
+    explicit DialogVersion(QMediaPlayer* player, QString version, QWidget *parent = 0);
     void  setValue(QString appversion,QString dataversion);
     ~DialogVersion();
 
