@@ -10,8 +10,9 @@ class TLEEvents : public QWidget
     Q_OBJECT
 public:
     explicit TLEEvents(quint8 size, QWidget *parent = 0);
+    ~TLEEvents();
 
-    void setvalue(quint8 background, quint8 type, quint8 position, quint8 orisignalstatus, quint8 restricpos, quint8 restricstatus);
+    void setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos, quint8 *p_statuspos, quint8 *p_rotationpos, quint8 count);
 
 
 protected:
@@ -20,32 +21,43 @@ protected:
 
 
 private:
+    quint8 image,signals_count;
+    quint16 *xpos,*ypos;
+    quint8 m_size,*status,*rotation;
 
-    quint8 m_background;
-    quint8 m_type;
-    quint8 m_position;
-    quint8 m_orivalue;
+         qint16 arrow_x,arrow_y;
 
-    quint8 m_restricpos;
-    quint8 m_restricvalue;
+    //    quint8 m_background;
+    //    quint8 m_type;
+    //    quint8 m_position;
+    //    quint8 m_orivalue;
 
-    quint8 m_size;
+    //    quint8 m_restricpos;
+    //    quint8 m_restricvalue;
 
-    MySignal *ms,*ms2,*ms3;
+    //
+
+    //    MySignal *ms,*ms2,*ms3;
 
 
-    void   drawEvent1(QPainter* painter);
-    void   drawEvent2(QPainter* painter);
-    void   drawEvent3(QPainter* painter);
-    void   drawEvent4(QPainter* painter);
-    void   drawEvent5(QPainter* painter);
-    void   drawEvent6(QPainter* painter);
+    //    void   drawEvent1(QPainter* painter);
+    //    void   drawEvent2(QPainter* painter);
+    //    void   drawEvent3(QPainter* painter);
+    //    void   drawEvent4(QPainter* painter);
+    //    void   drawEvent5(QPainter* painter);
+    //    void   drawEvent6(QPainter* painter);
 
-    void  drawSignal(QPainter *painter, quint8 type, quint8 pos, quint8 value, MySignal *ms);
+    //    void  drawSignal(QPainter *painter, quint8 type, quint8 pos, quint8 value, MySignal *ms);
 
-    void drawCar(QPainter *painter, QRect r);
-    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QColor &color);
-    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QPoint &p3, QColor &color);
+    //    void drawCar(QPainter *painter, QRect r);
+    //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QColor &color);
+    //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QPoint &p3, QColor &color);
+
+    void drawImage(QPainter* );
+    void drawSignals(QPainter* );
+    void drawOneSignal(QPainter*, quint16,
+                       quint16,
+                       quint8, quint8);
 };
 
 

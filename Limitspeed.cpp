@@ -2,7 +2,7 @@
 
 LimitSpeed::LimitSpeed(QWidget *parent) : QWidget(parent)
 {
-    m_speed=10;
+    m_speed=0;
 
     this->show();
 }

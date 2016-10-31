@@ -107,6 +107,17 @@ private :
         bool couldplay;
     };
 
+    struct Signal_Info{
+        quint8 id;
+        quint8 image;
+        quint8 x;
+        quint8 y;
+        quint8 bit;
+        quint8 rotation;
+        quint8 restricSignalCount;
+        Signal_Info* restricSignals;
+    };
+
     QMediaPlayer *player;
     void initMainWindow(QString type);
     void initialControl();
@@ -122,6 +133,7 @@ private :
     int initDriverPassword(QString);
     int initNet(QString);
     int initSignal(QString path);
+    void setSignalInfo(QDomElement e, Signal_Info *value);
     int initFault(QString);
 
     int initScreenmode(QString);
@@ -135,11 +147,12 @@ private :
     void setRecvDataFromSocket(QByteArray& bytes);//因为消息是变长的，因此无法用指针强转
     void setRecvDMSDataFromSocket(QByteArray &bytes);
     void refreshUI();
-
+    void refreshRadarPic();
     void refreshAlarmQue(quint8 index,QString filter);
     void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1);
     void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1, QString alarm_arg1);
     void refreshAlarmText(quint8 index, QString filter, QString );
+    void refreshSMSText(quint8 index, QString filter);
     void refreshAlarmMap();
     void putAlarmInQue(Alarm_Record info);
     void getAlarmOutQue();
@@ -234,7 +247,7 @@ private:
 
     //tab mission
     QLabel *lblNamesch,*lblNamedes,*lblSchId,*lblDesId,*lblDownstreamDis,*lblDownstreamTime,*lblUpstreamDis,*lblUpstreamTime,
-    *lblCurStaId,*lblDepTime,*btnMute,    *lblNameCurSta,*lblNameDepTime;
+    *lblCurStaId,*lblDepTime,*btnMute,   *lblNameCurSta,*lblNameDepTime;
     QSlider *btnSlider;
     //tab geo
     QWidget *widGeo,*widTLE,*widDMS,*widcurrentpsr,*widnextpsr;
@@ -244,9 +257,10 @@ private:
 #ifdef Baseline_2_0
     LimitSpeed* currentpsr;
     LimitSpeed* nextpsr;
-    bool  needinfri,isinfri,
+    bool  needinfri,isinfri,mute_radar,
     needcurpsrflash,iscurpsrflash,
     neednextpsrflash,isnextpsrflash;
+    QLabel *btnRadarSetting ;
 #endif
     //tab maintence
     //    QTableWidget* tblwidgetMaintance;
@@ -288,6 +302,8 @@ private:
     QString m_appversion;
     QString m_dataversion;
     quint8 m_smsdisplaycount;
+    quint8 m_globalsmsdisplaycount;
+    quint16 listsms_height;
     QString m_lastsms;
     quint64 m_promotesizeMB;
     quint64 m_clearsizeMB;
@@ -296,6 +312,7 @@ private:
     quint8 m_checktime;
 
     QMap<quint8,Alarm_Record>* m_Alarm_Record_map;
+    QMap<quint8,Signal_Info>* m_Signal_map;
 
 
     quint8 displayno; //4种显示界面,1代表默认界面
@@ -320,6 +337,8 @@ private:
     Alarm_Record m_current_alarm;
     char* m_alarm_filename;
     QQueue<QString> * list_sms;
+    QQueue<QString> * list_sms_display;
+    QQueue<QString> * list_alarm_display;
     QQueue<QString> * list_alarm;
 
     int   timerflash;
