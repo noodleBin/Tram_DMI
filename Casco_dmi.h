@@ -166,10 +166,10 @@ private :
     void refreshMute();
     void checkTimeWithELS(quint64 time);
 
-    void setScheduleId(qint8 scheduleid);
-    void setServiceId(qint8 serviceid);
-    void setTripId(qint8 tripid);
-
+    void setScheduleId(qint16 scheduleid);
+    void setServiceId(qint16 serviceid);
+    void setTripId(qint16 tripid);
+    void processScheduleServiceTripID();
 
 
 signals:
@@ -216,7 +216,8 @@ private:
 
     //RRCP area
     QProgressBar *RRCPbar;
-    QLabel *lblBarName,*lblBarTotalValue,*lblBarRemainValue;
+    QLabel *lblBarName,*lblBarTotalValue,*lblBarRemainValue,*lblCPTotal,
+    *lblCPUnit,*lblCPRemain,*lblCPRemainunit;
 
     //Operate area
     QLabel *btnleft,*btnstra,*btnright,*btncp,*btninput;

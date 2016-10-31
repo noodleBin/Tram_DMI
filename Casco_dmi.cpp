@@ -75,7 +75,7 @@ void Casco_DMI::initMainWindow(QString type)
 
     if(type=="UI")
     {
-        //                screenmode=3;
+        //        screenmode=3;
         switch (screenmode)
         {
         case 1:
@@ -212,11 +212,11 @@ void Casco_DMI::initialNormalControl()
     }
 
 
-    wid->findChild<QLabel*>("lbl_CPArea")->setText(tr("cparea"));
-    wid->findChild<QLabel*>("lbl_CPTotal")->setText(tr("cptotal"));
-    wid->findChild<QLabel*>("lbl_CPUnit")->setText(tr("meter"));
-    wid->findChild<QLabel*>("lbl_CPRemain")->setText(tr("cpremain"));
-    wid->findChild<QLabel*>("lbl_CPRemainUnit")->setText(tr("meter"));
+    //    wid->findChild<QLabel*>("lbl_CPArea")->setText(tr("cparea"));
+    //    wid->findChild<QLabel*>("lbl_CPTotal")->setText(tr("cptotal"));
+    //    wid->findChild<QLabel*>("lbl_CPUnit")->setText(tr("meter"));
+    //    wid->findChild<QLabel*>("lbl_CPRemain")->setText(tr("cpremain"));
+    //    wid->findChild<QLabel*>("lbl_CPRemainUnit")->setText(tr("meter"));
 
     //Tab mission
     //    if(screenmode==3)
@@ -263,9 +263,9 @@ void Casco_DMI::initialControl()
     lblNextstaId2 =wid->findChild<QLabel*>("lbl_nextstaid_2");
     lblNextstaId2->setText(tr("unknown"));
     lblArrTime=wid->findChild<QLabel*>("lbl_arrtime");
-    lblArrTime->setText(QTime::currentTime().toString("hh:mm:ss"));
+    lblArrTime->setText(QTime::currentTime().toString("HH:mm:ss"));
     lblArrTime2=wid->findChild<QLabel*>("lbl_arrtime_2");
-    lblArrTime2->setText(QTime::currentTime().toString("hh:mm:ss"));
+    lblArrTime2->setText(QTime::currentTime().toString("HH:mm:ss"));
     lblNameDelay=wid->findChild<QLabel*>("lbl_namedelay");
     //    lblDelayunit= wid->findChild<QLabel*>("lbl_delayunit");
     lblDelay=wid->findChild<QLabel*>("lbl_delay");
@@ -275,7 +275,7 @@ void Casco_DMI::initialControl()
     lblDateTime=wid->findChild<QLabel*>("lbl_date");
 
     QString format = "yyyy"+tr("年")+"MM"+tr("月")+"dd"+tr("日")+"\n"
-            +"hh:mm:ss";
+            +"HH:mm:ss";
 
     lblDateTime->setText((QDateTime::currentDateTime().toString(format)));
 
@@ -338,6 +338,10 @@ void Casco_DMI::initialControl()
     lblBarTotalValue   =wid->findChild<QLabel*>("lbl_RRCPTotalValue");
     lblBarRemainValue=wid->findChild<QLabel*>("lbl_RRCPRemainValue");
 
+    lblCPTotal=wid->findChild<QLabel*>("lbl_CPTotal");
+    lblCPUnit= wid->findChild<QLabel*>("lbl_CPUnit");
+    lblCPRemain= wid->findChild<QLabel*>("lbl_CPRemain");
+    lblCPRemainunit= wid->findChild<QLabel*>("lbl_CPRemainUnit");
 
     //Operate area
     btnleft=wid->findChild<QLabel*>("btn_left");
@@ -699,8 +703,9 @@ quint64 Casco_DMI::timeConvertDisplay(quint64 ntptime)
     time_t utctimefrom1970_1_1;
     if(utctimefrom2000_1_1==0) //如果为0，返回当前时间
     {
-        alarmPromte("[车载] ntp时间错误");
-        time(&utctimefrom1970_1_1);
+        //        alarmPromte("[车载] ntp时间错误");
+        //        time(&utctimefrom1970_1_1);
+        return 0;
         //        tmpdatetime.setTime_t(tmptime);
     }
     else
@@ -710,6 +715,53 @@ quint64 Casco_DMI::timeConvertDisplay(quint64 ntptime)
     }
 
     return utctimefrom1970_1_1;
+}
+void Casco_DMI::   processScheduleServiceTripID()
+{
+    quint8 tsche=els_dmi_data->Number_of_Schedule;
+    quint8 tservice=els_dmi_data->Number_of_Service;
+    quint8 ttrip=els_dmi_data->Number_of_Trip;
+
+    if(tsche<=20)
+    {
+        //normal;
+    }
+    else
+    {
+        tsche=20; //only demostrate 5 items;
+        warning_msg="[ELS] recv Number_of_schedule error";
+        alarmPromte(warning_msg);
+    }
+
+
+    quint16* scheid=new quint16[tsche];
+
+    for(int i=0;i<tsche;i++)
+    {
+        scheid[i]=els_dmi_data->Id_of_schedules[i];
+
+    }
+    quint16* serviceid=new quint16[tservice];
+
+    for(int i=0;i<tservice;i++)
+    {
+        serviceid[i]=els_dmi_data->Id_of_services[i];
+
+    }
+    quint16* tripid=new quint16[ttrip];
+
+    for(int i=0;i<ttrip;i++)
+    {
+        tripid[i]=els_dmi_data->Id_of_Trips[i];
+
+    }
+
+    dialschedule->setvalue(tsche,scheid,
+                           tservice,serviceid,
+                           ttrip,tripid);
+    delete[] scheid;
+    delete[] serviceid;
+    delete[] tripid;
 }
 
 bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
@@ -1032,56 +1084,9 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                     return true;
                 }
                 operateType="modify ScheduleID";
-                quint8 tsche=els_dmi_data->Number_of_Schedule;
-                quint8 tservice=els_dmi_data->Number_of_Service;
-                quint8 ttrip=els_dmi_data->Number_of_Trip;
+                processScheduleServiceTripID();
 
-                if(tsche<=20)
-                {
-                    //normal;
-                }
-                else
-                {
-                    tsche=20; //only demostrate 5 items;
-                    warning_msg="[ELS] recv Number_of_schedule error";
-                    alarmPromte(warning_msg);
-                }
 
-                //                if (tsche>0)
-                //                {
-                quint16* scheid=new quint16[tsche];
-
-                for(int i=0;i<tsche;i++)
-                {
-                    scheid[i]=els_dmi_data->Id_of_schedules[i];
-
-                }
-                quint16* serviceid=new quint16[tservice];
-
-                for(int i=0;i<tservice;i++)
-                {
-                    serviceid[i]=els_dmi_data->Id_of_services[i];
-
-                }
-                quint16* tripid=new quint16[ttrip];
-
-                for(int i=0;i<ttrip;i++)
-                {
-                    tripid[i]=els_dmi_data->Id_of_Trips[i];
-
-                }
-
-                dialschedule->setvalue(tsche,scheid,
-                                       tservice,serviceid,
-                                       ttrip,tripid);
-                delete[] scheid;
-                delete[] serviceid;
-                delete[] tripid;
-                //                }
-                //                else
-                //                 dialschedule->setvalue(0,NULL);   //需要清除界面
-
-                //        dialschedule->move(xpos,ypos);
                 dialschedule->exec();
 
             }
@@ -1150,7 +1155,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Left";
-//                dmi_els_data->RR_Left_Button=1;
+                //                dmi_els_data->RR_Left_Button=1;
 
             }
             else
@@ -1172,7 +1177,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Straight";
-//                dmi_els_data->RR_Straight_Button=1;
+                //                dmi_els_data->RR_Straight_Button=1;
             }
             else
             {
@@ -1193,7 +1198,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Right";
-//                dmi_els_data->RR_Right_Button=1;
+                //                dmi_els_data->RR_Right_Button=1;
             }
             else
             {
@@ -1723,9 +1728,20 @@ void Casco_DMI::refreshTop()
     }
 
     QDateTime tmpnextarrtime;
-    tmpnextarrtime.setTime_t(timeConvertDisplay(els_dmi_data->Next_SSA_Arrival_Time));
-    lblArrTime->setText(tmpnextarrtime.toString("hh:mm:ss"));
-    lblArrTime2->setText(tmpnextarrtime.toString("hh:mm:ss"));
+    quint64 tmpnxt=timeConvertDisplay(els_dmi_data->Next_SSA_Arrival_Time);
+    if(tmpnxt!=0)
+    {
+        tmpnextarrtime.setTime_t(tmpnxt);
+        lblArrTime->setText(tmpnextarrtime.toString("HH:mm:ss"));
+        lblArrTime2->setText(tmpnextarrtime.toString("HH:mm:ss"));
+    }
+    else
+    {
+        lblArrTime->setText("--:--:--");
+        lblArrTime2->setText("--:--:--");
+    }
+
+
     qint16 temp=els_dmi_data->Advance_Delay_Time;
     QPalette tmp;
     if(temp<0)
@@ -1756,8 +1772,10 @@ void Casco_DMI::refreshTop()
     if(!time_checked)
     {
         time_checked=true;
+
         quint64 utctime = timeConvertDisplay(els_dmi_data->Current_Time);
-        checkTimeWithELS(utctime);
+        if(utctime!=0)
+            checkTimeWithELS(utctime);
     }
 
 
@@ -2306,84 +2324,100 @@ void Casco_DMI::refreshMission()
 void Casco_DMI::refreshRRCP()
 {
     //RR&CP
-    if(els_dmi_data->Route_Request_Area_Status==1)
+    if(els_dmi_data->Distance_To_End_Selection_Area!=-1)
     {
+        lblBarTotalValue->setVisible(true);
+        lblBarRemainValue->setVisible(true);
+        lblBarName->setVisible(true);
+        RRCPbar->setVisible(true);
+        lblCPTotal->setVisible(true);
+        lblCPUnit->setVisible(true);
+        lblCPRemain->setVisible(true);
+        lblCPRemainunit->setVisible(true);
+
         quint8 RRtotal=els_dmi_data->Selection_Area_Length;
         qint16 RRremain=els_dmi_data->Distance_To_End_Selection_Area;
         RRCPbar->setMaximum(RRtotal);
-        if(RRremain!=-1)
+        lblBarTotalValue->setText(QString::number(RRtotal));
+        if(RRremain<=RRtotal)
         {
-            if(RRremain<RRtotal)
-            {
-                RRCPbar->setValue(RRremain);
-            }
-            else
-            {
-                RRCPbar->setValue(RRtotal);
-            }
+            RRCPbar->setValue(RRremain);
+            lblBarRemainValue->setText(QString::number(RRremain));
         }
         else
         {
-            RRCPbar->setValue(RRtotal); //recv -1, indicates that not in rr zone.
+            RRCPbar->setValue(RRtotal);
+            lblBarRemainValue->setText(QString::number(RRtotal));
         }
-        lblBarTotalValue->setText(QString::number(RRtotal));
-        lblBarRemainValue->setText(QString::number(RRremain));
+
+
         lblBarName->setText("进路区域");
 
 
         QPalette tmp;
 
-        switch(els_dmi_data->Station_RR_Beacon_Link)
-        {
-        case 0:
-            tmp.setBrush(QPalette::Window,Qt::gray);
-            break;
-        case 1:
-            tmp.setBrush(QPalette::Window,Qt::red);
-            break;
-        case 2:
-            tmp.setBrush(QPalette::Window,Qt::green);
-            break;
-        default:
-            tmp.setBrush(QPalette::Window,Qt::gray);
-            QString content=QString("recv Station_RR_Beacon_Link error value ")+QString::number(els_dmi_data->Station_RR_Beacon_Link);
-            if(!log->writeLog(content))
-            {
-                popFaultBox("fail to write log, now exit");
-            }
-        }
+        //        switch(els_dmi_data->Station_RR_Beacon_Link)
+        //        {
+        //        case 0:
+        //            tmp.setBrush(QPalette::Window,Qt::gray);
+        //            break;
+        //        case 1:
+        //            tmp.setBrush(QPalette::Window,Qt::red);
+        //            break;
+        //        case 2:
+        //            tmp.setBrush(QPalette::Window,Qt::green);
+        //            break;
+        //        default:
+        //            tmp.setBrush(QPalette::Window,Qt::gray);
+        //            QString content=QString("recv Station_RR_Beacon_Link error value ")+QString::number(els_dmi_data->Station_RR_Beacon_Link);
+        //            if(!log->writeLog(content))
+        //            {
+        //                popFaultBox("fail to write log, now exit");
+        //            }
+        //        }
 
-        lblBarName->setPalette(tmp);
+        //        lblBarName->setPalette(tmp);
 
-    }
-    else if(els_dmi_data->CP_Area_Status==1)   //if previous statement is true, this statement will not be judged
-    {
-        quint8 cptotal=els_dmi_data->CP_Length_Preselection_Area;
-        qint16 cpremain=els_dmi_data->CP_Distance_To_End_Preselection_Area;
-        RRCPbar->setMaximum(cptotal);
-        if(cpremain!=-1)
-        {
-            if(cpremain<cptotal)
-            {
-                RRCPbar->setValue(cpremain);
-            }
-            else
-            {
-                RRCPbar->setValue(cptotal);
-            }
-        }
-        else
-        {
-            RRCPbar->setValue(cptotal);//recv -1, indicates that not in cp zone.
-        }
-        lblBarTotalValue->setText(QString::number(cptotal));
-        lblBarRemainValue->setText(QString::number(cpremain));
-        lblBarName->setText("路口区域");
     }
     else
     {
-        //无操作
+        lblBarTotalValue->setVisible(false);
+        lblBarRemainValue->setVisible(false);
+        lblBarName->setVisible(false);
+        RRCPbar->setVisible(false);
+        lblCPTotal->setVisible(false);
+        lblCPUnit->setVisible(false);
+        lblCPRemain->setVisible(false);
+        lblCPRemainunit->setVisible(false);
     }
+    //    else if(els_dmi_data->CP_Area_Status==1)   //if previous statement is true, this statement will not be judged
+    //    {
+    //        quint8 cptotal=els_dmi_data->CP_Length_Preselection_Area;
+    //        qint16 cpremain=els_dmi_data->CP_Distance_To_End_Preselection_Area;
+    //        RRCPbar->setMaximum(cptotal);
+    //        if(cpremain!=-1)
+    //        {
+    //            if(cpremain<cptotal)
+    //            {
+    //                RRCPbar->setValue(cpremain);
+    //            }
+    //            else
+    //            {
+    //                RRCPbar->setValue(cptotal);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            RRCPbar->setValue(cptotal);//recv -1, indicates that not in cp zone.
+    //        }
+    //        lblBarTotalValue->setText(QString::number(cptotal));
+    //        lblBarRemainValue->setText(QString::number(cpremain));
+    //        lblBarName->setText("路口区域");
+    //    }
+    //    else
+    //    {
+    //        //无操作
+    //    }
 
     //RR
     switch(els_dmi_data->Right_Route_Status)
@@ -2568,9 +2602,16 @@ void Casco_DMI::refreshTabMission()
     }
 
     QDateTime deptime;
-    deptime.setTime_t(timeConvertDisplay(els_dmi_data->Current_SSA_Depature_Time));
-    lblDepTime->setText(deptime.toString("hh:mm:ss"));
-
+    quint64 tmpdep=timeConvertDisplay(els_dmi_data->Current_SSA_Depature_Time);
+    if(tmpdep!=0)
+    {
+        deptime.setTime_t(tmpdep);
+        lblDepTime->setText(deptime.toString("HH:mm:ss"));
+    }
+    else
+    {
+        lblDepTime->setText("--:--:--");
+    }
     tmpvalue=els_dmi_data->Distance_To_Downstream_Train;
     if(tmpvalue<=60000&&tmpvalue>0)
     {
@@ -2681,7 +2722,7 @@ void Casco_DMI::refreshTabMission()
 
     //    QDateTime deptime;
     //    deptime.setTime_t(timeConvertDisplay(els_dmi_data->Current_SSA_Depature_Time));
-    //    lblDepTime->setText(deptime.toString("hh:mm:ss"));
+    //    lblDepTime->setText(deptime.toString("HH:mm:ss"));
 
 }
 
@@ -2846,12 +2887,17 @@ void Casco_DMI::refreshMaintence()
             //            tblwidgetMaintance->setItem(i,1, new QTableWidgetItem(value));
 
             QDateTime t;
-            t.setTime_t(timeConvertDisplay(els_dmi_data->Time_of_Appearance[t2-1-i]));
+            quint64 tmptime=timeConvertDisplay(els_dmi_data->Time_of_Appearance[t2-1-i]);
+            if(tmptime!=0)
+            {
+                t.setTime_t(tmptime);
 
-            //            tblwidgetMaintance->setItem(i,2, new QTableWidgetItem( t.toString("yyyy/MM/dd hh:mm:ss")));
-
-            warning_msg="[维护 ] "+t.toString("hh:mm:ss")+" 车载 "+value;
-
+                warning_msg="[维护 ] "+t.toString("HH:mm:ss")+" 车载 "+value;
+            }
+            else
+            {
+                warning_msg="[维护 ] --:--:-- 车载 "+value;
+            }
             alarmPromte(warning_msg);
         }
 
@@ -2998,21 +3044,25 @@ void Casco_DMI::checkTimeWithELS(quint64 time)
     }
 }
 
-void Casco_DMI::setScheduleId(qint8 scheduleid)
+void Casco_DMI::setScheduleId(qint16 scheduleid)
 {
     dmi_els_data->Schedule_Id=scheduleid;
     is_scheduleid_send=true;
+    processScheduleServiceTripID();
     //    qDebug()<<"set sch"<<dmi_els_data->Schedule_Id;
 }
 
-void Casco_DMI::setServiceId(qint8 serviceid)
+void Casco_DMI::setServiceId(qint16 serviceid)
 {
     dmi_els_data->Service_Id=serviceid;
+    //    qDebug()<<"main serv"<<dmi_els_data->Service_Id;
     is_serviceid_send=true;
+
+    processScheduleServiceTripID();
     //    qDebug()<<"set service"<<dmi_els_data->Service_Id;
 }
 
-void Casco_DMI::setTripId(qint8 tripid)
+void Casco_DMI::setTripId(qint16 tripid)
 {
     dmi_els_data->Trip_Id=tripid;
     is_tripid_send=true;

@@ -115,7 +115,7 @@ void DialogSchedule::on_btn_sch_clicked()
     qint8 schedule_index=ui->cmb_schedule->currentIndex();
     if(schedule_index==-1)
         return;
-    quint8 scheduleid;
+    quint16 scheduleid;
     if(m_map_sch->size()>0)
         scheduleid=m_map_sch->key(ui->cmb_schedule->currentText());
     else
@@ -151,6 +151,7 @@ void DialogSchedule::on_btn_service_clicked()
     if(service_index==-1)
         return;
 
+//    qDebug()<<"service"<<ui->cmb_service->currentText()<<ui->cmb_service->currentText().toUInt();
     emit sendServiceId(ui->cmb_service->currentText().toUInt());
 
     ui->cmb_service->setEnabled(false);
