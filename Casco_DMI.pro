@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     DMISignal.cpp \
     Casco_dmi.cpp \
     Dialogwarningbox.cpp \
-    Limitspeed.cpp
+    Limitspeed.cpp \
+    Dialogshutdown.cpp
 
 HEADERS  += \
     ../DMIDataStruct/els_dmi_protocol.h \
@@ -67,7 +68,8 @@ HEADERS  += \
     Casco_dmi.h \
     Dialogwarningbox.h \
     Public_Variable.h \
-    Limitspeed.h
+    Limitspeed.h \
+    Dialogshutdown.h
 
 LIBS += -L$$PWD/ -lmsc
 
@@ -82,7 +84,8 @@ FORMS    += \
     DialogTimeshift.ui \
     DialogTimeupdate.ui \
     DialogVersion.ui \
-    Dialogwarningbox.ui
+    Dialogwarningbox.ui \
+    Dialogshutdown.ui
 
 TRANSLATIONS+=  app_zh.ts
 

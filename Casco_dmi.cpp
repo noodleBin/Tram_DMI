@@ -349,6 +349,9 @@ void Casco_DMI::initialControl()
     lblRunningType=wid->findChild<QLabel*>("pic_runningtype");
     lblSystemOK=wid->findChild<QLabel*>("pic_pantostatus");
 
+#ifdef Baseline_2_0
+    lblSystemOK->installEventFilter(this);
+#endif
     //    lblShutdownStatus=wid->findChild<QLabel*>("pic_working");
     lblActiveEnd=wid->findChild<QLabel*>("pic_activeend");
     lblEb=wid->findChild<QLabel*>("pic_eb");
@@ -456,7 +459,11 @@ void Casco_DMI::initDialog()
                                 ypos+(wid->height()-dialtimeupdate->height())/2
                                 ,dialtimeupdate->width(),dialtimeupdate->height());
     dialobs = new DialogOBSStatus(wid);
-    dialobs->setGeometry(xpos,ypos+wid->height()/2,dialobs->width(),dialobs->height());
+    dialobs->setGeometry(xpos+wid->width()/2-100,ypos+10,dialobs->width(),dialobs->height());
+#ifdef Baseline_2_0
+    dialshutdown=new DialogShutdown(wid);
+    dialshutdown->setGeometry(xpos+520,ypos+550,dialshutdown->width(),dialshutdown->height());
+#endif
     dialcommstatus = new DialogCommstatus(wid);
     dialcommstatus->setGeometry(xpos,ypos+wid->height()/2,dialcommstatus->width(),dialcommstatus->height());
     dialdes = new DialogDestination(wid);
@@ -796,6 +803,15 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
         {
             mute_radar=!mute_radar;
             refreshRadarPic();
+            QString txt;
+            if(mute_radar)
+                txt="关闭雷达";
+            else
+                txt="打开雷达";
+            logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+                    "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+                    txt;
+            log->writeLog(logcontent);
             //            mute_radar=true;
             //            qDebug()<<"in radar setting"<<mute_radar;
             return true;
@@ -913,24 +929,26 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             return false;
         }
     }
-    //    else if(obj==lblObsStatus)
-    //    {
-    //        if(event->type()==QEvent::MouseButtonRelease)
-    //        {
-    //            //            dialobs = new DialogOBSStatus(wid);
-    //            //            dialobs->setGeometry(xpos,ypos+wid->height()/2,dialobs->width(),dialobs->height());
-    //            isdialobspop=true;
-    //            dialobs->exec();
+#ifdef Baseline_2_0
+    else if(obj==lblSystemOK)
+#else
+    else if(obj==lblObsStatus)
+#endif
+    {
+        if(event->type()==QEvent::MouseButtonRelease)
+        {
+            isdialobspop=true;
+            dialobs->exec();
 
-    //            isdialobspop=false;
+            isdialobspop=false;
 
-    //            return true;
-    //        }
-    //        else
-    //        {
-    //            return false;
-    //        }
-    //    }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     //    else if(obj==lblELSDMSStatus)
     //    {
     //        if(event->type()==QEvent::MouseButtonRelease)
@@ -1019,18 +1037,26 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                     dmi_els_data->Trip_Id=-1;
 
                     quint8 desorpath=dialdes->m_desorpath;
-                    qint8 chosen_value=dialdes->chosen_value;
+                    qint16 chosen_value=dialdes->chosen_value;
                     if(desorpath==1)
                     {
                         dmi_els_data->Destination_Id=chosen_value;
                         dmi_els_data->Path_Id=-1;
 
-
+                        logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+                                "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+                                "  Destinationid 选择为 "+QString::number(chosen_value);
+                        log->writeLog(logcontent);
                     }
                     else if(desorpath==2)
                     {
                         dmi_els_data->Path_Id=chosen_value;
                         dmi_els_data->Destination_Id=-1;
+
+                        logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+                                "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+                                "  Pathid 选择为 "+QString::number(chosen_value);
+                        log->writeLog(logcontent);
                     }
 
                 }
@@ -1055,18 +1081,16 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
         {
             if(isLogin)
             {
-                quint8 elsmode=els_dmi_data->ELS_Service_Mode;
-                //                if(elsmode==0||elsmode==1)
-                //                {
-                //                    msbox->setValue("请在车载独立或者手工控制模式下操作");
-                //                    msbox->exec();
-                //                    return true;
-                //                }
+
                 operateType="modify ServiceMode";
                 if(dialelsmode->exec()==QDialog::Accepted)
                 {
                     quint8 i= dialelsmode->modevalue;
                     dmi_els_data->ELS_Mode_Selection=i;
+                    logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+                            "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+                            "  ELS mode 选择为 "+QString::number(i);
+                    log->writeLog(logcontent);
                     if(isDebug)
                     {
                         alarmPromte("ELS mode 选择为 "+QString::number(i));
@@ -1271,6 +1295,10 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             {
                 operateType="CP Request";
                 dmi_els_data->Crossing_Priority_Request=1;
+                logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+                        "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+                        "  申请路口优先 ";
+                log->writeLog(logcontent);
             }
             else
             {
@@ -1632,7 +1660,7 @@ void Casco_DMI::refreshUI()
     refreshTabMission();
     refreshGeoEvents();
     //    refreshMaintence();
-    //    refreshSMS();
+    refreshSMS();
     flashUI();
 }
 
@@ -2547,6 +2575,22 @@ void Casco_DMI::refreshMission()
     //        }
     //        break;
     //    }
+#ifdef Baseline_2_0
+    switch(els_dmi_data->ELS_RR_CP_Shutdown)
+    {
+    case 0:
+        dialshutdown->close();
+        break;
+    case 1:
+        dialshutdown->setValue(1);
+        dialshutdown->show();
+        break;
+    case 2:
+        dialshutdown->setValue(2);
+        dialshutdown->show();
+        break;
+    }
+#endif
 
     switch(els_dmi_data->Emergency_Braking_Applied)
     {
@@ -3103,14 +3147,15 @@ void Casco_DMI::refreshTLE()
             m_smsdisplaycount=5;
             //            listSMS->clear();
             //           refreshSMSText(16,"[车载] ");
-            listSMS->clear();
-            for(int i=0;i<list_sms_display->size()&&i<m_smsdisplaycount;i++)
-            {
-                listSMS->insertPlainText(list_sms_display->at(i)+"\n");
-            }
-            listSMS->setGeometry(listSMS->x(),listSMS->y(),
-                                 listSMS->width(),
-                                 2*listsms_height/5+5);
+            //            listSMS->clear();
+            //            for(int i=0;i<list_sms_display->size()&&i<m_smsdisplaycount;i++)
+            //            {
+            //                listSMS->insertPlainText(QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+            //                                         list_sms_display->at(i)+"\n");
+            //            }
+            //            listSMS->setGeometry(listSMS->x(),listSMS->y(),
+            //                                 listSMS->width(),
+            //                                 2*listsms_height/5+5);
             //            qDebug()<<"displaydms"<<m_smsdisplaycount;
         }
 
@@ -3355,6 +3400,7 @@ void Casco_DMI::refreshSMS()
     {
         QString tmptxt=QString::fromUtf8((char*)els_dmi_data->Driver_Message_Text);
         refreshAlarmQue(9,"[调度] ",tmptxt);
+        //        qDebug()<<"dd"<<tmptxt;
 
     }
     else
@@ -3470,38 +3516,60 @@ void Casco_DMI::checkTimeWithELS(quint64 time)
     }
 }
 
-void Casco_DMI::setScheduleId(qint8 scheduleid)
+void Casco_DMI::setScheduleId(qint16 scheduleid)
 {
     dmi_els_data->Schedule_Id=scheduleid;
+
+    logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+            "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+            "  ScheduleID 选择为 "+QString::number(scheduleid);
+    log->writeLog(logcontent);
     //    qDebug()<<"set sch"<<dmi_els_data->Schedule_Id;
 }
 
-void Casco_DMI::setServiceId(qint8 serviceid)
+void Casco_DMI::setServiceId(qint16 serviceid)
 {
     dmi_els_data->Service_Id=serviceid;
+    logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+            "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+            "  ServiceID 选择为 "+QString::number(serviceid);
+    log->writeLog(logcontent);
+
     //    qDebug()<<"set service"<<dmi_els_data->Service_Id;
 }
 
-void Casco_DMI::setTripId(qint8 tripid)
+void Casco_DMI::setTripId(qint16 tripid)
 {
     dmi_els_data->Trip_Id=tripid;
+    logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+            "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+            "  TripID 选择为 "+QString::number(tripid);
+    log->writeLog(logcontent);
+
     //    qDebug()<<"set trip"<<dmi_els_data->Trip_Id;
 }
 
 void Casco_DMI::ToggleMute()
 {
+    QString txt;
     if(player->isMuted())
     {
         player->setMuted(false);
         btnMute->setPixmap(resPath+"Sound.png");
+        txt="打开音量";
         //        btnSlider->setVisible(true);
     }
     else
     {
         player->setMuted(true);
         btnMute->setPixmap(resPath+"Mute.png");
+        txt="关闭音量";
         //        btnSlider->setVisible(false);
     }
+    logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
+            "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
+            txt;
+    log->writeLog(logcontent);
     //    qDebug()<<"after toogle  mute in main"<<player->isMuted();
 }
 

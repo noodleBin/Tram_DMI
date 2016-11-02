@@ -25,7 +25,7 @@ public:
     int chosenservice;
     int chosentrip;
     int chosenpath;
-    qint8 chosen_value;
+    qint16 chosen_value;
     quint8 m_desorpath;
     void  setDestinationValue(quint8 number, quint16* desid);
     //    void setServiceValue(quint8 number, quint16 *serviceid);

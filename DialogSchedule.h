@@ -18,9 +18,9 @@ class DialogSchedule : public QDialog
 {
     Q_OBJECT
 signals:
-    void sendScheduleId(qint8 scheduleid);
-    void sendServiceId(qint8 serviceid);
-    void sendTripId(qint8 tripid);
+    void sendScheduleId(qint16 scheduleid);
+    void sendServiceId(qint16 serviceid);
+    void sendTripId(qint16 tripid);
 protected:
     void showEvent(QShowEvent *);
 public:

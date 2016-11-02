@@ -64,6 +64,7 @@
 
 #ifdef Baseline_2_0
 #include "Limitspeed.h"
+#include "Dialogshutdown.h"
 #endif
 
 #include "TLEevents.h"
@@ -183,9 +184,9 @@ private :
     void refreshMute();
     void checkTimeWithELS(quint64 time);
 
-    void setScheduleId(qint8 scheduleid);
-    void setServiceId(qint8 serviceid);
-    void setTripId(qint8 tripid);
+    void setScheduleId(qint16 scheduleid);
+    void setServiceId(qint16 serviceid);
+    void setTripId(qint16 tripid);
 
 
 
@@ -206,6 +207,7 @@ private slots:
     void recvMySMS(QString promotetext);
 private:
 
+    QString logcontent;
     //time
     quint64 timeConvertDisplay(quint64 ntptime);
 
@@ -280,6 +282,10 @@ private:
     DialogWarningbox *msbox;
     DialogOBSStatus *dialobs;
     DialogCommstatus *dialcommstatus;
+
+#ifdef Baseline_2_0
+    DialogShutdown *dialshutdown;
+#endif
     bool isdialobspop,isdialcommstatuspop;
 
     DialogDestination *dialdes;
