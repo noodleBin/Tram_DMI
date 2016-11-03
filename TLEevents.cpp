@@ -30,7 +30,7 @@ void TLEEvents::setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos,
 {
     image=p_image;
     signals_count=count;
-//    qDebug()<<"sig count"<<signals_count;
+    //    qDebug()<<"sig count"<<signals_count;
     for(int i=0;i<signals_count;i++)
     {
         rotation[i]=p_rotationpos[i];
@@ -54,7 +54,7 @@ void TLEEvents::setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos,
 
         status[i]=p_statuspos[i];
 
-//        qDebug()<<"f"<<xpos[i]<<ypos[i]<<status[i];
+        //        qDebug()<<"f"<<xpos[i]<<ypos[i]<<status[i];
     }
 
     //    signals_count=1;
@@ -173,6 +173,40 @@ void TLEEvents::drawImage(QPainter *painter)
         rect=QRect(5*width()/9-8,8*height()/9,16,66);
         painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
         break;
+    case 2:
+        break;
+    case 3:
+        break;
+    case 4:
+        painter->drawLine(3*width()/9,0,3*width()/9,height());
+        painter->drawLine(6*width()/9,0,6*width()/9,height());
+        painter->drawLine(3*width()/9,2*height()/9,6*width()/9,5*height()/9);
+        rect=QRect(6*width()/9-8,8*height()/9,16,66);
+        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        break;
+    case 5:
+        painter->drawLine(3*width()/9,0,3*width()/9,height());
+        painter->drawLine(6*width()/9,0,6*width()/9,height());
+        painter->drawLine(3*width()/9,5*height()/9,6*width()/9,2*height()/9);
+        rect=QRect(6*width()/9-8,8*height()/9,16,66);
+        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        break;
+    case 6:
+        painter->drawLine(3*width()/9,0,3*width()/9,height());
+        painter->drawLine(6*width()/9,0,6*width()/9,height());
+        painter->drawLine(3*width()/9,5*height()/9,6*width()/9,2*height()/9);
+        painter->drawLine(3*width()/9,2*height()/9,6*width()/9,5*height()/9);
+        rect=QRect(6*width()/9-8,8*height()/9,16,66);
+        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        break;
+    case 7:
+        painter->drawLine(3*width()/9,0,3*width()/9,height());
+        painter->drawLine(6*width()/9,0,6*width()/9,height());
+        painter->drawLine(0,1*height()/9,width(),1*height()/9);
+        painter->drawLine(0,3*height()/9,width(),3*height()/9);
+        rect=QRect(6*width()/9-8,8*height()/9,16,66);
+        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        break;
     }
     painter->restore();
 }
@@ -182,7 +216,7 @@ void TLEEvents::drawSignals(QPainter *p)
     for(int i=0;i<signals_count;i++)
     {
         drawOneSignal(p,xpos[i],ypos[i],status[i],rotation[i]);
-//        qDebug()<<"ha"<<i<<xpos[i]<<ypos[i]<<status[i]<<rotation[i];
+        //        qDebug()<<"ha"<<i<<xpos[i]<<ypos[i]<<status[i]<<rotation[i];
     }
 }
 
@@ -195,7 +229,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
     {
     case 1:
         arrow_x=0-height()/18;
-//        arrow_y=0+2*width()/9-width()/18;
+        //        arrow_y=0+2*width()/9-width()/18;
         break;
     case 2:
         painter->rotate(90);
@@ -203,7 +237,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
         break;
     case 3:
         painter->rotate(-90);
-       arrow_x=0-height()/18;
+        arrow_x=0-height()/18;
         break;
     case 4:
         painter->rotate(180);
@@ -243,8 +277,8 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
                           0+width()/18-width()/72,0+height()/18-height()/72);
         //        painter->drawLine(arrow_x,0+height()/9,arrow_x,0-height()/9);
 
-//        painter->drawArc(QRect(arrow_x,arrow_y,4*width()/9,4*height()/9),0,90*16);
-//        painter->drawLine(arrow_x+2*width()/9,arrow_y,arrow_x+width()/9,arrow_y);
+        //        painter->drawArc(QRect(arrow_x,arrow_y,4*width()/9,4*height()/9),0,90*16);
+        //        painter->drawLine(arrow_x+2*width()/9,arrow_y,arrow_x+width()/9,arrow_y);
         //                painter->drawLine(arrow_x-10,-height()/9+10,arrow_x,-height()/9);
         //                painter->drawLine(arrow_x+10,-height()/9+10,arrow_x,-height()/9);
         break;
