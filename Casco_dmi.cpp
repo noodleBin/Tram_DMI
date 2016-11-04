@@ -245,6 +245,12 @@ void Casco_DMI::initialNormalControl()
     //    wid->findChild<QLabel*>("lbl_updisunit")->setText(tr("meter"));
     //    wid->findChild<QLabel*>("lbl_upminunit")->setText(tr("sec"));
 
+    int listsize=list_sms->size();
+    for(int i=0;i<listsize&&i<m_smsdisplaycount;i++)
+    {
+        listSMS->insertPlainText(list_sms->at(listsize-1-i)+"\n");
+    }
+
 }
 
 void Casco_DMI::initialControl()
@@ -1397,7 +1403,7 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
                     wid->close();
                     //                    qDebug()<<"widget close 1"<<tmp;
                     initMainWindow("UI");
-                    refreshAlarmQue(8,"[车载] ");
+//                    refreshAlarmQue(8,"[车载] ");
                 }
                 //                qDebug()<<"before refresh UI"<<els_dmi_data->ELS_Service_Mode;
                 refreshUI();
@@ -1429,7 +1435,7 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
                     displayno=2;
                     wid->hide();
                     wid->close();
-                    refreshAlarmQue(7,"[车载] ");
+//                    refreshAlarmQue(7,"[车载] ");
                     initMainWindow("LoseConnection");
 
                     //                    timer15s=0;
@@ -2933,7 +2939,6 @@ void Casco_DMI::smsPromte(QString txt)
     listSMS->clear();
 
     int listsize=list_sms->size();
-    //        qDebug()<<"m_smsdisplaycount"<<m_smsdisplaycount<<"listsms"<<listsize;
     for(int i=0;i<listsize&&i<m_smsdisplaycount;i++)
     {
         listSMS->insertPlainText(list_sms->at(listsize-1-i)+"\n");
