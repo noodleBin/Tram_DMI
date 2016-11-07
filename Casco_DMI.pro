@@ -37,7 +37,6 @@ SOURCES += main.cpp\
     DMISMS.cpp \
     TLEevents.cpp \
     ../DMIDataStruct/dms_dmi_protocol.cpp \
-    DMISignal.cpp \
     Casco_dmi.cpp \
     Dialogwarningbox.cpp \
     Limitspeed.cpp \
@@ -64,10 +63,9 @@ HEADERS  += \
     ../DMIDataStruct/dmi_dms_protocol.h \
     ../DMIDataStruct/dms_dmi_protocol.h \
     TLEevents.h \
-    DMISignal.h \
     Casco_dmi.h \
     Dialogwarningbox.h \
-    Public_Variable.h \
+     ../DMIDataStruct/Public_Variable.h \
     Limitspeed.h \
     Dialogshutdown.h
 

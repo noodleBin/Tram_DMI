@@ -81,7 +81,9 @@ void Casco_DMI::initMainWindow(QString type)
 
     if(type=="UI")
     {
+#ifdef Baseline_2_0
         screenmode=4;
+#endif
         switch (screenmode)
         {
         case 1:
@@ -252,6 +254,12 @@ void Casco_DMI::initialNormalControl()
     //    wid->findChild<QLabel*>("lbl_updisunit")->setText(tr("meter"));
     //    wid->findChild<QLabel*>("lbl_upminunit")->setText(tr("sec"));
 
+    int listsize=list_sms->size();
+    for(int i=0;i<listsize&&i<m_smsdisplaycount;i++)
+    {
+        listSMS->insertPlainText(list_sms->at(listsize-1-i)+"\n");
+    }
+
 }
 
 void Casco_DMI::initialControl()
@@ -269,10 +277,13 @@ void Casco_DMI::initialControl()
     //    lblNextstaId->setText(tr("unknown"));
     lblNextstaId2 =wid->findChild<QLabel*>("lbl_nextstaid_2");
     lblNextstaId2->setText(tr("unknown"));
-    //    lblArrTime=wid->findChild<QLabel*>("lbl_arrtime");
-    //    lblArrTime->setText(QTime::currentTime().toString("hh:mm:ss"));
+
+#ifndef Baseline_2_0
+    lblArrTime=wid->findChild<QLabel*>("lbl_arrtime");
+    lblArrTime->setText(QTime::currentTime().toString("HH:mm:ss"));
+#endif
     lblArrTime2=wid->findChild<QLabel*>("lbl_arrtime_2");
-    lblArrTime2->setText(QTime::currentTime().toString("hh:mm:ss"));
+    lblArrTime2->setText(QTime::currentTime().toString("HH:mm:ss"));
     lblNameDelay=wid->findChild<QLabel*>("lbl_namedelay");
     //    lblDelayunit= wid->findChild<QLabel*>("lbl_delayunit");
     lblDelay=wid->findChild<QLabel*>("lbl_delay");
@@ -282,7 +293,7 @@ void Casco_DMI::initialControl()
     lblDateTime=wid->findChild<QLabel*>("lbl_date");
 
     QString format = "yyyy"+tr("年")+"MM"+tr("月")+"dd"+tr("日")+"\n"
-            +"hh:mm:ss";
+            +"HH:mm:ss";
 
     lblDateTime->setText((QDateTime::currentDateTime().toString(format)));
 
@@ -320,9 +331,9 @@ void Casco_DMI::initialControl()
     //mission area
 
 
-
-    //    lblObsStatus=wid->findChild<QLabel*>("pic_obsstatus");
-
+#ifndef Baseline_2_0
+    lblObsStatus=wid->findChild<QLabel*>("pic_obsstatus");
+#endif
     lblELSDMSStatus=wid->findChild<QLabel*>("pic_dmsels");
 
 #ifdef Baseline_2_0
@@ -360,15 +371,20 @@ void Casco_DMI::initialControl()
     lblSkip=wid->findChild<QLabel*>("pic_skip");
     lblHold=wid->findChild<QLabel*>("pic_hold");
 
-    //    lblObsStatus->installEventFilter(this);
-    //    lblELSDMSStatus->installEventFilter(this);
-
+#ifndef Baseline_2_0
+    lblObsStatus->installEventFilter(this);
+    lblELSDMSStatus->installEventFilter(this);
+#endif
     //RRCP area
     RRCPbar = wid->findChild<QProgressBar*>("probar_CP");
     lblBarName=wid->findChild<QLabel*>("lbl_CPArea");
     lblBarTotalValue   =wid->findChild<QLabel*>("lbl_RRCPTotalValue");
     lblBarRemainValue=wid->findChild<QLabel*>("lbl_RRCPRemainValue");
 
+    lblCPTotal=wid->findChild<QLabel*>("lbl_CPTotal");
+    lblCPUnit= wid->findChild<QLabel*>("lbl_CPUnit");
+    lblCPRemain= wid->findChild<QLabel*>("lbl_CPRemain");
+    lblCPRemainunit= wid->findChild<QLabel*>("lbl_CPRemainUnit");
 
     //Operate area
     btnleft=wid->findChild<QLabel*>("btn_left");
@@ -459,14 +475,19 @@ void Casco_DMI::initDialog()
                                 ypos+(wid->height()-dialtimeupdate->height())/2
                                 ,dialtimeupdate->width(),dialtimeupdate->height());
     dialobs = new DialogOBSStatus(wid);
+#ifdef Baseline_2_0
     dialobs->setGeometry(xpos+wid->width()/2+10,ypos+100,dialobs->width(),dialobs->height());
-
+#else
+    dialobs->setGeometry(xpos+10,ypos+300,dialobs->width(),dialobs->height());
+#endif
 #ifdef Baseline_2_0
     dialshutdown=new DialogShutdown(wid);
     dialshutdown->setGeometry(xpos+525,ypos+590,dialshutdown->width(),dialshutdown->height());
 #endif
+#ifndef Baseline_2_0
     dialcommstatus = new DialogCommstatus(wid);
     dialcommstatus->setGeometry(xpos,ypos+wid->height()/2,dialcommstatus->width(),dialcommstatus->height());
+#endif
     dialdes = new DialogDestination(wid);
     dialdes->setGeometry(xpos+(wid->width()-dialdes->width())/2,
                          ypos+(wid->height()-dialdes->height())/2
@@ -536,11 +557,14 @@ void Casco_DMI::getAlarmOutQue()
             m_Alarm_Record_map->insert(modify_alarm.id,modify_alarm);
 
             //            qDebug()<<"in end media"<<alarm.str<<alarm.couldplay<<alarm.current_playtick;
+
+#ifdef Baseline_2_0
             if(mute_radar)
             {
                 if(alarm.id==14||alarm.id==15)
                     return;
             }
+#endif
             emit ttsConvertNow(alarm.str,m_alarm_filename);
         }
         else if(!ttsthreadisstart) //不能打断tts，需要tts完成后才能再次tts
@@ -647,7 +671,7 @@ void Casco_DMI::initialVariable()
 
     timerdisconnect=0;
     exePath=QDir::currentPath();
-    resPath = exePath+"/res2/";
+    resPath = exePath+"/res/";
 
     timer1s=0;
     smsCount=0;
@@ -741,6 +765,15 @@ void Casco_DMI::initDefaultValue()
     m_writecount =1000;
 
     m_checktime=15;
+    m_sendTime =255;
+    m_cp_sendtime=m_elsmode_sendtime=m_driverid_sendtime=m_timeshift_sendtime
+            =m_scheduleid_sendtime=m_serviceid_sendtime
+            =m_tripid_sendtime=m_pathid_sendtime
+            =m_desid_sendtime=m_sendTime;
+    is_cp_send=is_elsmode_send=is_driverid_send=is_timeshift_send=
+            is_scheduleid_send=is_serviceid_send
+            =is_tripid_send=is_pathid_send
+            =is_desid_send=false;
 }
 /**************/
 /* 时间转换函数*/
@@ -754,8 +787,9 @@ quint64 Casco_DMI::timeConvertDisplay(quint64 ntptime)
     time_t utctimefrom1970_1_1;
     if(utctimefrom2000_1_1==0) //如果为0，返回当前时间
     {
-        alarmPromte("[车载] ntp时间错误");
-        time(&utctimefrom1970_1_1);
+        //        alarmPromte("[车载] ntp时间错误");
+        //        time(&utctimefrom1970_1_1);
+        return 0;
         //        tmpdatetime.setTime_t(tmptime);
     }
     else
@@ -766,9 +800,57 @@ quint64 Casco_DMI::timeConvertDisplay(quint64 ntptime)
 
     return utctimefrom1970_1_1;
 }
+void Casco_DMI::   processScheduleServiceTripID()
+{
+    quint8 tsche=els_dmi_data->Number_of_Schedule;
+    quint8 tservice=els_dmi_data->Number_of_Service;
+    quint8 ttrip=els_dmi_data->Number_of_Trip;
+
+    if(tsche<=20)
+    {
+        //normal;
+    }
+    else
+    {
+        tsche=20; //only demostrate 5 items;
+        warning_msg="[ELS] recv Number_of_schedule error";
+        alarmPromte(warning_msg);
+    }
+
+
+    quint16* scheid=new quint16[tsche];
+
+    for(int i=0;i<tsche;i++)
+    {
+        scheid[i]=els_dmi_data->Id_of_schedules[i];
+
+    }
+    quint16* serviceid=new quint16[tservice];
+
+    for(int i=0;i<tservice;i++)
+    {
+        serviceid[i]=els_dmi_data->Id_of_services[i];
+
+    }
+    quint16* tripid=new quint16[ttrip];
+
+    for(int i=0;i<ttrip;i++)
+    {
+        tripid[i]=els_dmi_data->Id_of_Trips[i];
+
+    }
+
+    dialschedule->setvalue(tsche,scheid,
+                           tservice,serviceid,
+                           ttrip,tripid);
+    delete[] scheid;
+    delete[] serviceid;
+    delete[] tripid;
+}
 
 void Casco_DMI::refreshRadarPic()
 {
+#ifdef Baseline_2_0
     if(mute_radar)
     {
         btnRadarSetting->setPixmap(resPath+"Radar_Mute.png");
@@ -777,6 +859,7 @@ void Casco_DMI::refreshRadarPic()
     {
         btnRadarSetting->setPixmap(resPath+"Radar_Setting.png");
     }
+#endif
 }
 
 bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
@@ -788,11 +871,16 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
     {
         if(event->type()==QEvent::MouseButtonRelease)
         {
-
-            dialversion->setValue(m_appversion,m_dataversion);
-            dialversion->exec();
-
-            //            delete dialversion;
+            if(isLogin)
+            {
+                dialversion->setValue(m_appversion,m_dataversion);
+                dialversion->exec();
+            }
+            else
+            {
+                msbox->setValue("请登陆后操作");
+                msbox->exec();
+            }
             return true;
         }
         else
@@ -859,6 +947,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                 qint16 i=  diallogin->driverID.toInt();
 
                 dmi_els_data->Driver_Id=i;
+                is_driverid_send=true;
                 if(i!=0)
                     isLogin=true;
                 else
@@ -889,6 +978,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                 if(dialtimeshift->exec()==QDialog::Accepted)
                 {
                     dmi_els_data->Time_Shift_Request=1;
+                    is_timeshift_send=true;
                 }
                 else
                 {
@@ -953,23 +1043,25 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             return false;
         }
     }
-    //    else if(obj==lblELSDMSStatus)
-    //    {
-    //        if(event->type()==QEvent::MouseButtonRelease)
-    //        {
-    //            dialcommstatus = new DialogCommstatus(wid);
-    //            dialcommstatus->setGeometry(xpos,ypos+wid->height()/2,dialcommstatus->width(),dialcommstatus->height());
-    //            isdialcommstatuspop=true;
-    //            dialcommstatus->exec();
-    //            isdialcommstatuspop=false;
+#ifndef Baseline_2_0
+    else if(obj==lblELSDMSStatus)
+    {
+        if(event->type()==QEvent::MouseButtonRelease)
+        {
+            dialcommstatus = new DialogCommstatus(wid);
+            dialcommstatus->setGeometry(xpos,ypos+wid->height()/2,dialcommstatus->width(),dialcommstatus->height());
+            isdialcommstatuspop=true;
+            dialcommstatus->exec();
+            isdialcommstatuspop=false;
 
-    //            return true;
-    //        }
-    //        else
-    //        {
-    //            return false;
-    //        }
-    //    }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+#endif
     else if((obj==lblDesId)|(obj==lblNamedes))
     {
         if((event->type()==QEvent::MouseButtonRelease))
@@ -1047,14 +1139,20 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                         dmi_els_data->Destination_Id=chosen_value;
                         dmi_els_data->Path_Id=-1;
 
+
                         logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
                                 "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
                                 "  Destinationid 选择为 "+QString::number(chosen_value);
                         log->writeLog(logcontent);
+
+                        is_desid_send=true;
+
+
                     }
                     else if(desorpath==2)
                     {
                         dmi_els_data->Path_Id=chosen_value;
+                        is_pathid_send=true;
                         dmi_els_data->Destination_Id=-1;
 
                         logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
@@ -1086,15 +1184,20 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
 
+
                 operateType="modify ServiceMode";
                 if(dialelsmode->exec()==QDialog::Accepted)
                 {
                     quint8 i= dialelsmode->modevalue;
                     dmi_els_data->ELS_Mode_Selection=i;
+
                     logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
                             "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
                             "  ELS mode 选择为 "+QString::number(i);
                     log->writeLog(logcontent);
+
+                    is_elsmode_send=true;
+
                     if(isDebug)
                     {
                         alarmPromte("ELS mode 选择为 "+QString::number(i));
@@ -1127,56 +1230,9 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
                     return true;
                 }
                 operateType="modify ScheduleID";
-                quint8 tsche=els_dmi_data->Number_of_Schedule;
-                quint8 tservice=els_dmi_data->Number_of_Service;
-                quint8 ttrip=els_dmi_data->Number_of_Trip;
+                processScheduleServiceTripID();
 
-                if(tsche<=20)
-                {
-                    //normal;
-                }
-                else
-                {
-                    tsche=20; //only demostrate 5 items;
-                    warning_msg="[ELS] recv Number_of_schedule error";
-                    alarmPromte(warning_msg);
-                }
 
-                //                if (tsche>0)
-                //                {
-                quint16* scheid=new quint16[tsche];
-
-                for(int i=0;i<tsche;i++)
-                {
-                    scheid[i]=els_dmi_data->Id_of_schedules[i];
-
-                }
-                quint16* serviceid=new quint16[tservice];
-
-                for(int i=0;i<tservice;i++)
-                {
-                    serviceid[i]=els_dmi_data->Id_of_services[i];
-
-                }
-                quint16* tripid=new quint16[ttrip];
-
-                for(int i=0;i<ttrip;i++)
-                {
-                    tripid[i]=els_dmi_data->Id_of_Trips[i];
-
-                }
-
-                dialschedule->setvalue(tsche,scheid,
-                                       tservice,serviceid,
-                                       ttrip,tripid);
-                delete[] scheid;
-                delete[] serviceid;
-                delete[] tripid;
-                //                }
-                //                else
-                //                 dialschedule->setvalue(0,NULL);   //需要清除界面
-
-                //        dialschedule->move(xpos,ypos);
                 dialschedule->exec();
 
             }
@@ -1217,15 +1273,25 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
     //media play
     else if(obj==btnMute)
     {
+
         if(event->type()==QEvent::MouseButtonRelease)
         {
-            ToggleMute();
+            if(isLogin)
+            {
+                ToggleMute();
+
+            }
+            else
+            {
+                msbox->setValue("请登陆后操作");
+                msbox->exec();
+            }
             return true;
         }
         else
-        {
             return false;
-        }
+
+
     }
     //RRCP
     else if(obj==btnleft)
@@ -1235,7 +1301,8 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Left";
-                dmi_els_data->RR_Left_Button=1;
+                //                dmi_els_data->RR_Left_Button=1;
+
             }
             else
             {
@@ -1256,7 +1323,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Straight";
-                dmi_els_data->RR_Straight_Button=1;
+                //                dmi_els_data->RR_Straight_Button=1;
             }
             else
             {
@@ -1277,7 +1344,7 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             if(isLogin)
             {
                 operateType="RR Right";
-                dmi_els_data->RR_Right_Button=1;
+                //                dmi_els_data->RR_Right_Button=1;
             }
             else
             {
@@ -1299,10 +1366,14 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             {
                 operateType="CP Request";
                 dmi_els_data->Crossing_Priority_Request=1;
+
                 logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
                         "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
                         "  申请路口优先 ";
                 log->writeLog(logcontent);
+
+                is_cp_send=true;
+
             }
             else
             {
@@ -1510,7 +1581,7 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
                     wid->close();
                     //                    qDebug()<<"widget close 1"<<tmp;
                     initMainWindow("UI");
-                    refreshAlarmQue(8,"[车载] ");
+                    //                    refreshAlarmQue(8,"[车载] ");
                 }
                 //                qDebug()<<"before refresh UI"<<els_dmi_data->ELS_Service_Mode;
                 refreshUI();
@@ -1542,7 +1613,7 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
                     displayno=2;
                     wid->hide();
                     wid->close();
-                    refreshAlarmQue(7,"[车载] ");
+                    //                    refreshAlarmQue(7,"[车载] ");
                     initMainWindow("LoseConnection");
 
                     //                    timer15s=0;
@@ -1589,8 +1660,9 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
             }
             //            qDebug()<<"recv dms msg";
             setRecvDMSDataFromSocket(last_dms_dmi_data); //只用最新的
-
+#ifdef Baseline_2_0
             refreshTLE();
+#endif
         }
         else
         {
@@ -1881,9 +1953,26 @@ void Casco_DMI::refreshTop()
     }
 
     QDateTime tmpnextarrtime;
-    tmpnextarrtime.setTime_t(timeConvertDisplay(els_dmi_data->Next_SSA_Arrival_Time));
-    //    lblArrTime->setText(tmpnextarrtime.toString("hh:mm:ss"));
-    lblArrTime2->setText(tmpnextarrtime.toString("hh:mm:ss"));
+
+    quint64 tmpnxt=timeConvertDisplay(els_dmi_data->Next_SSA_Arrival_Time);
+    if(tmpnxt!=0)
+    {
+        tmpnextarrtime.setTime_t(tmpnxt);
+#ifndef Baseline_2_0
+        lblArrTime->setText(tmpnextarrtime.toString("HH:mm:ss"));
+#endif
+        lblArrTime2->setText(tmpnextarrtime.toString("HH:mm:ss"));
+    }
+    else
+    {
+#ifndef Baseline_2_0
+        lblArrTime->setText("--:--:--");
+#endif
+        lblArrTime2->setText("--:--:--");
+    }
+
+
+
     qint16 temp=els_dmi_data->Advance_Delay_Time;
     QPalette tmp;
     if(temp<0)
@@ -1914,8 +2003,10 @@ void Casco_DMI::refreshTop()
     if(!time_checked)
     {
         time_checked=true;
+
         quint64 utctime = timeConvertDisplay(els_dmi_data->Current_Time);
-        checkTimeWithELS(utctime);
+        if(utctime!=0)
+            checkTimeWithELS(utctime);
     }
 
 
@@ -2063,27 +2154,30 @@ void Casco_DMI::refreshATP()
     //        }
     //    }
 
-    //    switch(els_dmi_data->ATP_Warning)
-    //    {
-    //    case 0:
-    //    case 3:
-    //        needatpwarning=false;
-    //        lblAtpWarning->setPixmap(QPixmap());
-    //        break;
-    //    case 1:
-    //    case 2:
-    //        needatpwarning=true;
-    //        break;
-    //    default:
-    //        needatpwarning=false;
-    //        lblAtpWarning->setPixmap(QPixmap());
-    //        if(!log->writeLog("recv ATP_Warning error value "+els_dmi_data->ATP_Warning))
-    //        {
-    //            popFaultBox("fail to write log, now exit");
-    //        }
-    //        break;
-    //    }
-    //    qDebug()<<"servicemode"<<els_dmi_data->ELS_Service_Mode;
+#ifndef Baseline_2_0
+    switch(els_dmi_data->ATP_Warning)
+    {
+    case 0:
+    case 3:
+        needatpwarning=false;
+        lblAtpWarning->setPixmap(QPixmap());
+        break;
+    case 1:
+    case 2:
+        needatpwarning=true;
+        break;
+    default:
+        needatpwarning=false;
+        lblAtpWarning->setPixmap(QPixmap());
+        if(!log->writeLog("recv ATP_Warning error value "+els_dmi_data->ATP_Warning))
+        {
+            popFaultBox("fail to write log, now exit");
+        }
+        break;
+    }
+#endif
+
+
     switch(els_dmi_data->ELS_Service_Mode)
     {
 
@@ -2219,7 +2313,9 @@ void Casco_DMI::refreshMission()
     {
         if(els_dmi_data->ELS_Function_Detailed_Status==0x0f)
         {
-            //            lblObsStatus->setPixmap(resPath+"OBS_OK.png");
+#ifndef Baseline_2_0
+            lblObsStatus->setPixmap(resPath+"OBS_OK.png");
+#endif
         }
         else
         {
@@ -2240,8 +2336,9 @@ void Casco_DMI::refreshMission()
             {
                 refreshAlarmQue(6,"[车载] ","A T P");
             }
-
-            //            lblObsStatus->setPixmap(resPath+"OBS_Error.png");
+#ifndef Baseline_2_0
+            lblObsStatus->setPixmap(resPath+"OBS_Error.png");
+#endif
         }
         if(isdialobspop)
         {
@@ -2250,28 +2347,20 @@ void Casco_DMI::refreshMission()
     }
     else
     {
-        //        lblObsStatus->setPixmap(resPath+"OBS_Error.png");
+#ifndef Baseline_2_0
+        lblObsStatus->setPixmap(resPath+"OBS_Error.png");
+#endif
     }
 
 
-    //    if(els_dmi_data->Communication_ELS_DMS_Status!=1||els_dmi_data->Radio_Coverage_ELS_DMS!=1
-    //            ||els_dmi_data->Radio_Status!=1)
-    //    {
-    ////        lblELSDMSStatus->setPixmap(resPath+"Communication_fault.png");
-    //        //        qDebug()<<"fault"<<els_dmi_data->Communication_ELS_DMS_Status<<els_dmi_data->Radio_Coverage_ELS_DMS<<els_dmi_data->Radio_Status;
-    //    }
-    //    else
-    //    {
-    ////        lblELSDMSStatus->setPixmap(resPath+"Communication_good.png");
-    //        //         qDebug()<<"good"<<els_dmi_data->Communication_ELS_DMS_Status<<els_dmi_data->Radio_Coverage_ELS_DMS<<els_dmi_data->Radio_Status;
-    //    }
-
-    //    if(isdialcommstatuspop)
-    //    {
-    //        dialcommstatus->setPicCommDMSELS(els_dmi_data->Communication_ELS_DMS_Status);
-    //        dialcommstatus->setPicRadioDMSELS(els_dmi_data->Radio_Status);
-    //        dialcommstatus->setPicRadioCoverDMSELS(els_dmi_data->Radio_Coverage_ELS_DMS);
-    //    }
+#ifndef Baseline_2_0
+    if(isdialcommstatuspop)
+    {
+        dialcommstatus->setPicCommDMSELS(els_dmi_data->Communication_ELS_DMS_Status);
+        dialcommstatus->setPicRadioDMSELS(els_dmi_data->Radio_Status);
+        dialcommstatus->setPicRadioCoverDMSELS(els_dmi_data->Radio_Coverage_ELS_DMS);
+    }
+#endif
 
     switch(els_dmi_data->Communication_ELS_DMS_Status)
     {
@@ -2286,7 +2375,7 @@ void Casco_DMI::refreshMission()
         break;
 
     }
-
+#ifdef Baseline_2_0
     switch(els_dmi_data->Radio_Coverage_ELS_DMS)
     {
     case 0:
@@ -2303,6 +2392,7 @@ void Casco_DMI::refreshMission()
         break;
 
     }
+#endif
 #ifdef Baseline_2_0
     //    qDebug()<<"2.0"<<els_dmi_data->BCM_Status<<els_dmi_data->Radar_Status
     //           <<els_dmi_data->GPS_Status<<els_dmi_data->Distance_To_Signal
@@ -2709,86 +2799,46 @@ void Casco_DMI::refreshRRCP()
 {
     //RR&CP
 #ifndef Baseline_2_0
-    if(els_dmi_data->Route_Request_Area_Status==1)
+    if(els_dmi_data->Distance_To_End_Selection_Area!=-1)
     {
+        lblBarTotalValue->setVisible(true);
+        lblBarRemainValue->setVisible(true);
+        lblBarName->setVisible(true);
+        RRCPbar->setVisible(true);
+        lblCPTotal->setVisible(true);
+        lblCPUnit->setVisible(true);
+        lblCPRemain->setVisible(true);
+        lblCPRemainunit->setVisible(true);
+
         quint8 RRtotal=els_dmi_data->Selection_Area_Length;
         qint16 RRremain=els_dmi_data->Distance_To_End_Selection_Area;
         RRCPbar->setMaximum(RRtotal);
-        if(RRremain!=-1)
-        {
-            if(RRremain<RRtotal)
-            {
-                RRCPbar->setValue(RRremain);
-            }
-            else
-            {
-                RRCPbar->setValue(RRtotal);
-            }
-        }
-        else
-        {
-            RRCPbar->setValue(RRtotal); //recv -1, indicates that not in rr zone.
-        }
         lblBarTotalValue->setText(QString::number(RRtotal));
-        lblBarRemainValue->setText(QString::number(RRremain));
-        lblBarName->setText("进路区域");
-
-
-        QPalette tmp;
-
-        switch(els_dmi_data->Station_RR_Beacon_Link)
+        if(RRremain<=RRtotal)
         {
-        case 0:
-            tmp.setBrush(QPalette::Window,Qt::gray);
-            break;
-        case 1:
-            tmp.setBrush(QPalette::Window,Qt::red);
-            break;
-        case 2:
-            tmp.setBrush(QPalette::Window,Qt::green);
-            break;
-        default:
-            tmp.setBrush(QPalette::Window,Qt::gray);
-            QString content=QString("recv Station_RR_Beacon_Link error value ")+QString::number(els_dmi_data->Station_RR_Beacon_Link);
-            if(!log->writeLog(content))
-            {
-                popFaultBox("fail to write log, now exit");
-            }
+            RRCPbar->setValue(RRremain);
+            lblBarRemainValue->setText(QString::number(RRremain));
         }
 
-        lblBarName->setPalette(tmp);
 
     }
 
-    //    else if(els_dmi_data->CP_Area_Status==1)   //if previous statement is true, this statement will not be judged
-    //    {
-    //        quint8 cptotal=els_dmi_data->CP_Length_Preselection_Area;
-    //        qint16 cpremain=els_dmi_data->CP_Distance_To_End_Preselection_Area;
-    //        RRCPbar->setMaximum(cptotal);
-    //        if(cpremain!=-1)
-    //        {
-    //            if(cpremain<cptotal)
-    //            {
-    //                RRCPbar->setValue(cpremain);
-    //            }
-    //            else
-    //            {
-    //                RRCPbar->setValue(cptotal);
-    //            }
-    //        }
-    //        else
-    //        {
-    //            RRCPbar->setValue(cptotal);//recv -1, indicates that not in cp zone.
-    //        }
-    //        lblBarTotalValue->setText(QString::number(cptotal));
-    //        lblBarRemainValue->setText(QString::number(cpremain));
-    //        lblBarName->setText("路口区域");
-    //    }
+
     else
     {
-        //无操作
+        lblBarTotalValue->setVisible(false);
+        lblBarRemainValue->setVisible(false);
+        lblBarName->setVisible(false);
+        RRCPbar->setVisible(false);
+        lblCPTotal->setVisible(false);
+        lblCPUnit->setVisible(false);
+        lblCPRemain->setVisible(false);
+        lblCPRemainunit->setVisible(false);
     }
+
 #endif
+
+
     //RR
     switch(els_dmi_data->Right_Route_Status)
     {
@@ -2879,26 +2929,7 @@ void Casco_DMI::refreshRRCP()
 
     }
 
-    //    switch(els_dmi_data->Route_Request_Area_Status)
-    //    {
 
-    //    case 0:
-    //        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
-    //        break;
-    //    case 1:
-    //        frameRR->setPalette(QPalette(QPalette::Window,Qt::yellow));
-    //        break;
-    //    case 2:
-    //        frameRR->setPalette(QPalette(QPalette::Window,Qt::green));
-    //    default:
-    //        frameRR->setPalette(QPalette(QPalette::Window,QColor(64,64,64)));
-    //        QString content=QString("recv Route_Request_Area_Status error value ")+QString::number(els_dmi_data->Route_Request_Area_Status);
-    //        if(!log->writeLog(content))
-    //        {
-    //            popFaultBox("fail to write log, now exit");
-    //        }
-    //        break;
-    //    }
 }
 
 void Casco_DMI::refreshOperation()
@@ -2972,9 +3003,16 @@ void Casco_DMI::refreshTabMission()
     }
 
     QDateTime deptime;
-    deptime.setTime_t(timeConvertDisplay(els_dmi_data->Current_SSA_Depature_Time));
-    lblDepTime->setText(deptime.toString("hh:mm:ss"));
-
+    quint64 tmpdep=timeConvertDisplay(els_dmi_data->Current_SSA_Depature_Time);
+    if(tmpdep!=0)
+    {
+        deptime.setTime_t(tmpdep);
+        lblDepTime->setText(deptime.toString("HH:mm:ss"));
+    }
+    else
+    {
+        lblDepTime->setText("--:--:--");
+    }
     tmpvalue=els_dmi_data->Distance_To_Downstream_Train;
     if(tmpvalue<=60000&&tmpvalue>0)
     {
@@ -3085,7 +3123,7 @@ void Casco_DMI::refreshTabMission()
 
     //    QDateTime deptime;
     //    deptime.setTime_t(timeConvertDisplay(els_dmi_data->Current_SSA_Depature_Time));
-    //    lblDepTime->setText(deptime.toString("hh:mm:ss"));
+    //    lblDepTime->setText(deptime.toString("HH:mm:ss"));
 
 }
 
@@ -3161,76 +3199,9 @@ void Casco_DMI::refreshTLE()
         {
             widDMS->setHidden(false);
             m_smsdisplaycount=5;
-            //            listSMS->clear();
-            //           refreshSMSText(16,"[车载] ");
-            //            listSMS->clear();
-            //            for(int i=0;i<list_sms_display->size()&&i<m_smsdisplaycount;i++)
-            //            {
-            //                listSMS->insertPlainText(QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
-            //                                         list_sms_display->at(i)+"\n");
-            //            }
-            //            listSMS->setGeometry(listSMS->x(),listSMS->y(),
-            //                                 listSMS->width(),
-            //                                 2*listsms_height/5+5);
-            //            qDebug()<<"displaydms"<<m_smsdisplaycount;
+
         }
 
-        //        switch(dms_dmi_data->RTU_ID)
-        //        {
-        //        case 1:
-        //            sig=  map_CBI_Signal->value((quint8)dms_dmi_data->Signal_ID);
-
-        //            break;
-        //        case 7:
-        //            sig=map_OLC_Signal->value((quint8)dms_dmi_data->Signal_ID);
-
-        //            break;
-        //        default:
-        //            break;
-        //        }
-        //        backgroud=sig.scene;
-        //        type=sig.type;
-        //        position=sig.location;
-        //        status=dms_dmi_data->Signal_Status;
-
-        //        restricpos= sig.restricloc;
-
-        //        quint8* bitmap= dms_dmi_data->Bitmap;
-        //        DMI_CBI_Info bitinfo=map_DMI_CBI_Bitmap->value(sig.restricid);
-
-        //        QByteArray tt((char*)bitmap,dms_dmi_data->Bitmap_Length);
-        //        quint8 per=bitinfo.permissstatus;
-
-        //        quint8 ifgreen=(tt[per/8]>>(8-per%8))&0x01;
-        //        quint8 lef=bitinfo.leftstatus;
-        //        quint8 ifleftopen=(tt[lef/8]>>(8-lef%8))&0x01;
-
-        //        //        qDebug()<<per<<ifgreen<<lef<<ifleftopen;
-        //        //        qDebug()<<"hex"<<(quint8)tt[5];
-        //        if(ifgreen==1)
-        //        {
-        //            restricstaus=2; //green
-        //        }
-        //        else if(ifgreen==0)
-        //        {
-        //            if(ifleftopen==1)
-        //            {
-        //                restricstaus=3;//left yellow
-        //            }
-        //            else
-        //            {
-        //                restricstaus=1; //red
-        //            }
-
-        //        }
-
-        //        mytleevents->setvalue(dms_dmi_data->Signal_ID,1,
-        //                              1,
-        //                              1,1,1);
-        //        mytleevents->setvalue(backgroud,type,
-        //                              position,
-        //                              status,restricpos,restricstaus);
-        //        qDebug()<<"tleeve"<<backgroud<<type<<position<<status<<restricpos<<restricstaus;
         quint8 id=dms_dmi_data->Signal_ID;
 
         Signal_Info* restricsignal=m_Signal_map->value(id).restricSignals;
@@ -3323,12 +3294,17 @@ void Casco_DMI::refreshMaintence()
             //            tblwidgetMaintance->setItem(i,1, new QTableWidgetItem(value));
 
             QDateTime t;
-            t.setTime_t(timeConvertDisplay(els_dmi_data->Time_of_Appearance[t2-1-i]));
+            quint64 tmptime=timeConvertDisplay(els_dmi_data->Time_of_Appearance[t2-1-i]);
+            if(tmptime!=0)
+            {
+                t.setTime_t(tmptime);
 
-            //            tblwidgetMaintance->setItem(i,2, new QTableWidgetItem( t.toString("yyyy/MM/dd hh:mm:ss")));
-
-            warning_msg="[维护 ] "+t.toString("hh:mm:ss")+" 车载 "+value;
-
+                warning_msg="[维护 ] "+t.toString("HH:mm:ss")+" 车载 "+value;
+            }
+            else
+            {
+                warning_msg="[维护 ] --:--:-- 车载 "+value;
+            }
             alarmPromte(warning_msg);
         }
 
@@ -3354,11 +3330,7 @@ void Casco_DMI::alarmPromte(QString txt)
     if(displayno!=1)
         return;
     listAlarm->clear();
-    //    int listsize=list_alarm->size();
-    //    for(int i=0;i<listsize&&i<m_smsdisplaycount;i++)
-    //    {
-    //        listAlarm->insertPlainText(list_alarm->at(listsize-1-i)+"\n");
-    //    }
+
     for(int i=0;i<list_alarm_display->size()&&i<m_smsdisplaycount;i++)
     {
         listAlarm->insertPlainText(QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
@@ -3376,6 +3348,7 @@ void Casco_DMI::smsPromte(QString txt)
         return;
     list_sms->enqueue(txt);
 
+
     if(list_sms_display->size()<m_smsdisplaycount)
     {
         ;
@@ -3385,17 +3358,15 @@ void Casco_DMI::smsPromte(QString txt)
         list_sms_display->dequeue();
     }
     list_sms_display->enqueue(txt);
+
+
     if(displayno!=1)
         return;
     listSMS->clear();
 
-    //    int listsize=list_sms->size();
-    //        qDebug()<<"m_smsdisplaycount"<<m_smsdisplaycount<<"listsms"<<listsize;
-    //    for(int i=0;i<listsize&&i<m_smsdisplaycount;i++)
-    //    {
-    //        listSMS->insertPlainText(list_sms->at(listsize-1-i)+"\n");
-    //    }
+
     for(int i=0;i<list_sms_display->size()&&i<m_smsdisplaycount;i++)
+
     {
         listSMS->insertPlainText(QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")
                                  + list_sms_display->at(i)+"\n");
@@ -3536,33 +3507,49 @@ void Casco_DMI::setScheduleId(qint16 scheduleid)
 {
     dmi_els_data->Schedule_Id=scheduleid;
 
+
     logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
             "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
             "  ScheduleID 选择为 "+QString::number(scheduleid);
     log->writeLog(logcontent);
-    //    qDebug()<<"set sch"<<dmi_els_data->Schedule_Id;
+
+    is_scheduleid_send=true;
+    processScheduleServiceTripID();
+
+
 }
 
 void Casco_DMI::setServiceId(qint16 serviceid)
 {
     dmi_els_data->Service_Id=serviceid;
+
     logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
             "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
             "  ServiceID 选择为 "+QString::number(serviceid);
     log->writeLog(logcontent);
 
-    //    qDebug()<<"set service"<<dmi_els_data->Service_Id;
+
+
+    is_serviceid_send=true;
+
+    processScheduleServiceTripID();
+
+
 }
 
 void Casco_DMI::setTripId(qint16 tripid)
 {
     dmi_els_data->Trip_Id=tripid;
+
     logcontent=  QDateTime::currentDateTime().toString("yyyy/MM/dd HH:mm:ss")+
             "司机号 "+ QString::number(els_dmi_data->Driver_Id)+
             "  TripID 选择为 "+QString::number(tripid);
     log->writeLog(logcontent);
 
-    //    qDebug()<<"set trip"<<dmi_els_data->Trip_Id;
+
+    is_tripid_send=true;
+
+
 }
 
 void Casco_DMI::ToggleMute()
@@ -3637,15 +3624,113 @@ void Casco_DMI::sendMsgToELS()
 {
     QByteArray qsend;
 
-    //    if(els_dmi_data->ELS_Service_Mode==0||els_dmi_data->ELS_Service_Mode==1)
-    //    {
-    //        dmi_els_data->resetDefault();
-    //        dmi_els_data->Schedule_Id=-1;
-    //        dmi_els_data->Service_Id=-1;
-    //        dmi_els_data->Trip_Id=-1;
-    //        dmi_els_data->Path_Id=-1;
-    //        dmi_els_data->Destination_Id=-1;
-    //    }
+    if(m_sendTime!=255)
+    {
+        if(is_cp_send)
+        {
+            if(m_cp_sendtime>0)
+                m_cp_sendtime--;
+            else
+            {
+                is_cp_send=false;
+                m_cp_sendtime=m_sendTime;
+                dmi_els_data->Crossing_Priority_Request=0;
+            }
+        }
+        if(is_elsmode_send)
+        {
+            if(m_elsmode_sendtime>0)
+                m_elsmode_sendtime--;
+            else
+            {
+                is_elsmode_send=false;
+                m_elsmode_sendtime=m_sendTime;
+                dmi_els_data->ELS_Mode_Selection=0;
+            }
+        }
+        if(is_driverid_send)
+        {
+            if(m_driverid_sendtime>0)
+                m_driverid_sendtime--;
+            else
+            {
+                is_driverid_send=false;
+                m_driverid_sendtime=m_sendTime;
+                dmi_els_data->Driver_Id=-1;
+            }
+        }
+        if(is_timeshift_send)
+        {
+            if(m_timeshift_sendtime>0)
+                m_timeshift_sendtime--;
+            else
+            {
+                is_timeshift_send=false;
+                m_timeshift_sendtime=m_sendTime;
+                dmi_els_data->Time_Shift_Request=0;
+            }
+        }
+        if(is_scheduleid_send)
+        {
+            if(m_scheduleid_sendtime>0)
+            {
+                m_scheduleid_sendtime--;
+            }
+            else
+            {
+                is_scheduleid_send=false;
+                m_scheduleid_sendtime=m_sendTime;
+                dmi_els_data->Schedule_Id=-1;
+            }
+        }
+        if(is_serviceid_send)
+        {
+            if(m_serviceid_sendtime>0)
+                m_serviceid_sendtime--;
+            else
+            {
+                is_serviceid_send=false;
+                m_serviceid_sendtime=m_sendTime;
+                dmi_els_data->Service_Id=-1;
+            }
+        }
+        if(is_tripid_send)
+        {
+            if(m_tripid_sendtime>0)
+            {
+                m_tripid_sendtime--;
+            }
+            else
+            {
+                is_tripid_send=false;
+                m_tripid_sendtime=m_sendTime;
+                dmi_els_data->Trip_Id=-1;
+            }
+        }
+        if(is_pathid_send)
+        {
+            if(m_pathid_sendtime>0)
+                m_pathid_sendtime--;
+            else
+            {
+                is_pathid_send=false;
+                m_pathid_sendtime=m_sendTime;
+                dmi_els_data->Path_Id=-1;
+            }
+        }
+        if(is_desid_send)
+        {
+            if(m_desid_sendtime>0)
+                m_desid_sendtime--;
+            else
+            {
+                is_desid_send=false;
+                m_desid_sendtime=m_sendTime;
+                dmi_els_data->Destination_Id=-1;
+            }
+        }
+    }
+
 
     int t= sizeof(DMI_ELS_Protocol)+sizeof(quint8)*dmi_els_data->OCC_Message_Length-sizeof(dmi_els_data->OCC_Message_Text)
             +sizeof(quint8)*dmi_els_data->OSS_Message_Length-sizeof(dmi_els_data->OSS_Message_Text);
@@ -3660,7 +3745,8 @@ void Casco_DMI::sendMsgToELS()
                     "serviceid="+QString::number(dmi_els_data->Service_Id)+
                     "tripid="+QString::number(dmi_els_data->Trip_Id)+
                     "pathid="+QString::number(dmi_els_data->Path_Id)+
-                    "destinationid="+QString::number(dmi_els_data->Destination_Id));
+                    "destinationid="+QString::number(dmi_els_data->Destination_Id)+
+                    "elsmode="+QString::number(dmi_els_data->ELS_Mode_Selection));
     }
     //    qDebug()<<"sendtime"<<tmpsendtimeseconds;
     dmi_els_data->DMI_Message_Time_Stamp=(quint64)(tmpsendtimeseconds)<<32;
@@ -3987,6 +4073,8 @@ int Casco_DMI::initOther(QString path)
     QDomElement splitsizemb=itemlist.at(7).toElement();
     QDomElement checktime=itemlist.at(8).toElement();
 
+    QDomElement sendtime=itemlist.at(9).toElement();
+
 
     m_diffflash=diffFlash.attribute("Value").toUInt();
     m_discontime = disConnection.attribute("Time").toUInt();
@@ -4003,6 +4091,13 @@ int Casco_DMI::initOther(QString path)
     m_clearsizeMB =clearsizemb.attribute("ClearsizeMB").toUInt();
     m_writecount =splitsizemb.attribute("SplitsizeMB").toUInt();
     m_checktime = checktime.attribute("time").toUInt();
+
+    m_sendTime= sendtime.attribute("time").toUInt();
+    m_cp_sendtime=m_elsmode_sendtime=m_driverid_sendtime=m_timeshift_sendtime
+            =m_scheduleid_sendtime=m_serviceid_sendtime
+            =m_tripid_sendtime=m_pathid_sendtime
+            =m_desid_sendtime=m_sendTime;
+
     if(m_checktime>25)
     {
         m_checktime=25; //at most 25 minute check time

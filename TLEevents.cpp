@@ -215,7 +215,7 @@ void TLEEvents::drawImage(QPainter *painter)
 
         drawTSharpeRoad(painter);
         rect=QRect(5*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
     case 2:
 
@@ -226,7 +226,7 @@ void TLEEvents::drawImage(QPainter *painter)
 
         painter->restore();
         rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
 
 
 
@@ -239,7 +239,7 @@ void TLEEvents::drawImage(QPainter *painter)
 
         painter->restore();
         rect=QRect(4*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
     case 4:
         painter->drawLine(3*width()/9,0,3*width()/9,height());
@@ -257,7 +257,7 @@ void TLEEvents::drawImage(QPainter *painter)
         painter->drawPath(ppath);
 
         rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
     case 5:
         painter->drawLine(3*width()/9,0,3*width()/9,height());
@@ -277,7 +277,7 @@ void TLEEvents::drawImage(QPainter *painter)
         painter->drawPath(ppath);
 
         rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
     case 6:
         painter->drawLine(3*width()/9,0,3*width()/9,height());
@@ -307,7 +307,7 @@ void TLEEvents::drawImage(QPainter *painter)
 
 
         rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
     case 7:
         painter->drawLine(3*width()/9,0,3*width()/9,height());
@@ -320,7 +320,7 @@ void TLEEvents::drawImage(QPainter *painter)
         painter->setPen(QPen(Qt::yellow,2,Qt::DotLine));
         painter->drawLine(0,3*height()/9,width(),3*height()/9);
         rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res2/Tram_Tracklayout.png"));
+        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
     }
     painter->restore();

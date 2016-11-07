@@ -86,7 +86,7 @@ void DialogSMSToDriver::getSMSContent()
         row++;
         ui->textEdit->insertPlainText(s+"\n");
 
-        if(row>=20)
+        if(row>=10)
         {
             row=0;
             qint64 nn=qts.pos();

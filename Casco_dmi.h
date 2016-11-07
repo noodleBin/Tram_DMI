@@ -7,7 +7,7 @@
 #ifndef CASCO_DMI_H
 #define CASCO_DMI_H
 
-#include "Public_Variable.h"
+#include "../DMIDataStruct/Public_Variable.h"
 #include <QObject>
 #include <QWidget>
 #include <QFile>
@@ -188,6 +188,8 @@ private :
     void setServiceId(qint16 serviceid);
     void setTripId(qint16 tripid);
 
+    void processScheduleServiceTripID();
+
 
 
 signals:
@@ -240,7 +242,8 @@ private:
 
     //RRCP area
     QProgressBar *RRCPbar;
-    QLabel *lblBarName,*lblBarTotalValue,*lblBarRemainValue;
+    QLabel *lblBarName,*lblBarTotalValue,*lblBarRemainValue,*lblCPTotal,
+    *lblCPUnit,*lblCPRemain,*lblCPRemainunit;
 
     //Operate area
     QLabel *btnleft,*btnstra,*btnright,*btncp,*btninput;
@@ -316,6 +319,18 @@ private:
     quint64 m_writecount;
 
     quint8 m_checktime;
+    quint8 m_sendTime;
+    quint8 m_cp_sendtime,m_elsmode_sendtime,m_timeshift_sendtime,
+    m_driverid_sendtime,
+    m_scheduleid_sendtime,
+    m_serviceid_sendtime,
+    m_tripid_sendtime,
+    m_pathid_sendtime,
+    m_desid_sendtime;
+
+    bool is_cp_send,is_elsmode_send,is_driverid_send,is_timeshift_send,
+    is_scheduleid_send,is_serviceid_send,is_tripid_send,
+    is_pathid_send,is_desid_send;
 
     QMap<quint8,Alarm_Record>* m_Alarm_Record_map;
     QMap<quint8,Signal_Info>* m_Signal_map;

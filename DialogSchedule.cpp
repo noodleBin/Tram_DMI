@@ -151,6 +151,7 @@ void DialogSchedule::on_btn_service_clicked()
     if(service_index==-1)
         return;
 
+//    qDebug()<<"service"<<ui->cmb_service->currentText()<<ui->cmb_service->currentText().toUInt();
     emit sendServiceId(ui->cmb_service->currentText().toUInt());
 
     ui->cmb_service->setEnabled(false);
