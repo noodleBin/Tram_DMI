@@ -35,7 +35,3 @@ void DialogShutdown::setValue(quint8 value)
 
 }
 
-bool DialogShutdown::eventFilter(QObject *obj, QEvent *event)
-{
-
-}

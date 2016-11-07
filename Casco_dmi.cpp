@@ -459,10 +459,11 @@ void Casco_DMI::initDialog()
                                 ypos+(wid->height()-dialtimeupdate->height())/2
                                 ,dialtimeupdate->width(),dialtimeupdate->height());
     dialobs = new DialogOBSStatus(wid);
-    dialobs->setGeometry(xpos+wid->width()/2-100,ypos+10,dialobs->width(),dialobs->height());
+    dialobs->setGeometry(xpos+wid->width()/2+10,ypos+100,dialobs->width(),dialobs->height());
+
 #ifdef Baseline_2_0
     dialshutdown=new DialogShutdown(wid);
-    dialshutdown->setGeometry(xpos+520,ypos+550,dialshutdown->width(),dialshutdown->height());
+    dialshutdown->setGeometry(xpos+525,ypos+590,dialshutdown->width(),dialshutdown->height());
 #endif
     dialcommstatus = new DialogCommstatus(wid);
     dialcommstatus->setGeometry(xpos,ypos+wid->height()/2,dialcommstatus->width(),dialcommstatus->height());
@@ -780,6 +781,9 @@ void Casco_DMI::refreshRadarPic()
 
 bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
 {
+    //    if(obj->objectName()!="Window_8ch")
+    //        return false;
+    //    qDebug()<<"in main"<<obj->objectName();
     if(obj==lblCascoLogo)
     {
         if(event->type()==QEvent::MouseButtonRelease)
@@ -1315,6 +1319,8 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
     else if( event->type()== QKeyEvent::KeyPress)
     {
         //        qDebug()<<"it is quit";
+        //        qDebug()<<"in main"<<obj->objectName();
+
         QKeyEvent* key =(QKeyEvent*)(event);
         if(key->key()==Qt::Key_1&&key->modifiers()==Qt::CTRL)
         {
@@ -1366,6 +1372,12 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
             {
                 widDMS->setHidden(true);
             }
+            return true;
+        }
+        if(key->key()==Qt::Key_0&&key->modifiers()==Qt::CTRL)
+        {
+            //            if(!widDMS->isHidden())
+            mytleevents->display9cubic=!mytleevents->display9cubic;
             return true;
         }
         return false;
@@ -1917,8 +1929,12 @@ void Casco_DMI::refreshATP()
     quint16 tmpvalue;
     //ATP
     quint8 tmpcurspeed=els_dmi_data->ELS_Current_Speed;
-    quint8 tmplimitspeed=els_dmi_data->Authorized_Speed;
-
+    quint8 tmplimitspeed;
+#ifdef Baseline_2_0
+    tmplimitspeed=els_dmi_data->Current_PSR_Speed;
+#else
+    tmplimitspeed=els_dmi_data->Authorized_Speed;
+#endif
     if(tmpcurspeed>=tmplimitspeed&&tmpcurspeed!=0)
     {
         QString convertlimitspeed=  ConvertSpeed(tmplimitspeed);

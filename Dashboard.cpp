@@ -211,7 +211,7 @@ void MyDashboard::drawCoverBall(QPainter *painter)
     painter->setFont(font);
 
     painter->setOpacity(1.0);
-    painter->setPen(Qt::white);
+    painter->setPen(Qt::blue);
     QString strValue;
     strValue=tr("%1").arg(m_currentValue);
     painter->drawText(textRect,Qt::AlignHCenter|Qt::AlignVCenter,strValue);

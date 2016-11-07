@@ -22,8 +22,7 @@ private:
     Ui::DialogShutdown *ui;
     QString currentPath;
     QMovie *movieshutdown;
-protected:
-    bool eventFilter(QObject *, QEvent *);
+
 };
 
 #endif // DIALOGSHUTDOWN_H

@@ -3,6 +3,8 @@
 
 #include <QPainter>
 #include <QFrame>
+#include <QEvent>
+#include <QKeyEvent>
 #include "DMISignal.h"
 
 class TLEEvents : public QWidget
@@ -13,11 +15,12 @@ public:
     ~TLEEvents();
 
     void setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos, quint8 *p_statuspos, quint8 *p_rotationpos, quint8 count);
-
+    bool display9cubic;
 
 protected:
     void paintEvent(QPaintEvent *);
     QSize sizeHint() const;
+
 
 
 private:
@@ -25,7 +28,9 @@ private:
     quint16 *xpos,*ypos;
     quint8 m_size,*status,*rotation;
 
-         qint16 arrow_x,arrow_y;
+    qint16 arrow_x,arrow_y;
+
+
 
     //    quint8 m_background;
     //    quint8 m_type;
@@ -53,6 +58,7 @@ private:
     //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QColor &color);
     //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QPoint &p3, QColor &color);
 
+    void drawTSharpeRoad(QPainter *painter);
     void drawImage(QPainter* );
     void drawSignals(QPainter* );
     void drawOneSignal(QPainter*, quint16,
