@@ -320,6 +320,7 @@ private:
 
     quint8 m_checktime;
     quint8 m_sendTime;
+    quint8 m_activeEnd;
     quint8 m_cp_sendtime,m_elsmode_sendtime,m_timeshift_sendtime,
     m_driverid_sendtime,
     m_scheduleid_sendtime,

@@ -219,29 +219,8 @@ void Casco_DMI::initialNormalControl()
     default:
         break;
     }
+    wid->findChild<QTabWidget*>("tabWidget")->removeTab(1);
 
-
-    //    wid->findChild<QLabel*>("lbl_CPArea")->setText(tr("cparea"));
-    //    wid->findChild<QLabel*>("lbl_CPTotal")->setText(tr("cptotal"));
-    //    wid->findChild<QLabel*>("lbl_CPUnit")->setText(tr("meter"));
-    //    wid->findChild<QLabel*>("lbl_CPRemain")->setText(tr("cpremain"));
-    //    wid->findChild<QLabel*>("lbl_CPRemainUnit")->setText(tr("meter"));
-
-    //Tab mission
-    //    if(screenmode==3)
-    //    {
-    //        //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(0,tr("geoInfo"));
-    //        wid->findChild<QTabWidget*>("tabWidget")->removeTab(0);
-    //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(1,tr("maintenceInfo"));
-    //    }
-    //    else
-    {
-        //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(0,tr("missionInfo"));
-        //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(1,tr("geoInfo"));
-        //        wid->findChild<QTabWidget*>("tabWidget")->removeTab(1);
-
-        //        wid->findChild<QTabWidget*>("tabWidget")->setTabText(2,tr("maintenceInfo"));
-    }
     wid->findChild<QLabel*>("lbl_namesch")->setText(tr("sch"));
     wid->findChild<QLabel*>("lbl_namedes")->setText(tr("des"));
     wid->findChild<QLabel*>("lbl_namedownstream")->setText(tr("downstream"));
@@ -362,9 +341,21 @@ void Casco_DMI::initialControl()
 
 #ifdef Baseline_2_0
     lblSystemOK->installEventFilter(this);
+    lblActiveEnd=wid->findChild<QLabel*>("pic_activeend");
+
+    switch(m_activeEnd)
+    {
+    case 1:lblActiveEnd->setPixmap(resPath+"Cab1.png");
+        break;
+    case 2:lblActiveEnd->setPixmap(resPath+"Cab2.png");
+        break;
+    default:lblActiveEnd->setPixmap(resPath+"Cab1.png");
+        break;
+    }
+
 #endif
     //    lblShutdownStatus=wid->findChild<QLabel*>("pic_working");
-    lblActiveEnd=wid->findChild<QLabel*>("pic_activeend");
+
     lblEb=wid->findChild<QLabel*>("pic_eb");
     lblSb=wid->findChild<QLabel*>("pic_sb");
     lblTurnback=wid->findChild<QLabel*>("pic_turnback");
@@ -766,6 +757,7 @@ void Casco_DMI::initDefaultValue()
 
     m_checktime=15;
     m_sendTime =255;
+    m_activeEnd=1;
     m_cp_sendtime=m_elsmode_sendtime=m_driverid_sendtime=m_timeshift_sendtime
             =m_scheduleid_sendtime=m_serviceid_sendtime
             =m_tripid_sendtime=m_pathid_sendtime
@@ -4074,7 +4066,7 @@ int Casco_DMI::initOther(QString path)
     QDomElement checktime=itemlist.at(8).toElement();
 
     QDomElement sendtime=itemlist.at(9).toElement();
-
+    QDomElement activeend=itemlist.at(10).toElement();
 
     m_diffflash=diffFlash.attribute("Value").toUInt();
     m_discontime = disConnection.attribute("Time").toUInt();
@@ -4091,18 +4083,18 @@ int Casco_DMI::initOther(QString path)
     m_clearsizeMB =clearsizemb.attribute("ClearsizeMB").toUInt();
     m_writecount =splitsizemb.attribute("SplitsizeMB").toUInt();
     m_checktime = checktime.attribute("time").toUInt();
-
+    if(m_checktime>25)
+    {
+        m_checktime=25; //at most 25 minute check time
+    }
     m_sendTime= sendtime.attribute("time").toUInt();
     m_cp_sendtime=m_elsmode_sendtime=m_driverid_sendtime=m_timeshift_sendtime
             =m_scheduleid_sendtime=m_serviceid_sendtime
             =m_tripid_sendtime=m_pathid_sendtime
             =m_desid_sendtime=m_sendTime;
 
-    if(m_checktime>25)
-    {
-        m_checktime=25; //at most 25 minute check time
-    }
-    //    qDebug()<<"3 size"<<m_promotesizeMB<<m_clearsizeMB<<m_writecount;
+    m_activeEnd=activeend.attribute("end").toUInt();
+
 
     localFile->close();
     delete localFile;  //清理资源，避免内存泄露
