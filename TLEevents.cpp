@@ -48,8 +48,9 @@ void TLEEvents::setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos,
             ypos[i]=p_ypos[i]*height()/9+height()/18;
             break;
         case 3:
-            xpos[i]=p_xpos[i]*width()/9-width()/18;
+            xpos[i]=p_xpos[i]*width()/9;
             ypos[i]=p_ypos[i]*height()/9-height()/18;
+
             break;
         case 4:
             xpos[i]=p_xpos[i]*width()/9+width()/18;
@@ -72,18 +73,7 @@ void TLEEvents::setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos,
 
 }
 
-//void TLEEvents::setvalue(quint8 background, quint8 type, quint8 position, quint8 orisignalstatus
-//                         ,quint8 restricpos,quint8 restricstatus)
-//{
-//    m_background=background;
-//    m_type=type;
-//    m_position=position;
-//    m_orivalue=orisignalstatus;
-//    m_restricpos=restricpos;
-//    m_restricvalue=restricstatus;
-//    update();
 
-//}
 
 void TLEEvents::paintEvent(QPaintEvent *e)
 {
@@ -101,37 +91,7 @@ void TLEEvents::paintEvent(QPaintEvent *e)
     drawImage(&painter);
     drawSignals(&painter);
 
-    //    m_background=1;
-    //    switch (m_background)
-    //    {
-    //    case 1:
-    //        drawEvent1(&painter);
-    //        break;
-    //    case 2:
-    //        drawEvent2(&painter);
-    //        break;
-    //    case 3:
-    //        drawEvent3(&painter);
-    //        break;
-    //    case 4:
-    //        drawEvent4(&painter);
-    //        break;
-    //    case 5:
-    //        drawEvent5(&painter);
-    //        break;
-    //    case 6:
-    //        drawEvent6(&painter);
-    //        break;
-    //    default:
-    //        break;
-    //    }
-    //    m_type=1;
-    //    m_position=5;
-    //    m_value=2;
-    //    qDebug()<<"mm"<<m_position<<m_restricpos;
 
-
-    //    drawCar(&painter);
 
     if(display9cubic)
     {
@@ -173,6 +133,30 @@ QSize TLEEvents::sizeHint() const
     return QSize(100,100);
 }
 
+void TLEEvents::drawArrow(QPainter *painter, QPoint &end,QColor color)
+{
+    QPoint p1,p2,p3,p4,p5,p6;
+    QPoint ps[6];
+    p1= QPoint(end.x()-10,end.y()-10);
+    p2=        QPoint(end.x(),end.y()-25);
+    p3=       QPoint(end.x()+10,end.y()-10);
+
+
+    p4= QPoint(end.x()-10,end.y()+15);
+    p5=        QPoint(end.x(),end.y());
+    p6=       QPoint(end.x()+10,end.y()+15);
+
+    ps[0]=p1;
+    ps[1]=p2;
+    ps[2]=p3;
+    ps[3]=p6;
+    ps[4]=p5;
+    ps[5]=p4;
+    painter->setPen(QPen(color,1));
+    painter->setBrush(color);
+    painter->drawPolygon(ps,6);
+}
+
 
 
 
@@ -185,6 +169,12 @@ void TLEEvents::drawTSharpeRoad(QPainter *painter)
     //pen.setColor(QColor(220,220,220));
 
     painter->translate(0,height()/9);
+    painter->save();
+    painter->setPen(QPen(QColor(64,64,64),1));
+    painter->setBrush(QColor(64,64,64));
+    painter->drawRect(0,1*height()/9,9*width()/9,3*height()/9);
+    painter->drawRect(3*width()/9,1*height()/9,3*width()/9,7*height()/9);
+    painter->restore();
     painter->drawLine(0,2*height()/9,width(),2*height()/9);
     painter->drawLine(0,3*height()/9,width(),3*height()/9);
 
@@ -199,6 +189,8 @@ void TLEEvents::drawTSharpeRoad(QPainter *painter)
 
     painter->drawLine(4*width()/9,4*height()/9,4*width()/9,height());
     painter->drawLine(5*width()/9,4*height()/9,5*width()/9,height());
+
+
     painter->restore();
 }
 
@@ -310,15 +302,19 @@ void TLEEvents::drawImage(QPainter *painter)
         painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
     case 7:
-        painter->drawLine(3*width()/9,0,3*width()/9,height());
-        painter->drawLine(6*width()/9,0,6*width()/9,height());
-        //        painter->drawLine(0,2*height()/9,width(),2*height()/9);
-        //        painter->drawLine(0,4*height()/9,width(),4*height()/9);
+        painter->save();
         painter->setPen(QPen(QColor(64,64,64),1));
         painter->setBrush(QColor(64,64,64));
         painter->drawRect(0,2*height()/9,width(),2*height()/9);
         painter->setPen(QPen(Qt::yellow,2,Qt::DotLine));
         painter->drawLine(0,3*height()/9,width(),3*height()/9);
+        painter->restore();
+
+        painter->drawLine(3*width()/9,0,3*width()/9,height());
+        painter->drawLine(6*width()/9,0,6*width()/9,height());
+        //        painter->drawLine(0,2*height()/9,width(),2*height()/9);
+        //        painter->drawLine(0,4*height()/9,width(),4*height()/9);
+
         rect=QRect(6*width()/9-8,8*height()/9,16,66);
         painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
         break;
@@ -328,14 +324,20 @@ void TLEEvents::drawImage(QPainter *painter)
 
 void TLEEvents::drawSignals(QPainter *p)
 {
-    for(int i=0;i<signals_count;i++)
+    for(int i=0;i<signals_count-1;i++)
     {
-        drawOneSignal(p,xpos[i],ypos[i],status[i],rotation[i]);
+        drawOneSignal(p,xpos[i],ypos[i],status[i],rotation[i],true);
         //        qDebug()<<"ha"<<i<<xpos[i]<<ypos[i]<<status[i]<<rotation[i];
     }
+    drawOneSignal(p,xpos[signals_count-1],
+            ypos[signals_count-1],
+            status[signals_count-1],
+            rotation[signals_count-1]);
 }
 
-void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s , quint8 ro)
+
+
+void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s , quint8 ro, bool isconflict)
 {
     painter->save();
     painter->translate(x,y);
@@ -353,25 +355,26 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
     case 3:
         painter->rotate(-90);
         arrow_x=0-height()/18;
-        arrow_y=0+height()/18;
+        //        arrow_y=0+height()/18;
         break;
     case 4:
         painter->rotate(180);
-               arrow_x=0-height()/18;
+        arrow_x=0-height()/18;
         break;
     }
 
-    //    painter->rotate(90);
+
     painter->setPen(QPen(QColor(0,0,0),1));
     painter->setBrush(QBrush(Qt::black));
-    //    painter->drawEllipse(x,y,width()/18,height()/18);
+
     painter->drawEllipse(0,0,width()/18,height()/18);
     painter->drawLine(0+width()/36,0+height()/18,0+width()/36,0+height()/18+height()/36);
     painter->drawLine(0,0+height()/18+height()/36,0+width()/18,0+height()/18+height()/36);
 
-    QPoint p1,p2,p3,c1,c2;
-    QPoint ps[3];
+    QPoint p1,p2,p3,p4,p5,p6,c1,c2,end;
+    QPoint ps[6];
     QPainterPath ppath;
+    QColor arrow_color;
 
     switch (s)
     {
@@ -381,6 +384,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
         painter->drawLine(0+3,0+height()/36,0+width()/18-3,0+height()/36);
         break;
     case 2:
+
         painter->setPen(QPen(Qt::green,5));
         painter->drawLine(0+width()/36,0+3,0+width()/36,0+height()/18-3);
 
@@ -388,20 +392,15 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
 
         painter->save();
 
-        painter->setPen(QPen(Qt::green,8));
+        if(isconflict)
+            arrow_color=Qt::red;
+        else\
+            arrow_color=Qt::green;
+
+        painter->setPen(QPen(arrow_color,8));
         painter->drawLine(arrow_x,0+height()/9,arrow_x,0-4*height()/9);
-
-        p1= QPoint(arrow_x-15,0-4*height()/9+10);
-        p2=        QPoint(arrow_x+15,0-4*height()/9+10);
-        p3=       QPoint(arrow_x,0-4*height()/9-10);
-
-
-        ps[0]=p1;
-        ps[1]=p2;
-        ps[2]=p3;
-        painter->setPen(QPen(Qt::green,1));
-        painter->setBrush(Qt::green);
-        painter->drawPolygon(ps,3);
+        end=QPoint(arrow_x,0-4*height()/9);
+        drawArrow(painter,end,arrow_color);
 
         painter->restore();
         break;
@@ -409,11 +408,14 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
         painter->setPen(QPen(Qt::yellow,5));
         painter->drawLine(0+width()/72,0+height()/72,
                           0+width()/18-width()/72,0+height()/18-height()/72);
-        //        painter->drawLine(arrow_x,0+height()/9,arrow_x,0-height()/9);
 
         painter->save();
 
-        painter->setPen(QPen(Qt::yellow,8));
+        if(isconflict)
+            arrow_color=Qt::red;
+        else
+            arrow_color=Qt::yellow;
+        painter->setPen(QPen(arrow_color,8));
 
 
         if(image==1||image==2||image==3)
@@ -421,20 +423,21 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             painter->drawArc(QRect(arrow_x-4*width()/9,arrow_y-2*height()/9
                                    ,4*width()/9,4*height()/9),0,90*16);
 
+            painter->drawLine(arrow_x,arrow_y,
+                              arrow_x,arrow_y+1*height()/9);
             painter->drawLine(arrow_x-2*width()/9,arrow_y-2*height()/9,
-                              arrow_x-2*width()/9-10,arrow_y-2*height()/9);
-
-            p1= QPoint(arrow_x-2*width()/9-10,arrow_y-2*height()/9-15);
-            p2=        QPoint(arrow_x-2*width()/9-10,arrow_y-2*height()/9+15);
-            p3=       QPoint(arrow_x-2*width()/9-30,arrow_y-2*height()/9);
+                              arrow_x-3*width()/9,arrow_y-2*height()/9);
 
 
-            ps[0]=p1;
-            ps[1]=p2;
-            ps[2]=p3;
-            painter->setPen(QPen(Qt::yellow,1));
-            painter->setBrush(Qt::yellow);
-            painter->drawPolygon(ps,3);
+            end=QPoint(arrow_x-3*width()/9,arrow_y-2*height()/9);
+
+            painter->save();
+            painter->translate(-2*width()/9-arrow_x,-5*height()/9-27);
+            painter->rotate(-90);
+
+            drawArrow(painter,end,arrow_color);
+            painter->restore();
+
 
         }
         else
@@ -442,7 +445,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             painter->translate(-x,-y);
             p1=  QPoint (6*width()/9,5*height()/9);
             p2=  QPoint (3*width()/9,2*height()/9);
-            painter->setPen(QPen(Qt::yellow,8));
+            painter->setPen(QPen(arrow_color,8));
             painter->setBrush(Qt::NoBrush);
             ppath= QPainterPath (p1);
 
@@ -450,23 +453,11 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
             ppath.cubicTo(c1,c2,p2);
             painter->drawPath(ppath);
-            painter->drawLine(p2.x(),p2.y(),p2.x(),p2.y()-10);
-
-
-            p1= QPoint(p2.x()-15,p2.y()-10);
-            c1=        QPoint(p2.x()+15,p2.y()-10);
-            p3=       QPoint(p2.x(),p2.y()-30);
-
-
-            ps[0]=p1;
-            ps[1]=c1;
-            ps[2]=p3;
-            painter->setPen(QPen(Qt::yellow,1));
-            painter->setBrush(Qt::yellow);
-            painter->drawPolygon(ps,3);
+            painter->drawLine(p1.x(),p1.y(),p1.x(),p1.y()+height()/9);
+            painter->drawLine(p2.x(),p2.y(),p2.x(),p2.y()-height()/9);
+            end=QPoint(p2.x(),p2.y()-height()/9);
+            drawArrow(painter,end,arrow_color);
         }
-
-
         painter->restore();
         break;
     case 4:
@@ -477,35 +468,40 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
 
 
         painter->save();
-
+        if(isconflict)
+            arrow_color=Qt::red;
+        else
+            arrow_color=Qt::yellow;
         if(image==1||image==2||image==3)
         {
-        painter->setPen(QPen(Qt::yellow,8));
-        painter->drawArc(QRect(arrow_x,arrow_y-1*height()/9
-                               ,2*width()/9,2*height()/9),90*16,90*16);
+            painter->setPen(QPen(arrow_color,8));
+            painter->drawArc(QRect(arrow_x,arrow_y-1*height()/9
+                                   ,2*width()/9,2*height()/9),90*16,90*16);
 
 
-        painter->drawLine(arrow_x+1*width()/9,arrow_y-1*height()/9,
-                          arrow_x+1*width()/9+20,arrow_y-1*height()/9);
 
-        p1= QPoint(arrow_x+1*width()/9+40,arrow_y-1*height()/9);
-        p2=        QPoint(arrow_x+1*width()/9+20,arrow_y-1*height()/9-15);
-        p3=       QPoint(arrow_x+1*width()/9+20,arrow_y-1*height()/9+15);
+            painter->drawLine(arrow_x,arrow_y,
+                              arrow_x,arrow_y+1*height()/9);
+            painter->drawLine(arrow_x+1*width()/9,arrow_y-1*height()/9,
+                              arrow_x+2*width()/9,arrow_y-1*height()/9);
 
 
-        ps[0]=p1;
-        ps[1]=p2;
-        ps[2]=p3;
-        painter->setPen(QPen(Qt::yellow,1));
-        painter->setBrush(Qt::yellow);
-        painter->drawPolygon(ps,3);
-}
+            end=QPoint(arrow_x+2*width()/9,arrow_y-1*height()/9);
+
+            painter->save();
+            painter->translate(1*width()/9+arrow_x,-3*height()/9+27);
+            painter->rotate(90);
+
+            drawArrow(painter,end,arrow_color);
+            painter->restore();
+
+        }
         else
         {
             painter->translate(-x,-y);
             p1=  QPoint (3*width()/9,5*height()/9);
             p2=  QPoint (6*width()/9,2*height()/9);
-            painter->setPen(QPen(Qt::yellow,8));
+            painter->setPen(QPen(arrow_color,8));
             painter->setBrush(Qt::NoBrush);
             ppath= QPainterPath (p1);
 
@@ -513,20 +509,10 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
             ppath.cubicTo(c1,c2,p2);
             painter->drawPath(ppath);
-            painter->drawLine(p2.x(),p2.y(),p2.x(),p2.y()-10);
-
-
-            p1= QPoint(p2.x()-15,p2.y()-10);
-            c1=        QPoint(p2.x()+15,p2.y()-10);
-            p3=       QPoint(p2.x(),p2.y()-30);
-
-
-            ps[0]=p1;
-            ps[1]=c1;
-            ps[2]=p3;
-            painter->setPen(QPen(Qt::yellow,1));
-            painter->setBrush(Qt::yellow);
-            painter->drawPolygon(ps,3);
+            painter->drawLine(p1.x(),p1.y(),p1.x(),p1.y()+height()/9);
+            painter->drawLine(p2.x(),p2.y(),p2.x(),p2.y()-height()/9);
+            end=QPoint(p2.x(),p2.y()-height()/9);
+            drawArrow(painter,end,arrow_color);
         }
 
         painter->restore();

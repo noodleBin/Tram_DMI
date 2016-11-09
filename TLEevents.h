@@ -55,7 +55,7 @@ private:
     //    void  drawSignal(QPainter *painter, quint8 type, quint8 pos, quint8 value, MySignal *ms);
 
     //    void drawCar(QPainter *painter, QRect r);
-    //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QColor &color);
+        void drawArrow(QPainter*painter, QPoint &end, QColor color);
     //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QPoint &p3, QColor &color);
 
     void drawTSharpeRoad(QPainter *painter);
@@ -63,7 +63,7 @@ private:
     void drawSignals(QPainter* );
     void drawOneSignal(QPainter*, quint16,
                        quint16,
-                       quint8, quint8);
+                       quint8, quint8,bool isconflict=false);
 };
 
 

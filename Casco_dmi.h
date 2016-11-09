@@ -149,7 +149,7 @@ private :
     void setRecvDMSDataFromSocket(QByteArray &bytes);
     void refreshUI();
     void refreshRadarPic();
-    void refreshAlarmQue(quint8 index,QString filter);
+    void refreshAlarmQue(quint8 index,QString filter,bool issms=true);
     void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1);
     void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1, QString alarm_arg1);
     void refreshAlarmText(quint8 index, QString filter, QString );
