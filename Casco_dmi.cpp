@@ -3372,6 +3372,11 @@ void Casco_DMI::smsPromte(QString txt)
     list_sms->enqueue(txt);
 
 
+    for(int i=0;i<list_sms_display->size();i++)
+    {
+        if(txt==list_sms_display->at(i))
+            return;
+    }
     if(list_sms_display->size()<m_smsdisplaycount)
     {
         ;
