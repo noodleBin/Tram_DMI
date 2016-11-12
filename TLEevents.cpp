@@ -454,6 +454,32 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
 
 
         }
+        else if(image==8)
+        {
+            painter->drawLine(arrow_x,0+height()/9,arrow_x,0-1*height()/9);
+            painter->drawLine(arrow_x,0-1*height()/9,arrow_x-2*width()/9,
+                              0-3*height()/9);
+            painter->drawLine(arrow_x-2*width()/9,
+                              0-3*height()/9,
+                              arrow_x-2*width()/9,
+                              0-4*height()/9);
+            painter->drawLine(          arrow_x-2*width()/9,
+                                        0-4*height()/9,
+                                        arrow_x-4*width()/9,
+                                        0-6*height()/9);
+            painter->drawLine(            arrow_x-4*width()/9,
+                                          0-6*height()/9,
+                                          arrow_x-5*width()/9,
+                                          0-6*height()/9);
+            end=QPoint(arrow_x-5*width()/9,-6*height()/9);
+
+            painter->save();
+            painter->translate(30,-638);
+            painter->rotate(-90);
+
+            drawArrow(painter,end,arrow_color);
+            painter->restore();
+        }
         else
         {
             painter->translate(-x,-y);
@@ -510,6 +536,27 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             painter->restore();
 
         }
+        else if(image==8)
+        {
+    painter->setPen(QPen(arrow_color,8));
+            painter->drawLine(arrow_x-width()/9,arrow_y,
+                              arrow_x-width()/9,arrow_y+1*height()/9);
+
+            painter->drawLine(arrow_x-width()/9,arrow_y,
+                              arrow_x+1*width()/9,arrow_y-2*height()/9);
+            painter->drawLine(arrow_x+1*width()/9,arrow_y-2*height()/9,
+                              arrow_x+2*width()/9,arrow_y-2*height()/9);
+            painter->drawLine(arrow_x+2*width()/9,arrow_y-2*height()/9,
+                              arrow_x+3*width()/9,arrow_y-2*height()/9);
+            end=QPoint(arrow_x+3*width()/9,arrow_y-2*height()/9);
+            painter->save();
+            painter->translate(20,-250);
+            painter->rotate(90);
+
+            drawArrow(painter,end,arrow_color);
+            painter->restore();
+        }
+
         else
         {
             painter->translate(-x,-y);
