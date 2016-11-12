@@ -2236,7 +2236,7 @@ void Casco_DMI::refreshAlarmQue(quint8 index, QString filter, bool issms)
         alarmPromte(filter+warning_record.str);
     putAlarmInQue(warning_record);
 }
-void Casco_DMI::refreshAlarmQue(quint8 index,QString filter,QString sms_arg1)
+void Casco_DMI::refreshAlarmQue(quint8 index, QString filter, QString sms_arg1, bool issms)
 {
     warning_index=index;
     warning_record=m_Alarm_Record_map->value(warning_index);
@@ -2244,7 +2244,7 @@ void Casco_DMI::refreshAlarmQue(quint8 index,QString filter,QString sms_arg1)
     smsPromte(filter+warning_record.str);
     putAlarmInQue(warning_record);
 }
-void Casco_DMI::refreshAlarmQue(quint8 index,QString filter,QString sms_arg1,QString alarm_arg1)
+void Casco_DMI::refreshAlarmQue(quint8 index, QString filter, QString sms_arg1, QString alarm_arg1, bool issms)
 {
     warning_index=index;
     warning_record=m_Alarm_Record_map->value(warning_index);
@@ -2325,19 +2325,19 @@ void Casco_DMI::refreshMission()
             quint8 v=els_dmi_data->ELS_Function_Detailed_Status;
             if((v&0x01)==0)
             {
-                refreshAlarmQue(6,"[车载] ","E L S");
+                refreshAlarmQue(6,"[车载] ","E L S",true);
             }
             if((v&0x02)==0)
             {
-                refreshAlarmQue(6,"[车载] ","R R");
+                refreshAlarmQue(6,"[车载] ","R R",true);
             }
             if((v&0x04)==0)
             {
-                refreshAlarmQue(6,"[车载] ","C P");
+                refreshAlarmQue(6,"[车载] ","C P",true);
             }
             if((v&0x08)==0)
             {
-                refreshAlarmQue(6,"[车载] ","A T P");
+                refreshAlarmQue(6,"[车载] ","A T P",true);
             }
 #ifndef Baseline_2_0
             lblObsStatus->setPixmap(resPath+"OBS_Error.png");

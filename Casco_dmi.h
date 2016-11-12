@@ -150,8 +150,8 @@ private :
     void refreshUI();
     void refreshRadarPic();
     void refreshAlarmQue(quint8 index,QString filter,bool issms=true);
-    void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1);
-    void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1, QString alarm_arg1);
+    void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1,bool issms=true);
+    void refreshAlarmQue(quint8 index, QString filter, QString sms_arg1, QString alarm_arg1,bool issms=true);
     void refreshAlarmText(quint8 index, QString filter, QString );
     void refreshSMSText(quint8 index, QString filter);
     void refreshAlarmMap();

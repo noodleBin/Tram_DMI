@@ -59,6 +59,7 @@ private:
     //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QPoint &p3, QColor &color);
 
     void drawTSharpeRoad(QPainter *painter);
+    void drawParkinglog(QPainter *painter);
     void drawImage(QPainter* );
     void drawSignals(QPainter* );
     void drawOneSignal(QPainter*, quint16,

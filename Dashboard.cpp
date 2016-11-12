@@ -205,7 +205,7 @@ void MyDashboard::drawCoverBall(QPainter *painter)
                     2*ballRadius);
 
 
-    qreal fontSize=textRect.height()/2;
+    qreal fontSize=textRect.height()/3;
     QFont font;
     font.setPointSize(fontSize);
     painter->setFont(font);
