@@ -39,19 +39,23 @@ void TLEEvents::setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos,
         {
         case 1:
             ypos[i]=p_ypos[i]*height()/9;
-            xpos[i]=p_xpos[i]*width()/9+width()/18;
+             xpos[i]=p_xpos[i]*width()/9;
+//            xpos[i]=p_xpos[i]*width()/9+width()/18;
             break;
         case 2:
             xpos[i]=p_xpos[i]*width()/9;
-            ypos[i]=p_ypos[i]*height()/9+height()/18;
+            ypos[i]=p_ypos[i]*height()/9;
+//            ypos[i]=p_ypos[i]*height()/9+height()/18;
             break;
         case 3:
             xpos[i]=p_xpos[i]*width()/9;
-            ypos[i]=p_ypos[i]*height()/9-height()/18;
+            ypos[i]=p_ypos[i]*height()/9;
+//            ypos[i]=p_ypos[i]*height()/9-height()/18;
 
             break;
         case 4:
-            xpos[i]=p_xpos[i]*width()/9+width()/18;
+//            xpos[i]=p_xpos[i]*width()/9+width()/18;
+             xpos[i]=p_xpos[i]*width()/9;
             ypos[i]=p_ypos[i]*height()/9;
             break;
         }
@@ -359,21 +363,21 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
     switch(ro)
     {
     case 1:
-        arrow_x=0-height()/18;
+        arrow_x=0-height()/9;
         //        arrow_y=0+2*width()/9-width()/18;
         break;
     case 2:
         painter->rotate(90);
-        arrow_x=0-height()/18;
+        arrow_x=0-height()/9;
         break;
     case 3:
         painter->rotate(-90);
-        arrow_x=0-height()/18;
+        arrow_x=0-height()/9;
         //        arrow_y=0+height()/18;
         break;
     case 4:
         painter->rotate(180);
-        arrow_x=0-height()/18;
+        arrow_x=0-height()/9;
         break;
     }
 
@@ -381,9 +385,9 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
     painter->setPen(QPen(QColor(0,0,0),1));
     painter->setBrush(QBrush(Qt::black));
 
-    painter->drawEllipse(0,0,width()/18,height()/18);
-    painter->drawLine(0+width()/36,0+height()/18,0+width()/36,0+height()/18+height()/36);
-    painter->drawLine(0,0+height()/18+height()/36,0+width()/18,0+height()/18+height()/36);
+    painter->drawEllipse(-width()/36,0,width()/18,height()/18);
+    painter->drawLine(0,0+height()/18,0,0+height()/18+height()/36);
+    painter->drawLine(0-width()/36,0+height()/18+height()/36,0+width()/18-width()/36,0+height()/18+height()/36);
 
     QPoint p1,p2,p3,p4,p5,p6,c1,c2,end;
     QPoint ps[6];
@@ -395,12 +399,12 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
 
     case 1:
         painter->setPen(QPen(Qt::red,5));
-        painter->drawLine(0+3,0+height()/36,0+width()/18-3,0+height()/36);
+        painter->drawLine(-width()/36+3,0+height()/36,0+width()/36-3,0+height()/36);
         break;
     case 2:
 
         painter->setPen(QPen(Qt::green,5));
-        painter->drawLine(0+width()/36,0+3,0+width()/36,0+height()/18-3);
+        painter->drawLine(0,0+3,0,0+height()/18-3);
 
 
 
@@ -420,8 +424,8 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
         break;
     case 3:
         painter->setPen(QPen(Qt::yellow,5));
-        painter->drawLine(0+width()/72,0+height()/72,
-                          0+width()/18-width()/72,0+height()/18-height()/72);
+        painter->drawLine(0+width()/72-width()/36,0+height()/72,
+                          0+width()/18-width()/72-width()/36,0+height()/18-height()/72);
 
         painter->save();
 
@@ -446,7 +450,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             end=QPoint(arrow_x-3*width()/9,arrow_y-2*height()/9);
 
             painter->save();
-            painter->translate(-2*width()/9-arrow_x,-5*height()/9-27);
+            painter->translate(-2*width()/9-arrow_x-60,-5*height()/9-55);
             painter->rotate(-90);
 
             drawArrow(painter,end,arrow_color);
@@ -474,7 +478,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             end=QPoint(arrow_x-5*width()/9,-6*height()/9);
 
             painter->save();
-            painter->translate(30,-638);
+            painter->translate(0,-664);
             painter->rotate(-90);
 
             drawArrow(painter,end,arrow_color);
@@ -502,8 +506,8 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
         break;
     case 4:
         painter->setPen(QPen(Qt::yellow,5));
-        painter->drawLine(0+width()/18-width()/72,0+height()/72,
-                          0+width()/72,0+height()/18-height()/72);
+        painter->drawLine(0+width()/18-width()/72-width()/36,0+height()/72,
+                          0+width()/72-width()/36,0+height()/18-height()/72);
 
 
 
@@ -529,7 +533,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
             end=QPoint(arrow_x+2*width()/9,arrow_y-1*height()/9);
 
             painter->save();
-            painter->translate(1*width()/9+arrow_x,-3*height()/9+27);
+            painter->translate(1*width()/9+arrow_x,-3*height()/9+55);
             painter->rotate(90);
 
             drawArrow(painter,end,arrow_color);
@@ -550,7 +554,7 @@ void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s 
                               arrow_x+3*width()/9,arrow_y-2*height()/9);
             end=QPoint(arrow_x+3*width()/9,arrow_y-2*height()/9);
             painter->save();
-            painter->translate(20,-250);
+            painter->translate(0,-222);
             painter->rotate(90);
 
             drawArrow(painter,end,arrow_color);
