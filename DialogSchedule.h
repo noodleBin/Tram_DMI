@@ -23,6 +23,7 @@ signals:
     void sendTripId(qint16 tripid);
 protected:
     void showEvent(QShowEvent *);
+
 public:
     explicit DialogSchedule(QMap<int,QString>*map,QWidget *parent = 0);
     ~DialogSchedule();
@@ -46,6 +47,8 @@ private slots:
     void on_btn_tripcancel_clicked();
 
     void on_btn_schcancel_clicked();
+
+
 
 private:
     Ui::DialogSchedule *ui;

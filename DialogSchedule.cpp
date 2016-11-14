@@ -47,6 +47,7 @@ DialogSchedule::DialogSchedule(QMap<int, QString> *map, QWidget *parent) :
     m_service_id=new quint16[50];
     m_trip_id=new quint16[50];
 
+
     if(map->size()>0)
         m_map_sch=map;
     else
@@ -208,5 +209,7 @@ void DialogSchedule::on_btn_tripcancel_clicked()
     ui->btn_service->setEnabled(true);
     ui->btn_servicecancel->setEnabled(true);
 }
+
+
 
 

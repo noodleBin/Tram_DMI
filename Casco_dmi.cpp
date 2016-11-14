@@ -35,8 +35,6 @@ Casco_DMI::Casco_DMI()
 
 
 
-
-
     refreshAlarmQue(100,"[软件] ",false);
 
     timer100ms=startTimer(100);
@@ -1649,25 +1647,25 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
 
         writeSMSToFile();
         writeAlarmToFile();
-        if(!que_dms_dmi->isEmpty())
-        {
-            //            qDebug()<<"que_dms_dmi count is"<<que_dms_dmi->count();
+//        if(!que_dms_dmi->isEmpty())
+//        {
+//            //            qDebug()<<"que_dms_dmi count is"<<que_dms_dmi->count();
 
-            while(!que_dms_dmi->isEmpty())
-            {
-                last_dms_dmi_data=que_dms_dmi->dequeue();
+//            while(!que_dms_dmi->isEmpty())
+//            {
+//                last_dms_dmi_data=que_dms_dmi->dequeue();
 
-            }
-            //            qDebug()<<"recv dms msg";
-            setRecvDMSDataFromSocket(last_dms_dmi_data); //只用最新的
-#ifdef Baseline_2_0
-            refreshTLE();
-#endif
-        }
-        else
-        {
+//            }
+//            //            qDebug()<<"recv dms msg";
+//            setRecvDMSDataFromSocket(last_dms_dmi_data); //只用最新的
+//#ifdef Baseline_2_0
+//            refreshTLE();
+//#endif
+//        }
+//        else
+//        {
 
-        }
+//        }
     }
 
 }
@@ -1724,7 +1722,7 @@ void Casco_DMI::setRecvDMSDataFromSocket(QByteArray &bytes)
 
         dms_dmi_data->setBytesFromData(b);
 
-        mySocket2->writeDatagram(b,QHostAddress(remoteip2),remoteport2);
+        mySocket2->writeDatagram(b,QHostAddress(remoteip),remoteport);
 
 
     }
@@ -1745,6 +1743,7 @@ void Casco_DMI::refreshUI()
     refreshGeoEvents();
     refreshMaintence();
     refreshSMS();
+    refreshTLE();
     flashUI();
 }
 
@@ -3186,6 +3185,14 @@ void Casco_DMI::refreshGeoEvents()
 
 void Casco_DMI::refreshTLE()
 {
+   QByteArray bytes;
+   bytes.resize(els_dmi_data->DMS_DMI_Data_Size);
+    for(int i=0;i<els_dmi_data->DMS_DMI_Data_Size;i++)
+    {
+        bytes[i]=els_dmi_data->DMS_DMI_Data[i];
+    }
+
+     setRecvDMSDataFromSocket(bytes); //只用最新的
     if(dms_dmi_data->Msg_ID!=102)
     {
         if(dms_dmi_data->Signal_ID==0)
@@ -4224,6 +4231,11 @@ int Casco_DMI::initSignal(QString path)
     delete dom;
     return 1;
 }
+
+
+
+
+
 
 int  Casco_DMI::initialLogSMS()
 {

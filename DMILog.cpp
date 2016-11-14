@@ -130,7 +130,7 @@ quint8 DMI_Log::initialLog(QString name)
 
     if(!qLogfile.open(QIODevice::WriteOnly|QIODevice::Text|QIODevice::Append))
     {
-        return 0;
+        return 0    ;
 
     }
     qts.setDevice(&qLogfile);

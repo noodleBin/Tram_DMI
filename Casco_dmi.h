@@ -134,6 +134,7 @@ private :
     int initDriverPassword(QString);
     int initNet(QString);
     int initSignal(QString path);
+
     void setSignalInfo(QDomElement e, Signal_Info *value);
     int initFault(QString);
 
