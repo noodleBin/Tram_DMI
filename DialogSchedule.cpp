@@ -32,7 +32,72 @@ void DialogSchedule::showEvent(QShowEvent *)
             ui->cmb_schedule->addItem(QString::number(m_sch_id[i]));
         }
     }
+    ui->cmb_schedule->installEventFilter(this);
+    ui->cmb_service->installEventFilter(this);
+    ui->cmb_trip->installEventFilter(this);
 }
+
+bool DialogSchedule::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj==ui->cmb_schedule)
+    {
+        if(  event->type()==QEvent::MouseButtonPress)
+        {
+            if(ui->cmb_schedule->isEnabled())
+            {
+                ui->cmb_schedule->clear();
+                for(int i=0;i<m_sch_num;i++)
+                {
+                    ui->cmb_schedule->addItem(QString::number(m_sch_id[i]));
+                }
+                ui->cmb_schedule->showPopup();
+            }
+
+            return true;
+
+        }
+        else
+            return false;
+    }
+    if(obj==ui->cmb_service)
+    {
+        if(  event->type()==QEvent::MouseButtonPress)
+        {
+            if(ui->cmb_service->isEnabled())
+            {
+                ui->cmb_service->clear();
+                for(int i=0;i<m_service_num;i++)
+                {
+                    ui->cmb_service->addItem(QString::number(m_service_id[i]));
+                }
+                ui->cmb_service->showPopup();
+            }
+            return true;
+        }
+        else
+            return false;
+    }
+    if(obj==ui->cmb_trip)
+    {
+        if(  event->type()==QEvent::MouseButtonPress)
+        {
+            if(ui->cmb_trip->isEnabled())
+            {
+                ui->cmb_trip->clear();
+                for(int i=0;i<m_trip_num;i++)
+                {
+                    ui->cmb_trip->addItem(QString::number(m_trip_id[i]));
+                }
+                ui->cmb_trip->showPopup();
+            }
+            return true;
+        }
+        else
+            return false;
+    }
+}
+
+
 
 DialogSchedule::DialogSchedule(QMap<int, QString> *map, QWidget *parent) :
     QDialog(parent),
@@ -152,7 +217,7 @@ void DialogSchedule::on_btn_service_clicked()
     if(service_index==-1)
         return;
 
-//    qDebug()<<"service"<<ui->cmb_service->currentText()<<ui->cmb_service->currentText().toUInt();
+    //    qDebug()<<"service"<<ui->cmb_service->currentText()<<ui->cmb_service->currentText().toUInt();
     emit sendServiceId(ui->cmb_service->currentText().toUInt());
 
     ui->cmb_service->setEnabled(false);

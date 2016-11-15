@@ -78,7 +78,7 @@ class Casco_DMI:public QObject
 public:
     explicit Casco_DMI();
     ~Casco_DMI();
-    int isquit;
+    bool isquit;
 private :
     struct Description{
         QString English_Description;

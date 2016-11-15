@@ -23,6 +23,7 @@ signals:
     void sendTripId(qint16 tripid);
 protected:
     void showEvent(QShowEvent *);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 public:
     explicit DialogSchedule(QMap<int,QString>*map,QWidget *parent = 0);

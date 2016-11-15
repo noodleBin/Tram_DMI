@@ -35,7 +35,7 @@ Casco_DMI::Casco_DMI()
 
 
 
-    refreshAlarmQue(100,"[软件] ",false);
+//    refreshAlarmQue(100,"[软件] ",false);
 
     timer100ms=startTimer(100);
     timerchecktime=startTimer(1*60*1000); //定时1分钟
@@ -2310,6 +2310,7 @@ void Casco_DMI::refreshMission()
 {
     //Mission Information
 
+    processScheduleServiceTripID();
 
     if(els_dmi_data->ELS_Function_Detailed_Status<=0x0f)
     {

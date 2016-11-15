@@ -32,6 +32,7 @@ private:
 
 
 
+
     //    quint8 m_background;
     //    quint8 m_type;
     //    quint8 m_position;
