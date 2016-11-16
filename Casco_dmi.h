@@ -68,6 +68,7 @@
 #endif
 
 #include "TLEevents.h"
+#include "tlepublicvariables.h"
 #include "../DMIDataStruct/dms_dmi_protocol.h"
 
 #include "sys/time.h"
@@ -119,6 +120,18 @@ private :
         Signal_Info* restricSignals;
     };
 
+    /**********tle events***********/
+    /**********begin***********/
+
+    QMap<quint8,QString> *map_sigid_name;
+    QMap<quint8,QString> *map_olcid_name;
+    QMap<QString,SignalBit> *map_Signal;
+    QMap<QString,SignalBit> *map_OLC;
+    QMap<quint8,QList<Shape>* > *map_Template;
+    QMap<quint8,View> *map_ViewID;
+    QMap<QString,Entry> *map_sigentry;
+    /**********end***********/
+
     QMediaPlayer *player;
     void initMainWindow(QString type);
     void initialControl();
@@ -134,7 +147,8 @@ private :
     int initDriverPassword(QString);
     int initNet(QString);
     int initSignal(QString path);
-
+    void parseElement(QDomNode node, QString nodename,
+                                 QMap<quint8,QString>* mapid,QMap<QString,SignalBit> * map);
     void setSignalInfo(QDomElement e, Signal_Info *value);
     int initFault(QString);
 

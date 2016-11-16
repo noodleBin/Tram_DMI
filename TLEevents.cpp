@@ -6,12 +6,14 @@ TLEEvents::TLEEvents(quint8 size, QWidget *parent): QWidget(parent)
 {
 
     m_size=size;
-
+    grid=27.7;
     xpos = new quint16[50];
     ypos = new quint16[50];
     status = new quint8[50];
     rotation = new quint8[50];
+    m_bitmap=new quint8[200];
     display9cubic=false;
+    need_paint=false;
     this->installEventFilter(this);
     this->show();
 }
@@ -24,46 +26,52 @@ TLEEvents::~TLEEvents()
     delete[] rotation;
 }
 
-void TLEEvents::setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos,
-                         quint8* p_statuspos, quint8* p_rotationpos,
-                         quint8 count)
+void TLEEvents::setvalue(quint8 id,quint8 status,
+                         quint16 bitmaplength,
+                         quint8* bitmap)
 {
-    image=p_image;
-    signals_count=count;
 
-    for(int i=0;i<signals_count;i++)
+    sigid =id;
+    sigstatus=status;
+    m_bitmaplength=bitmaplength;
+    for(int i=0;i<m_bitmaplength;i++)
     {
-        rotation[i]=p_rotationpos[i];
-
-        switch(rotation[i])
-        {
-        case 1:
-            ypos[i]=p_ypos[i]*height()/9;
-             xpos[i]=p_xpos[i]*width()/9;
-//            xpos[i]=p_xpos[i]*width()/9+width()/18;
-            break;
-        case 2:
-            xpos[i]=p_xpos[i]*width()/9;
-            ypos[i]=p_ypos[i]*height()/9;
-//            ypos[i]=p_ypos[i]*height()/9+height()/18;
-            break;
-        case 3:
-            xpos[i]=p_xpos[i]*width()/9;
-            ypos[i]=p_ypos[i]*height()/9;
-//            ypos[i]=p_ypos[i]*height()/9-height()/18;
-
-            break;
-        case 4:
-//            xpos[i]=p_xpos[i]*width()/9+width()/18;
-             xpos[i]=p_xpos[i]*width()/9;
-            ypos[i]=p_ypos[i]*height()/9;
-            break;
-        }
-
-
-        status[i]=p_statuspos[i];
-
+        m_bitmap[i]=bitmap[i];
     }
+
+    entryname=map_sigid_name->value(id);
+    //    qDebug()<<"signame"<<name;
+    if(!map_sigentry->contains(entryname))
+    {
+        need_paint=false;
+        //        qDebug()<<"paint entry"<<need_paint;
+        update();
+        return;
+    }
+    entry= map_sigentry->value(entryname);
+
+    if(!map_ViewID->contains(entry.viewid))
+    {
+        need_paint=false;
+        //        qDebug()<<"paint view"<<need_paint;
+        update();
+        return;
+    }
+    view= map_ViewID->value( entry.viewid);
+
+    if(!map_Template->contains(view.templateid))
+    {
+        need_paint=false;
+        //        qDebug()<<"paint tepl"<<need_paint;
+        update();
+        return;
+    }
+    tplete= map_Template->value( view.templateid);
+    siglist=view.signallist;
+    olclist=view.LCSlist;
+    need_paint=true;
+
+    //    qDebug()<<"templatid"<<view.templateid;
 
     update();
 }
@@ -83,32 +91,259 @@ void TLEEvents::paintEvent(QPaintEvent *e)
     painter.setBrush(QColor(73,86,119));
     painter.drawRect(0,0,this->width(),this->height());
 
-    drawImage(&painter);
-    drawSignals(&painter);
-
 
 
     if(display9cubic)
     {
         painter.setPen(QPen( QColor(220,220,220),1,Qt::DotLine));
 
-        for(int i=0;i<10;i++)
-            painter.drawLine(0,i*height()/9,width(),i*height()/9);
-        for(int i=0;i<10;i++)
-            painter.drawLine(i*width()/9,0,i*width()/9,height());
+        for(int i=0;i<19;i++)
+            painter.drawLine(0,i*height()/18,width(),i*height()/18);
+        for(int i=0;i<19;i++)
+            painter.drawLine(i*width()/18,0,i*width()/18,height());
     }
     else
     {
         painter.setPen(QPen( QColor(220,220,220),1,Qt::NoPen));
 
-        for(int i=0;i<10;i++)
-            painter.drawLine(0,i*height()/9,width(),i*height()/9);
-        for(int i=0;i<10;i++)
-            painter.drawLine(0*width()/9,0,i*width()/9,height());
+        for(int i=0;i<19;i++)
+            painter.drawLine(0,i*height()/18,width(),i*height()/18);
+        for(int i=0;i<19;i++)
+            painter.drawLine(0*width()/18,0,i*width()/18,height());
     }
+    if(need_paint)
+    {
+        painter.save();
+        if(entry.rotate>0)
+        {
+            painter.rotate(entry.rotate);
+            painter.translate(-width(),-height());
+        }
 
+        if(tplete->size()>0)
+        {
+
+            for(int i=0;i<tplete->size();i++)
+            {
+                Shape sh = tplete->at(i);
+                QString name=sh.name;
+
+
+
+                if(name== "Line")
+                {
+
+                    //                painter.save();
+                    painter.setPen(QPen( QColor(sh.list_Attr->value("Color")),
+                                         sh.list_Attr->value("LineStyle").toUInt()));
+
+                    painter.drawLine(sh.list_Attr->value("StartX").toUInt()*grid,
+                                     sh.list_Attr->value("StartY").toUInt()*grid,
+                                     sh.list_Attr->value("EndX").toUInt()*grid,
+                                     sh.list_Attr->value("EndY").toUInt()*grid);
+                    //                painter.restore();
+                }
+                else if(name== "Bezier")
+                {
+                    //                painter.save();
+                    painter.setPen(QPen( QColor(sh.list_Attr->value("Color")),
+                                         sh.list_Attr->value("LineStyle").toUInt()));
+
+                    QPoint begin(sh.list_Attr->value("StartX").toUInt()*grid,
+                                 sh.list_Attr->value("StartY").toUInt()*grid);
+                    QPoint end( sh.list_Attr->value("EndX").toUInt()*grid,
+                                sh.list_Attr->value("EndY").toUInt()*grid);
+                    QPoint c1(sh.list_Attr->value("StartX").toUInt()*grid,
+                             (sh.list_Attr->value("StartY").toUInt()+
+                              sh.list_Attr->value("EndY").toUInt())*grid/2 );
+                    QPoint c2(sh.list_Attr->value("EndX").toUInt()*grid,
+                              (sh.list_Attr->value("StartY").toUInt()+
+                               sh.list_Attr->value("EndY").toUInt())*grid/2 );
+                    QPainterPath pp(begin);
+                    pp.cubicTo(c1,c2,end);
+                    painter.drawPath(pp);
+//                    painter.drawLine(sh.list_Attr->value("StartX").toUInt()*grid,
+//                                     sh.list_Attr->value("StartY").toUInt()*grid,
+//                                     sh.list_Attr->value("EndX").toUInt()*grid,
+//                                     sh.list_Attr->value("EndY").toUInt()*grid);
+                    //                painter.restore();
+                }
+                else if(name== "Rect")
+                {
+//                    qDebug()<<"Rect";
+                    painter.setBrush(QColor(sh.list_Attr->value("BrushColor")));
+                    painter.setPen(QPen( QColor(sh.list_Attr->value("PenColor")),
+                                         sh.list_Attr->value("LineStyle").toUInt()));
+                    painter.drawRect(sh.list_Attr->value("LeftTopX").toUInt()*grid,
+                                     sh.list_Attr->value("LeftTopY").toUInt()*grid,
+                                     sh.list_Attr->value("RightBottomX").toUInt()*grid,
+                                     sh.list_Attr->value("RightBottomY").toUInt()*grid);
+                    //                for(int j=0;j<sh.list_Attr->size();j++)
+                    //                    qDebug()<<j<<sh.list_Attr->at(j);
+                }
+                else if(name== "ARC")
+                {
+                    painter.setPen(QPen( QColor(sh.list_Attr->value("Color")),
+                                         sh.list_Attr->value("LineStyle").toUInt()));
+                    painter.drawArc(QRect(QPoint(sh.list_Attr->value("StartX").toUInt()*grid,
+                                          sh.list_Attr->value("StartY").toUInt()*grid),
+                                          QPoint(sh.list_Attr->value("EndX").toUInt()*grid,
+                                          sh.list_Attr->value("EndY").toUInt()*grid)),
+                                    0,sh.list_Attr->value("Angle").toInt()*16);
+//painter.drawRect(0,0,5*grid,5*grid);
+//                    painter.drawArc(QRect(QPoint(1*grid,7*grid),QPoint(7*grid,13*grid)),0,180*16);
+                }
+            }
+        }
+
+        if(siglist->size()>0)
+
+        {
+            QByteArray bytes((char*)m_bitmap,m_bitmaplength);
+
+            //        for(int i=0;i<m_bitmaplength;i++)
+            //        {
+            //            qDebug()<<"bytes["<<i<<"]"<<(quint8)bytes.at(i);
+            //        }
+
+            for(int i=0;i<siglist->size();i++)
+            {
+                SignalInfo s=siglist->at(i);
+                painter.save();
+                if(s.name==entryname)
+                    drawSignal(s.x,
+                               s.y,
+                               s.rotate,sigstatus,
+                               &painter);
+                else
+                {
+                    SignalBit b= map_Signal->value(s.name);
+
+
+                    quint8 status;
+                    //                qDebug()<<"signal"<<s.name<< b.left
+                    //                       <<b.right
+                    //                      <<b.permiss
+                    //                     <<b.restric;
+                    quint8 left = (m_bitmap[b.left/8]);
+                    left&=1<<b.left%8;
+                    quint8 right = (m_bitmap[b.right/8]);
+                    right&=1<<b.right%8;
+                    quint8 permiss = (m_bitmap[b.permiss/8]);
+                    permiss&=1<<b.permiss%8;
+                    quint8 restric = (m_bitmap[b.restric/8]);
+                    restric&=1<<b.restric%8;
+                    //                qDebug()<<"left"<<left;
+
+                    //                quint8 red=(m_bitmap[b.restric/8]&=(1<<b.restric%8))>>b.restric%8;
+                    //                quint8 green=(m_bitmap[b.permiss/8]&=(1<<b.permiss%8))>>b.permiss%8;
+                    //                quint8 left=(m_bitmap[b.left/8]&=(1<<b.left%8))>>b.left%8;
+                    //                quint8 right=(m_bitmap[b.right/8]&=(1<<b.right%8))>>b.right%8;
+                    //                qDebug()<<"red"<<red<<green<<left<<right;
+                    //                qDebug()<<m_bitmap[b.left/8]
+                    //                        <<m_bitmap[b.right/8]
+                    //                        <<m_bitmap[b.permiss/8]
+                    //                        <<m_bitmap[b.restric/8];
+
+                    //                qDebug()<<"bit"<<b.left   <<"="<<(m_bitmap[b.left/8]&=(1<<b.left%8));
+                    //                qDebug()<<"bit"<<b.right  <<"="<<(m_bitmap[b.right/8]&=(1<<b.right%8));
+                    //                qDebug()<<"bit"<<b.permiss<<"="<<(m_bitmap[b.permiss/8]&=(1<<b.permiss%8));
+                    //                qDebug()<<"bit"<<b.restric<<"="<<(m_bitmap[b.restric/8]&=(1<<b.restric%8));
+                    if(b.restric!=0&&restric)
+                    {
+                        status=1;
+                    }
+                    else if(b.permiss!=0&&permiss)
+                    {
+                        status=2;
+                    }
+                    else   if(b.left!=0&&left)
+                    {
+                        status=3;
+                    }
+                    else   if(b.right!=0&&right)
+                    {
+                        status=4;
+                    }
+                    else
+                    {
+                        status=1;
+                    }
+
+                    drawSignal(s.x,
+                               s.y,
+                               s.rotate,status,
+                               &painter);
+                }
+                painter.setPen(QPen(QColor(Qt::black),1));
+                painter.drawText(QRect(-2*grid-2,0,grid*2,grid),Qt::AlignLeft,s.name);
+                //            painter.drawRect(0,0,grid,grid);
+                painter.restore();
+
+            }
+        }
+        painter.restore();
+        //    if(olclist->size()>0)
+        //    {
+        //        for(int i=0;i<olclist->size();i++)
+        //        {
+        //            SignalInfo s=olclist->at(i);
+        //            painter.save();
+        //            drawSignal(s.x,
+        //                       s.y,
+        //                       s.rotate,sigstatus,
+        //                       &painter);
+        //            painter.restore();
+
+        //        }
+        //    }
+        QRect rect=QRect(entry.tramx*grid-8,entry.tramy*grid,16,66);
+        painter.drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
+        painter.setPen(QPen(Qt::black,5));
+        painter.drawText(QRect(0,0,10*grid,4*grid),Qt::AlignLeft,view.name);
+
+        //        painter.drawText(rect,Qt::AlignLeft,view.name);
+    }
+    else
+    {
+
+        //        qDebug()<<"need painter paint false";
+    }
     painter.end();
 
+}
+
+void TLEEvents:: drawSignal(quint8 x,quint8 y,quint8 rotate,quint8 status,QPainter *painter)
+{
+    //    qDebug()<<"x"<<x<<y<<grid<<width()/18;
+    //    painter->save();
+    painter->translate(x*grid,y*grid);
+    painter->rotate(rotate);
+    painter->setBrush(Qt::black);
+    painter->setPen(QPen(Qt::black,2));
+    painter->drawEllipse(0-grid/2,0,grid,grid);
+    painter->drawLine(0,grid,0,grid+grid/2);
+    painter->drawLine(0-grid/2,grid+grid/2,grid/2,grid+grid/2);
+    switch(status)
+    {
+    case 1:
+        painter->setPen(QPen(QColor(Qt::red),4));
+        painter->drawLine(0-grid/2+3,grid/2,grid/2-2,grid/2);
+        break;
+    case 2:
+        painter->setPen(QPen(QColor(Qt::green),4));
+        painter->drawLine(0,0+3,0,grid-3);
+        break;
+    case 3:
+        painter->setPen(QPen(QColor(Qt::yellow),4));
+        painter->drawLine(0-grid/4,grid/4,grid/4,3*grid/4);
+        break;
+    case 4 :
+        painter->setPen(QPen(QColor(Qt::yellow),4));
+        painter->drawLine(grid/4,grid/4,0-grid/4,3*grid/4);
+        break;
+    }
+    //    painter->restore();
 }
 
 QSize TLEEvents::sizeHint() const
@@ -152,439 +387,17 @@ void TLEEvents::drawArrow(QPainter *painter, QPoint &end,QColor color)
     painter->drawPolygon(ps,6);
 }
 
-void TLEEvents::drawParkinglog(QPainter *painter)
+
+
+void TLEEvents::setMap(QMap<quint8, QString> *mapsigidname, QMap<quint8, QString> *mapolcidname, QMap<QString, SignalBit> *mapsignal, QMap<QString, SignalBit> *mapolc, QMap<quint8, QList<Shape> *> *mapTemplate, QMap<quint8, View> *mapViewID, QMap<QString, Entry> *mapsigentry)
 {
-    painter->drawLine(4*width()/9,0,4*width()/9,height());
-    painter->drawLine(6*width()/9,0,6*width()/9,height());
-    painter->drawLine(4*width()/9,5*height()/9,6*width()/9,7*height()/9);
-    painter->drawLine(2*width()/9,2*height()/9,4*width()/9,4*height()/9);
-    painter->drawLine(0,2*height()/9,2*width()/9,2*height()/9);
-}
-
-
-
-void TLEEvents::drawTSharpeRoad(QPainter *painter)
-{
-    QRect rect;
-    painter->save();
-
-
-    painter->translate(0,height()/9);
-    painter->save();
-    painter->setPen(QPen(QColor(64,64,64),1));
-    painter->setBrush(QColor(64,64,64));
-    painter->drawRect(0,1*height()/9,9*width()/9,3*height()/9);
-    painter->drawRect(3*width()/9,1*height()/9,3*width()/9,7*height()/9);
-    painter->restore();
-    painter->drawLine(0,2*height()/9,width(),2*height()/9);
-    painter->drawLine(0,3*height()/9,width(),3*height()/9);
-
-    rect=QRect(2*width()/9,3*height()/9,2*width()/9,2*height()/9);
-    painter->drawArc(rect,0,90*16);
-    rect=QRect(1*width()/9,2*height()/9,4*width()/9,4*height()/9);
-    painter->drawArc(rect,0,90*16);
-    rect=QRect(5*width()/9,3*height()/9,2*width()/9,2*height()/9);
-    painter->drawArc(rect,90*16,90*16);
-    rect=QRect(4*width()/9,2*height()/9,4*width()/9,4*height()/9);
-    painter->drawArc(rect,90*16,90*16);
-
-    painter->drawLine(4*width()/9,4*height()/9,4*width()/9,height());
-    painter->drawLine(5*width()/9,4*height()/9,5*width()/9,height());
-
-
-    painter->restore();
-}
-
-void TLEEvents::drawImage(QPainter *painter)
-{
-    QPoint p1,p2,c1,c2;
-    QPainterPath ppath;
-    painter->save();
-    painter->setPen(QPen(QColor(220,220,220),4));
-    QRect rect;
-    switch(image)
-    {
-    case 1:
-
-        drawTSharpeRoad(painter);
-        rect=QRect(5*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        break;
-    case 2:
-
-        painter->save();
-        painter->rotate(90);
-        painter->translate(0,-500);
-        drawTSharpeRoad(painter);
-
-        painter->restore();
-        rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-
-
-
-        break;
-    case 3:
-        painter->save();
-        painter->rotate(-90);
-        painter->translate(-500,0);
-        drawTSharpeRoad(painter);
-
-        painter->restore();
-        rect=QRect(4*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        break;
-    case 4:
-        painter->drawLine(3*width()/9,0,3*width()/9,height());
-        painter->drawLine(6*width()/9,0,6*width()/9,height());
-        //        painter->drawLine(3*width()/9,2*height()/9,6*width()/9,5*height()/9);
-        p1=  QPoint (3*width()/9,2*height()/9);
-        p2=  QPoint (6*width()/9,5*height()/9);
-
-        ppath= QPainterPath (p1);
-
-        c1 =QPoint(p1.x(),(p1.y()+p2.y())/2);
-        c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
-        ppath.cubicTo(c1,c2,p2);
-
-        painter->drawPath(ppath);
-
-        rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        break;
-    case 5:
-        painter->drawLine(3*width()/9,0,3*width()/9,height());
-        painter->drawLine(6*width()/9,0,6*width()/9,height());
-        //        painter->drawLine(3*width()/9,5*height()/9,6*width()/9,2*height()/9);
-
-
-        p1=  QPoint (3*width()/9,5*height()/9);
-        p2=  QPoint (6*width()/9,2*height()/9);
-
-        ppath= QPainterPath (p1);
-
-        c1 =QPoint(p1.x(),(p1.y()+p2.y())/2);
-        c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
-        ppath.cubicTo(c1,c2,p2);
-
-        painter->drawPath(ppath);
-
-        rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        break;
-    case 6:
-        painter->drawLine(3*width()/9,0,3*width()/9,height());
-        painter->drawLine(6*width()/9,0,6*width()/9,height());
-
-        p1=  QPoint (3*width()/9,5*height()/9);
-        p2=  QPoint (6*width()/9,2*height()/9);
-
-        ppath= QPainterPath (p1);
-
-        c1 =QPoint(p1.x(),(p1.y()+p2.y())/2);
-        c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
-        ppath.cubicTo(c1,c2,p2);
-
-        painter->drawPath(ppath);
-
-        p1=  QPoint (3*width()/9,2*height()/9);
-        p2=  QPoint (6*width()/9,5*height()/9);
-
-        ppath= QPainterPath (p1);
-
-        c1 =QPoint(p1.x(),(p1.y()+p2.y())/2);
-        c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
-        ppath.cubicTo(c1,c2,p2);
-
-        painter->drawPath(ppath);
-
-
-        rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        break;
-    case 7:
-        painter->save();
-        painter->setPen(QPen(QColor(64,64,64),1));
-        painter->setBrush(QColor(64,64,64));
-        painter->drawRect(0,2*height()/9,width(),2*height()/9);
-        painter->setPen(QPen(Qt::yellow,2,Qt::DotLine));
-        painter->drawLine(0,3*height()/9,width(),3*height()/9);
-        painter->restore();
-
-        painter->drawLine(3*width()/9,0,3*width()/9,height());
-        painter->drawLine(6*width()/9,0,6*width()/9,height());
-        //        painter->drawLine(0,2*height()/9,width(),2*height()/9);
-        //        painter->drawLine(0,4*height()/9,width(),4*height()/9);
-
-        rect=QRect(6*width()/9-8,8*height()/9,16,66);
-        painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        break;
-    case 8:
-        drawParkinglog(painter);
-        break;
-    case 9:
-        painter->save();
-        painter->rotate(-90);
-        painter->translate(-width(),0);
-        drawParkinglog(painter);
-        painter->restore();
-        break;
-    case 10:
-        painter->save();
-        painter->rotate(-180);
-        painter->translate(-width(),-height());
-        drawParkinglog(painter);
-        painter->restore();
-        break;
-    }
-    painter->restore();
-}
-
-void TLEEvents::drawSignals(QPainter *p)
-{
-    for(int i=0;i<signals_count-1;i++)
-    {
-        drawOneSignal(p,xpos[i],ypos[i],status[i],rotation[i],true);
-        //        qDebug()<<"ha"<<i<<xpos[i]<<ypos[i]<<status[i]<<rotation[i];
-    }
-    drawOneSignal(p,xpos[signals_count-1],
-            ypos[signals_count-1],
-            status[signals_count-1],
-            rotation[signals_count-1]);
-}
-
-
-
-void TLEEvents::drawOneSignal(QPainter *painter, quint16 x, quint16 y, quint8 s , quint8 ro, bool isconflict)
-{
-    painter->save();
-    painter->translate(x,y);
-    arrow_x=arrow_y=0;
-    switch(ro)
-    {
-    case 1:
-        arrow_x=0-height()/9;
-        //        arrow_y=0+2*width()/9-width()/18;
-        break;
-    case 2:
-        painter->rotate(90);
-        arrow_x=0-height()/9;
-        break;
-    case 3:
-        painter->rotate(-90);
-        arrow_x=0-height()/9;
-        //        arrow_y=0+height()/18;
-        break;
-    case 4:
-        painter->rotate(180);
-        arrow_x=0-height()/9;
-        break;
-    }
-
-
-    painter->setPen(QPen(QColor(0,0,0),1));
-    painter->setBrush(QBrush(Qt::black));
-
-    painter->drawEllipse(-width()/36,0,width()/18,height()/18);
-    painter->drawLine(0,0+height()/18,0,0+height()/18+height()/36);
-    painter->drawLine(0-width()/36,0+height()/18+height()/36,0+width()/18-width()/36,0+height()/18+height()/36);
-
-    QPoint p1,p2,p3,p4,p5,p6,c1,c2,end;
-    QPoint ps[6];
-    QPainterPath ppath;
-    QColor arrow_color;
-
-    switch (s)
-    {
-
-    case 1:
-        painter->setPen(QPen(Qt::red,5));
-        painter->drawLine(-width()/36+3,0+height()/36,0+width()/36-3,0+height()/36);
-        break;
-    case 2:
-
-        painter->setPen(QPen(Qt::green,5));
-        painter->drawLine(0,0+3,0,0+height()/18-3);
-
-
-
-        painter->save();
-
-        if(isconflict)
-            arrow_color=Qt::red;
-        else\
-            arrow_color=Qt::green;
-
-        painter->setPen(QPen(arrow_color,8));
-        painter->drawLine(arrow_x,0+height()/9,arrow_x,0-4*height()/9);
-        end=QPoint(arrow_x,0-4*height()/9);
-        drawArrow(painter,end,arrow_color);
-
-        painter->restore();
-        break;
-    case 3:
-        painter->setPen(QPen(Qt::yellow,5));
-        painter->drawLine(0+width()/72-width()/36,0+height()/72,
-                          0+width()/18-width()/72-width()/36,0+height()/18-height()/72);
-
-        painter->save();
-
-        if(isconflict)
-            arrow_color=Qt::red;
-        else
-            arrow_color=Qt::yellow;
-        painter->setPen(QPen(arrow_color,8));
-
-
-        if(image==1||image==2||image==3)
-        {
-            painter->drawArc(QRect(arrow_x-4*width()/9,arrow_y-2*height()/9
-                                   ,4*width()/9,4*height()/9),0,90*16);
-
-            painter->drawLine(arrow_x,arrow_y,
-                              arrow_x,arrow_y+1*height()/9);
-            painter->drawLine(arrow_x-2*width()/9,arrow_y-2*height()/9,
-                              arrow_x-3*width()/9,arrow_y-2*height()/9);
-
-
-            end=QPoint(arrow_x-3*width()/9,arrow_y-2*height()/9);
-
-            painter->save();
-            painter->translate(-2*width()/9-arrow_x-60,-5*height()/9-55);
-            painter->rotate(-90);
-
-            drawArrow(painter,end,arrow_color);
-            painter->restore();
-
-
-        }
-        else if(image==8)
-        {
-            painter->drawLine(arrow_x,0+height()/9,arrow_x,0-1*height()/9);
-            painter->drawLine(arrow_x,0-1*height()/9,arrow_x-2*width()/9,
-                              0-3*height()/9);
-            painter->drawLine(arrow_x-2*width()/9,
-                              0-3*height()/9,
-                              arrow_x-2*width()/9,
-                              0-4*height()/9);
-            painter->drawLine(          arrow_x-2*width()/9,
-                                        0-4*height()/9,
-                                        arrow_x-4*width()/9,
-                                        0-6*height()/9);
-            painter->drawLine(            arrow_x-4*width()/9,
-                                          0-6*height()/9,
-                                          arrow_x-5*width()/9,
-                                          0-6*height()/9);
-            end=QPoint(arrow_x-5*width()/9,-6*height()/9);
-
-            painter->save();
-            painter->translate(0,-664);
-            painter->rotate(-90);
-
-            drawArrow(painter,end,arrow_color);
-            painter->restore();
-        }
-        else
-        {
-            painter->translate(-x,-y);
-            p1=  QPoint (6*width()/9,5*height()/9);
-            p2=  QPoint (3*width()/9,2*height()/9);
-            painter->setPen(QPen(arrow_color,8));
-            painter->setBrush(Qt::NoBrush);
-            ppath= QPainterPath (p1);
-
-            c1 =QPoint(p1.x(),(p1.y()+p2.y())/2);
-            c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
-            ppath.cubicTo(c1,c2,p2);
-            painter->drawPath(ppath);
-            painter->drawLine(p1.x(),p1.y(),p1.x(),p1.y()+height()/9);
-            painter->drawLine(p2.x(),p2.y(),p2.x(),p2.y()-height()/9);
-            end=QPoint(p2.x(),p2.y()-height()/9);
-            drawArrow(painter,end,arrow_color);
-        }
-        painter->restore();
-        break;
-    case 4:
-        painter->setPen(QPen(Qt::yellow,5));
-        painter->drawLine(0+width()/18-width()/72-width()/36,0+height()/72,
-                          0+width()/72-width()/36,0+height()/18-height()/72);
-
-
-
-        painter->save();
-        if(isconflict)
-            arrow_color=Qt::red;
-        else
-            arrow_color=Qt::yellow;
-        if(image==1||image==2||image==3)
-        {
-            painter->setPen(QPen(arrow_color,8));
-            painter->drawArc(QRect(arrow_x,arrow_y-1*height()/9
-                                   ,2*width()/9,2*height()/9),90*16,90*16);
-
-
-
-            painter->drawLine(arrow_x,arrow_y,
-                              arrow_x,arrow_y+1*height()/9);
-            painter->drawLine(arrow_x+1*width()/9,arrow_y-1*height()/9,
-                              arrow_x+2*width()/9,arrow_y-1*height()/9);
-
-
-            end=QPoint(arrow_x+2*width()/9,arrow_y-1*height()/9);
-
-            painter->save();
-            painter->translate(1*width()/9+arrow_x,-3*height()/9+55);
-            painter->rotate(90);
-
-            drawArrow(painter,end,arrow_color);
-            painter->restore();
-
-        }
-        else if(image==8)
-        {
-    painter->setPen(QPen(arrow_color,8));
-            painter->drawLine(arrow_x-width()/9,arrow_y,
-                              arrow_x-width()/9,arrow_y+1*height()/9);
-
-            painter->drawLine(arrow_x-width()/9,arrow_y,
-                              arrow_x+1*width()/9,arrow_y-2*height()/9);
-            painter->drawLine(arrow_x+1*width()/9,arrow_y-2*height()/9,
-                              arrow_x+2*width()/9,arrow_y-2*height()/9);
-            painter->drawLine(arrow_x+2*width()/9,arrow_y-2*height()/9,
-                              arrow_x+3*width()/9,arrow_y-2*height()/9);
-            end=QPoint(arrow_x+3*width()/9,arrow_y-2*height()/9);
-            painter->save();
-            painter->translate(0,-222);
-            painter->rotate(90);
-
-            drawArrow(painter,end,arrow_color);
-            painter->restore();
-        }
-
-        else
-        {
-            painter->translate(-x,-y);
-            p1=  QPoint (3*width()/9,5*height()/9);
-            p2=  QPoint (6*width()/9,2*height()/9);
-            painter->setPen(QPen(arrow_color,8));
-            painter->setBrush(Qt::NoBrush);
-            ppath= QPainterPath (p1);
-
-            c1 =QPoint(p1.x(),(p1.y()+p2.y())/2);
-            c2= QPoint (p2.x(),(p1.y()+p2.y())/2);
-            ppath.cubicTo(c1,c2,p2);
-            painter->drawPath(ppath);
-            painter->drawLine(p1.x(),p1.y(),p1.x(),p1.y()+height()/9);
-            painter->drawLine(p2.x(),p2.y(),p2.x(),p2.y()-height()/9);
-            end=QPoint(p2.x(),p2.y()-height()/9);
-            drawArrow(painter,end,arrow_color);
-        }
-
-        painter->restore();
-        break;
-    }
-
-    painter->restore();
+    map_sigid_name=mapsigidname;
+    map_olcid_name=mapolcidname;
+    map_Signal=mapsignal;
+    map_OLC=mapolc;
+    map_Template=mapTemplate;
+    map_ViewID=mapViewID;
+    map_sigentry=mapsigentry;
 }
 
 

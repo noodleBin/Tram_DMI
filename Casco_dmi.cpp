@@ -35,7 +35,7 @@ Casco_DMI::Casco_DMI()
 
 
 
-//    refreshAlarmQue(100,"[软件] ",false);
+    //    refreshAlarmQue(100,"[软件] ",false);
 
     timer100ms=startTimer(100);
     timerchecktime=startTimer(1*60*1000); //定时1分钟
@@ -430,6 +430,14 @@ void Casco_DMI::initialControl()
 
     //    mygeoevents = new MyGeoEvents(screenmode,widGeo);
     mytleevents=new TLEEvents(3,widDMS);
+    mytleevents->setMap(map_sigid_name,
+                        map_olcid_name,
+                        map_Signal,
+                        map_OLC,
+                        map_Template,
+                        map_ViewID,
+                        map_sigentry);
+
     widDMS->setHidden(true);
     //tab maintence
     listAlarm=wid->findChild<QTextEdit*>("tblwdg_fault");
@@ -728,6 +736,14 @@ void Casco_DMI::initialVariable()
     neednextpsrflash=false;
     isnextpsrflash=false;
     mute_radar=false;
+
+    map_sigid_name = new QMap<quint8,QString>;
+    map_olcid_name = new QMap<quint8,QString>;\
+    map_Signal=new QMap<QString,SignalBit>;
+    map_OLC=new QMap<QString,SignalBit>;
+    map_Template=new QMap<quint8,QList<Shape>* >;
+    map_ViewID=new QMap<quint8,View>;
+    map_sigentry=new QMap<QString,Entry>;
 #endif
 
 }
@@ -1647,25 +1663,25 @@ void Casco_DMI::timerEvent(QTimerEvent *e)
 
         writeSMSToFile();
         writeAlarmToFile();
-//        if(!que_dms_dmi->isEmpty())
-//        {
-//            //            qDebug()<<"que_dms_dmi count is"<<que_dms_dmi->count();
+        //        if(!que_dms_dmi->isEmpty())
+        //        {
+        //            //            qDebug()<<"que_dms_dmi count is"<<que_dms_dmi->count();
 
-//            while(!que_dms_dmi->isEmpty())
-//            {
-//                last_dms_dmi_data=que_dms_dmi->dequeue();
+        //            while(!que_dms_dmi->isEmpty())
+        //            {
+        //                last_dms_dmi_data=que_dms_dmi->dequeue();
 
-//            }
-//            //            qDebug()<<"recv dms msg";
-//            setRecvDMSDataFromSocket(last_dms_dmi_data); //只用最新的
-//#ifdef Baseline_2_0
-//            refreshTLE();
-//#endif
-//        }
-//        else
-//        {
+        //            }
+        //            //            qDebug()<<"recv dms msg";
+        //            setRecvDMSDataFromSocket(last_dms_dmi_data); //只用最新的
+        //#ifdef Baseline_2_0
+        //            refreshTLE();
+        //#endif
+        //        }
+        //        else
+        //        {
 
-//        }
+        //        }
     }
 
 }
@@ -3186,14 +3202,14 @@ void Casco_DMI::refreshGeoEvents()
 
 void Casco_DMI::refreshTLE()
 {
-   QByteArray bytes;
-   bytes.resize(els_dmi_data->DMS_DMI_Data_Size);
+    QByteArray bytes;
+    bytes.resize(els_dmi_data->DMS_DMI_Data_Size);
     for(int i=0;i<els_dmi_data->DMS_DMI_Data_Size;i++)
     {
         bytes[i]=els_dmi_data->DMS_DMI_Data[i];
     }
 
-     setRecvDMSDataFromSocket(bytes); //只用最新的
+    setRecvDMSDataFromSocket(bytes); //只用最新的
     if(dms_dmi_data->Msg_ID!=102)
     {
         if(dms_dmi_data->Signal_ID==0)
@@ -3235,38 +3251,38 @@ void Casco_DMI::refreshTLE()
 
         quint8 id=dms_dmi_data->Signal_ID;
 
-        Signal_Info* restricsignal=m_Signal_map->value(id).restricSignals;
+//        Signal_Info* restricsignal=m_Signal_map->value(id).restricSignals;
 
-        quint8 restric_count=m_Signal_map->value(id).restricSignalCount;
-        quint8 image=m_Signal_map->value(id).image;
-        quint8 *p_xpos=new quint8[1+restric_count];
-        quint8 *p_ypos=new quint8[1+restric_count];
-        quint8 *p_statuspos=new quint8[1+restric_count];
-        quint8 *p_rotationpos=new quint8[1+restric_count];
+//        quint8 restric_count=m_Signal_map->value(id).restricSignalCount;
+//        quint8 image=m_Signal_map->value(id).image;
+//        quint8 *p_xpos=new quint8[1+restric_count];
+//        quint8 *p_ypos=new quint8[1+restric_count];
+//        quint8 *p_statuspos=new quint8[1+restric_count];
+//        quint8 *p_rotationpos=new quint8[1+restric_count];
 
-        for(int i=0;i<restric_count;i++)
-        {
-            p_xpos[i]=restricsignal[i].x;
-            p_ypos[i]=restricsignal[i].y;
+//        for(int i=0;i<restric_count;i++)
+//        {
+//            p_xpos[i]=restricsignal[i].x;
+//            p_ypos[i]=restricsignal[i].y;
 
-            p_rotationpos[i]=restricsignal[i].rotation;
-        }
+//            p_rotationpos[i]=restricsignal[i].rotation;
+//        }
 
-        p_xpos[restric_count]=m_Signal_map->value(id).x;
-        p_ypos[restric_count]=m_Signal_map->value(id).y;
-        p_rotationpos[restric_count]=m_Signal_map->value(id).rotation;
+//        p_xpos[restric_count]=m_Signal_map->value(id).x;
+//        p_ypos[restric_count]=m_Signal_map->value(id).y;
+//        p_rotationpos[restric_count]=m_Signal_map->value(id).rotation;
 
         //                qDebug()<<"xy"<< p_xpos[restric_count]<<p_ypos[restric_count];
-        p_statuspos[restric_count]=dms_dmi_data->Signal_Status;
+//        p_statuspos[restric_count]=dms_dmi_data->Signal_Status;
 
 
-        QByteArray tt((char*)dms_dmi_data->Bitmap,dms_dmi_data->Bitmap_Length);
+//        QByteArray tt((char*)dms_dmi_data->Bitmap,dms_dmi_data->Bitmap_Length);
 
-        for(int i=0;i<restric_count;i++)
-        {
-            p_statuspos[i]=tt.at(restricsignal[i].bit);
-            //                    qDebug()<<"ii"<<p_statuspos[i];
-        }
+//        for(int i=0;i<restric_count;i++)
+//        {
+//            p_statuspos[i]=tt.at(restricsignal[i].bit);
+//            //                    qDebug()<<"ii"<<p_statuspos[i];
+//        }
 
         //                qDebug()<<"cur"<<p_statuspos[restric_count];
 
@@ -3287,7 +3303,17 @@ void Casco_DMI::refreshTLE()
         //        {
         //            qDebug()<<"main"<<i<<p_xpos[i]<<p_ypos[i]<<p_statuspos[i]<<p_rotationpos[i];
         //        }
-        mytleevents->setvalue(image,p_xpos,p_ypos,p_statuspos,p_rotationpos,restric_count+1);
+        mytleevents->setvalue(dms_dmi_data->Signal_ID,
+                              dms_dmi_data->Signal_Status,
+                              dms_dmi_data->Bitmap_Length,
+                              dms_dmi_data->Bitmap);
+//        qDebug()<<"in dmi bitmaplen"<<dms_dmi_data->Bitmap_Length;
+//        QByteArray a((char*)dms_dmi_data->Bitmap,dms_dmi_data->Bitmap_Length);
+//        for(int i=0;i<dms_dmi_data->Bitmap_Length;i++)
+//        {
+//            qDebug()<<"a["<<i<<"]"<<(quint8)a.at(i);
+//        }
+
 
         dms_dmi_data->freePointer();
     }
@@ -4192,46 +4218,212 @@ int Casco_DMI::initSignal(QString path)
     QFile* localFile = new QFile();
     QDomDocument* dom=new QDomDocument();
     QDomNode node;
-    QDomNodeList itemlist;
+
     QString strfilename = path;
     if(!OpenAndSetFile(strfilename,localFile,dom))
         return 0;
 
-    node=dom->elementsByTagName("Signal_Info").at(0);//唯一的一条station_info记录
-    itemlist= node.childNodes();
-    for(int i=0;i<itemlist.size();i++)
-    {
-        QDomElement e=itemlist.at(i).toElement();
-        Signal_Info value1;
-        setSignalInfo(e,&value1);
+    node=dom->elementsByTagName("Layout_Info").at(0);//唯一的一条station_info记录
 
-        QDomNodeList restriclists=itemlist.at(i).childNodes();
-        value1.restricSignals = new Signal_Info[restriclists.size()];
-        value1.restricSignalCount=restriclists.size();
-        for(int i=0;i<restriclists.size();i++)
+    parseElement(node,"Signal_List",map_sigid_name,map_Signal);
+    parseElement(node,"LCS_List",map_olcid_name,map_OLC);
+
+    QDomElement lcss= node.firstChildElement("ViewTemplate_LIST");
+    QDomNodeList lclist= lcss.childNodes();
+    for(int i=0;i<lclist.size();i++)
+    {
+        QDomElement e=lclist.at(i).toElement();
+        quint8 templeid=e.attribute("TemplateID").toUInt();
+        //        qDebug()<<"tmeid"<<templeid;
+        QList<Shape> *list_shape=new QList<Shape>;
+        QDomNodeList shapelist=lclist.at(i).childNodes();
+        for(int i=0;i<shapelist.size();i++)
         {
-            QDomElement e=restriclists.at(i).toElement();
-            setSignalInfo(e,&value1.restricSignals[i]);
-            //            qDebug()<<"value1.restricSignals"<<i<<value1.restricSignals[i].id
-            //                   <<value1.restricSignals[i].x<<value1.restricSignals[i].y;
+            Shape x;
+            QDomElement e=shapelist.at(i).toElement();
+            QString tagname=e.tagName();
+            //                        qDebug()<<"tagname"<<tagname;
+            x.name=tagname;
+            x.list_Attr=new QMap<QString,QString>;
+            QDomNamedNodeMap atts=  e.attributes();
+            for(int i=0;i<atts.size();i++)
+            {
+                //                              qDebug()<<"attr "<<i<<"name"<<atts.item(i).toAttr().name()
+                //                                     <<"value"<<atts.item(i).toAttr().value();
+                x.list_Attr->insert(atts.item(i).toAttr().name(),
+                                    atts.item(i).toAttr().value());
+
+            }
+            list_shape->append(x);
         }
-        m_Signal_map->insert(value1.id,value1);
-        //        Alarm_Record value;
-        //        value.couldplay=true;
-        //        value.id=e.attribute("ID").toUInt();
-        //        value.current_playtick= value.playtick=e.attribute("PlayTick").toUInt();
-        //        value.priority=e.attribute("Priority").toUInt();
-        //        value.str=e.attribute("PlayText");
-        //        m_Alarm_Record_map->insert(value.id,value);
+        map_Template->insert(templeid,list_shape);
+
     }
 
-    //   Signal_Info s= m_Signal_map->value(0).restricSignals[1];
+
+
+
+    QDomElement views= node.firstChildElement("ViewList");
+    QDomNodeList viewslist= views.childNodes();
+    View view;
+    for(int i=0;i<viewslist.size();i++)
+    {
+        QDomElement e=viewslist.at(i).toElement();
+        quint8 templeid=e.attribute("TemplateID").toUInt();
+        quint8 viewid=e.attribute("ID").toUInt();
+        QString viewname=e.attribute("Name");
+
+        view.name=viewname;
+        view.templateid=templeid;
+
+        QDomElement routesignalinfo=viewslist.at(i).firstChildElement("SignalList");
+        QDomNodeList routesignals=routesignalinfo.childNodes();
+        if(routesignals.size()>0)
+        {
+            view.signallist = new QList<SignalInfo>;
+            for(int i=0;i<routesignals.size();i++)
+            {
+                QDomElement e=routesignals.at(i).toElement();
+                SignalInfo sig;
+                sig.name=e.attribute("Name");
+                sig.x=e.attribute("X").toUInt();
+                sig.y=e.attribute("Y").toUInt();
+                sig.rotate=e.attribute("Rotate").toUInt();
+                view.signallist->append(sig);
+//                qDebug()<<"siglist"<<sig.name<<sig.x
+//                       <<sig.y<<sig.rotate<<i;
+            }
+        }
+        QDomElement signalinfo=viewslist.at(i).firstChildElement("LCSList");
+        QDomNodeList lcssignals=signalinfo.childNodes();
+        if(lcssignals.size()>0)
+        {
+            view.LCSlist = new QList<SignalInfo>;
+            for(int i=0;i<lcssignals.size();i++)
+            {
+                QDomElement e=lcssignals.at(i).toElement();
+                SignalInfo sig;
+                sig.name=e.attribute("Name");
+                sig.x=e.attribute("X").toUInt();
+                sig.y=e.attribute("Y").toUInt();
+                sig.rotate=e.attribute("Rotate").toUInt();
+                view.LCSlist->append(sig);
+//                qDebug()<<"lcslist"<<sig.name<<sig.x
+//                       <<sig.y<<sig.rotate<<i;
+            }
+
+        }
+
+
+        map_ViewID->insert(viewid,view);
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    QDomElement entrans= node.firstChildElement("Signal_Entrance_List");
+    QDomNodeList entranlist= entrans.childNodes();
+
+    for(int i=0;i<entranlist.size();i++)
+    {
+        QDomElement e=entranlist.at(i).toElement();
+        QString name=e.attribute("SignalName");
+        quint8 viewid=e.attribute("ViewID").toUInt();
+        quint8 viewrotate=e.attribute("ViewRotate").toUInt();
+        quint8 tramx=e.attribute("TramX").toUInt();
+        quint8 tramy=e.attribute("TramY").toUInt();
+        Entry entry;
+        entry.viewid=viewid;
+        entry.rotate=viewrotate;
+        entry.tramx=tramx;
+        entry.tramy=tramy;
+        map_sigentry->insert(name,entry);
+
+    }
 
     localFile->close();
     delete localFile;  //清理资源，避免内存泄露
     delete dom;
     return 1;
 }
+
+void Casco_DMI::parseElement(QDomNode node, QString nodename,
+                             QMap<quint8,QString>* mapid,QMap<QString,SignalBit> * map)
+{
+    QDomElement lcss= node.firstChildElement(nodename);
+    QDomNodeList lclist= lcss.childNodes();
+    for(int i=0;i<lclist.size();i++)
+    {
+        QDomElement e=lclist.at(i).toElement();
+        QString name=e.attribute("Name");
+        quint8 id=e.attribute("ID").toUInt();
+        mapid->insert(id,name);
+        SignalBit rec;
+        rec.left=e.attribute("Left").toUInt();
+        rec.right=e.attribute("Right").toUInt();
+        rec.permiss=e.attribute("Permissive").toUInt();
+        rec.restric=e.attribute("Restric").toUInt();
+        map->insert(name,rec);
+
+    }
+}
+
+//int Casco_DMI::initSignal(QString path)
+//{
+//    QFile* localFile = new QFile();
+//    QDomDocument* dom=new QDomDocument();
+//    QDomNode node;
+//    QDomNodeList itemlist;
+//    QString strfilename = path;
+//    if(!OpenAndSetFile(strfilename,localFile,dom))
+//        return 0;
+
+//    node=dom->elementsByTagName("Signal_Info").at(0);//唯一的一条station_info记录
+//    itemlist= node.childNodes();
+//    for(int i=0;i<itemlist.size();i++)
+//    {
+//        QDomElement e=itemlist.at(i).toElement();
+//        Signal_Info value1;
+//        setSignalInfo(e,&value1);
+
+//        QDomNodeList restriclists=itemlist.at(i).childNodes();
+//        value1.restricSignals = new Signal_Info[restriclists.size()];
+//        value1.restricSignalCount=restriclists.size();
+//        for(int i=0;i<restriclists.size();i++)
+//        {
+//            QDomElement e=restriclists.at(i).toElement();
+//            setSignalInfo(e,&value1.restricSignals[i]);
+//            //            qDebug()<<"value1.restricSignals"<<i<<value1.restricSignals[i].id
+//            //                   <<value1.restricSignals[i].x<<value1.restricSignals[i].y;
+//        }
+//        m_Signal_map->insert(value1.id,value1);
+//        //        Alarm_Record value;
+//        //        value.couldplay=true;
+//        //        value.id=e.attribute("ID").toUInt();
+//        //        value.current_playtick= value.playtick=e.attribute("PlayTick").toUInt();
+//        //        value.priority=e.attribute("Priority").toUInt();
+//        //        value.str=e.attribute("PlayText");
+//        //        m_Alarm_Record_map->insert(value.id,value);
+//    }
+
+//    //   Signal_Info s= m_Signal_map->value(0).restricSignals[1];
+
+//    localFile->close();
+//    delete localFile;  //清理资源，避免内存泄露
+//    delete dom;
+//    return 1;
+//}
 
 
 
@@ -4342,9 +4534,9 @@ int Casco_DMI::initialMapFromXml()
     {
         popExitBox(tr("缺少Alarm文件！"));
     }
-    if(!initSignal(cur+"Signal.xml"))
+    if(!initSignal(cur+"Signal_Layout.xml"))
     {
-        popExitBox(tr("缺少Signal文件！"));
+        popExitBox(tr("Signal_Layout"));
     }
 
 

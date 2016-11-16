@@ -5,7 +5,7 @@
 #include <QFrame>
 #include <QEvent>
 #include <QKeyEvent>
-#include "DMISignal.h"
+#include "tlepublicvariables.h"
 
 class TLEEvents : public QWidget
 {
@@ -14,8 +14,10 @@ public:
     explicit TLEEvents(quint8 size, QWidget *parent = 0);
     ~TLEEvents();
 
-    void setvalue(quint8 p_image, quint8 *p_xpos, quint8 *p_ypos, quint8 *p_statuspos, quint8 *p_rotationpos, quint8 count);
+    void setvalue(quint8 id, quint8 status, quint16 bitmaplength, quint8 *bitmap);
     bool display9cubic;
+
+
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -30,42 +32,54 @@ private:
 
     qint16 arrow_x,arrow_y;
 
+    bool need_paint;
+
+    quint8 sigid,sigstatus;
+    quint16 m_bitmaplength;
+    quint8* m_bitmap;
+
+    float grid;
 
 
 
-    //    quint8 m_background;
-    //    quint8 m_type;
-    //    quint8 m_position;
-    //    quint8 m_orivalue;
 
-    //    quint8 m_restricpos;
-    //    quint8 m_restricvalue;
-
-    //
-
-    //    MySignal *ms,*ms2,*ms3;
-
-
-    //    void   drawEvent1(QPainter* painter);
-    //    void   drawEvent2(QPainter* painter);
-    //    void   drawEvent3(QPainter* painter);
-    //    void   drawEvent4(QPainter* painter);
-    //    void   drawEvent5(QPainter* painter);
-    //    void   drawEvent6(QPainter* painter);
-
-    //    void  drawSignal(QPainter *painter, quint8 type, quint8 pos, quint8 value, MySignal *ms);
-
-    //    void drawCar(QPainter *painter, QRect r);
-        void drawArrow(QPainter*painter, QPoint &end, QColor color);
+    void drawArrow(QPainter*painter, QPoint &end, QColor color);
     //    void drawArrow(QPainter*painter, QPoint &p1, QPoint &p2, QPoint &p3, QColor &color);
 
-    void drawTSharpeRoad(QPainter *painter);
-    void drawParkinglog(QPainter *painter);
-    void drawImage(QPainter* );
-    void drawSignals(QPainter* );
-    void drawOneSignal(QPainter*, quint16,
-                       quint16,
-                       quint8, quint8,bool isconflict=false);
+
+
+
+    QList<Shape>* tplete;
+    View view;
+
+    QList<SignalInfo> *siglist;
+    QList<SignalInfo> *olclist;
+
+    Entry entry;
+    QString entryname;
+
+    void drawSignal(quint8 x,quint8 y,quint8 rotate,quint8 status,QPainter *painter);
+
+    QMap<quint8,QString> *map_sigid_name;
+    QMap<quint8,QString> *map_olcid_name;
+    QMap<QString,SignalBit> *map_Signal;
+    QMap<QString,SignalBit> *map_OLC;
+    QMap<quint8,QList<Shape>* > *map_Template;
+    QMap<quint8,View> *map_ViewID;
+    QMap<QString,Entry> *map_sigentry;
+    /**********end***********/
+
+public:
+
+    void setMap(QMap<quint8, QString> *mapsigidname,
+                QMap<quint8, QString> *mapolcidname,
+                QMap<QString, SignalBit> *mapsignal,
+                QMap<QString, SignalBit> *mapolc,
+                QMap<quint8, QList<Shape> *> *mapTemplate,
+                QMap<quint8, View> *mapViewID,
+                QMap<QString, Entry> *mapsigentry);
+
+
 };
 
 

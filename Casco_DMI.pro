@@ -68,7 +68,8 @@ HEADERS  += \
     Dialogwarningbox.h \
      ../DMIDataStruct/Public_Variable.h \
     Limitspeed.h \
-    Dialogshutdown.h
+    Dialogshutdown.h \
+    tlepublicvariables.h
 
 LIBS += -L$$PWD/ -lmsc
 
