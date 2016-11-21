@@ -20,7 +20,7 @@ struct SignalInfo
     QString name;
     quint8 x;
     quint8 y;
-    quint8 rotate;
+    qint16 Rotate;
 };
 
 struct View
@@ -37,6 +37,17 @@ struct Entry
     quint8 rotate;
     quint8 tramx;
     quint8 tramy;
+};
+
+struct TextInfo
+{
+    QString txt;
+    quint8 x;
+    quint8 y;
+    quint8 Size;
+    QString Color;
+    QString Font;
+    qint16 Rotate;
 };
 #endif // TLEPUBLICVARIABLES
 

@@ -436,7 +436,9 @@ void Casco_DMI::initialControl()
                         map_OLC,
                         map_Template,
                         map_ViewID,
-                        map_sigentry);
+                        map_sigentry,
+                        map_Route,
+                        map_View_Texts);
 
     widDMS->setHidden(true);
     //tab maintence
@@ -741,9 +743,11 @@ void Casco_DMI::initialVariable()
     map_olcid_name = new QMap<quint8,QString>;\
     map_Signal=new QMap<QString,SignalBit>;
     map_OLC=new QMap<QString,SignalBit>;
-    map_Template=new QMap<quint8,QList<Shape>* >;
-    map_ViewID=new QMap<quint8,View>;
+    map_Template=new QMap<quint16,QList<Shape>* >;
+    map_ViewID=new QMap<quint16,View>;
     map_sigentry=new QMap<QString,Entry>;
+    map_Route=new QMap<QString,QMap<QString,QList<Shape>*>*>;
+    map_View_Texts=new QMap<quint16,QList<TextInfo>*>;
 #endif
 
 }
@@ -1463,6 +1467,12 @@ bool Casco_DMI::eventFilter(QObject *obj, QEvent *event)
         {
             //            if(!widDMS->isHidden())
             mytleevents->display9cubic=!mytleevents->display9cubic;
+            return true;
+        }
+        if(key->key()==Qt::Key_P&&key->modifiers()==Qt::CTRL)
+        {
+            //            if(!widDMS->isHidden())
+            mytleevents->isdisplay_signame=!mytleevents->isdisplay_signame;
             return true;
         }
         return false;
@@ -3251,38 +3261,38 @@ void Casco_DMI::refreshTLE()
 
         quint8 id=dms_dmi_data->Signal_ID;
 
-//        Signal_Info* restricsignal=m_Signal_map->value(id).restricSignals;
+        //        Signal_Info* restricsignal=m_Signal_map->value(id).restricSignals;
 
-//        quint8 restric_count=m_Signal_map->value(id).restricSignalCount;
-//        quint8 image=m_Signal_map->value(id).image;
-//        quint8 *p_xpos=new quint8[1+restric_count];
-//        quint8 *p_ypos=new quint8[1+restric_count];
-//        quint8 *p_statuspos=new quint8[1+restric_count];
-//        quint8 *p_rotationpos=new quint8[1+restric_count];
+        //        quint8 restric_count=m_Signal_map->value(id).restricSignalCount;
+        //        quint8 image=m_Signal_map->value(id).image;
+        //        quint8 *p_xpos=new quint8[1+restric_count];
+        //        quint8 *p_ypos=new quint8[1+restric_count];
+        //        quint8 *p_statuspos=new quint8[1+restric_count];
+        //        quint8 *p_rotationpos=new quint8[1+restric_count];
 
-//        for(int i=0;i<restric_count;i++)
-//        {
-//            p_xpos[i]=restricsignal[i].x;
-//            p_ypos[i]=restricsignal[i].y;
+        //        for(int i=0;i<restric_count;i++)
+        //        {
+        //            p_xpos[i]=restricsignal[i].x;
+        //            p_ypos[i]=restricsignal[i].y;
 
-//            p_rotationpos[i]=restricsignal[i].rotation;
-//        }
+        //            p_rotationpos[i]=restricsignal[i].rotation;
+        //        }
 
-//        p_xpos[restric_count]=m_Signal_map->value(id).x;
-//        p_ypos[restric_count]=m_Signal_map->value(id).y;
-//        p_rotationpos[restric_count]=m_Signal_map->value(id).rotation;
+        //        p_xpos[restric_count]=m_Signal_map->value(id).x;
+        //        p_ypos[restric_count]=m_Signal_map->value(id).y;
+        //        p_rotationpos[restric_count]=m_Signal_map->value(id).rotation;
 
         //                qDebug()<<"xy"<< p_xpos[restric_count]<<p_ypos[restric_count];
-//        p_statuspos[restric_count]=dms_dmi_data->Signal_Status;
+        //        p_statuspos[restric_count]=dms_dmi_data->Signal_Status;
 
 
-//        QByteArray tt((char*)dms_dmi_data->Bitmap,dms_dmi_data->Bitmap_Length);
+        //        QByteArray tt((char*)dms_dmi_data->Bitmap,dms_dmi_data->Bitmap_Length);
 
-//        for(int i=0;i<restric_count;i++)
-//        {
-//            p_statuspos[i]=tt.at(restricsignal[i].bit);
-//            //                    qDebug()<<"ii"<<p_statuspos[i];
-//        }
+        //        for(int i=0;i<restric_count;i++)
+        //        {
+        //            p_statuspos[i]=tt.at(restricsignal[i].bit);
+        //            //                    qDebug()<<"ii"<<p_statuspos[i];
+        //        }
 
         //                qDebug()<<"cur"<<p_statuspos[restric_count];
 
@@ -3307,12 +3317,12 @@ void Casco_DMI::refreshTLE()
                               dms_dmi_data->Signal_Status,
                               dms_dmi_data->Bitmap_Length,
                               dms_dmi_data->Bitmap);
-//        qDebug()<<"in dmi bitmaplen"<<dms_dmi_data->Bitmap_Length;
-//        QByteArray a((char*)dms_dmi_data->Bitmap,dms_dmi_data->Bitmap_Length);
-//        for(int i=0;i<dms_dmi_data->Bitmap_Length;i++)
-//        {
-//            qDebug()<<"a["<<i<<"]"<<(quint8)a.at(i);
-//        }
+        //        qDebug()<<"in dmi bitmaplen"<<dms_dmi_data->Bitmap_Length;
+        //        QByteArray a((char*)dms_dmi_data->Bitmap,dms_dmi_data->Bitmap_Length);
+        //        for(int i=0;i<dms_dmi_data->Bitmap_Length;i++)
+        //        {
+        //            qDebug()<<"a["<<i<<"]"<<(quint8)a.at(i);
+        //        }
 
 
         dms_dmi_data->freePointer();
@@ -4270,7 +4280,7 @@ int Casco_DMI::initSignal(QString path)
     {
         QDomElement e=viewslist.at(i).toElement();
         quint8 templeid=e.attribute("TemplateID").toUInt();
-        quint8 viewid=e.attribute("ID").toUInt();
+        quint16 viewid=e.attribute("ID").toUInt();
         QString viewname=e.attribute("Name");
 
         view.name=viewname;
@@ -4281,6 +4291,7 @@ int Casco_DMI::initSignal(QString path)
         if(routesignals.size()>0)
         {
             view.signallist = new QList<SignalInfo>;
+
             for(int i=0;i<routesignals.size();i++)
             {
                 QDomElement e=routesignals.at(i).toElement();
@@ -4288,11 +4299,45 @@ int Casco_DMI::initSignal(QString path)
                 sig.name=e.attribute("Name");
                 sig.x=e.attribute("X").toUInt();
                 sig.y=e.attribute("Y").toUInt();
-                sig.rotate=e.attribute("Rotate").toUInt();
+                sig.Rotate=e.attribute("Rotate").toInt();
                 view.signallist->append(sig);
-//                qDebug()<<"siglist"<<sig.name<<sig.x
-//                       <<sig.y<<sig.rotate<<i;
+                //                qDebug()<<"siglist"<<sig.name<<sig.x
+                //                       <<sig.y<<sig.rotate<<i;
+                QDomNodeList routes=routesignals.at(i).childNodes();
+                QMap<QString,QList<Shape>*> *childroute=new QMap<QString,QList<Shape>*>;
+                for(int j=0;j<routes.size();j++)
+                {
+                    //                    qDebug()<<"routes"<<sig.name
+                    //                           <<routes.at(j).toElement().tagName()<<j;
+
+                    QDomNodeList s=routes.at(j).childNodes();
+                    QList<Shape> * shapes=new QList<Shape>;
+                    for(int k=0;k<s.size();k++)
+                    {
+                        //                        qDebug()<<s.at(k).toElement().tagName();
+
+                        QDomElement e=s.at(k).toElement();
+                        Shape x;
+                        x.name=e.tagName();
+                        x.list_Attr=new QMap<QString,QString>;
+                        QDomNamedNodeMap atts=e.attributes();
+                        for(int l=0;l<atts.size();l++)
+                        {
+                            x.list_Attr->insert(atts.item(l).toAttr().name(),
+                                                atts.item(l).toAttr().value());
+
+                        }
+                        shapes->append(x);
+                    }
+                    childroute->insert(routes.at(j).toElement().tagName(),
+                                       shapes);
+
+
+
+                }
+                map_Route->insert(sig.name,childroute);
             }
+
         }
         QDomElement signalinfo=viewslist.at(i).firstChildElement("LCSList");
         QDomNodeList lcssignals=signalinfo.childNodes();
@@ -4306,10 +4351,10 @@ int Casco_DMI::initSignal(QString path)
                 sig.name=e.attribute("Name");
                 sig.x=e.attribute("X").toUInt();
                 sig.y=e.attribute("Y").toUInt();
-                sig.rotate=e.attribute("Rotate").toUInt();
+                sig.Rotate=e.attribute("Rotate").toInt();
                 view.LCSlist->append(sig);
-//                qDebug()<<"lcslist"<<sig.name<<sig.x
-//                       <<sig.y<<sig.rotate<<i;
+                //                qDebug()<<"lcslist"<<sig.name<<sig.x
+                //                       <<sig.y<<sig.rotate<<i;
             }
 
         }
@@ -4317,8 +4362,28 @@ int Casco_DMI::initSignal(QString path)
 
         map_ViewID->insert(viewid,view);
 
-
-
+        /********map_View_TextInfo*******/
+        /*********begin**************/
+        QDomElement textlist=viewslist.at(i).firstChildElement("TextList");
+        QDomNodeList texts=textlist.childNodes();
+        if(texts.size()>0)
+        {
+            QList<TextInfo> *list_textinfo=new QList<TextInfo>;
+            for(int i=0;i<texts.size();i++)
+            {
+                TextInfo txtinfo;
+                QDomElement e=texts.at(i).toElement();
+                txtinfo.txt=e.attribute("Text");
+                txtinfo.x=e.attribute("X").toUInt();
+                txtinfo.y=e.attribute("Y").toUInt();
+                txtinfo.Size=e.attribute("Size").toUInt();
+                txtinfo.Rotate=e.attribute("Rotate").toInt();
+                txtinfo.Color=e.attribute("Color");
+                txtinfo.Font=e.attribute("Font");
+                list_textinfo->append(txtinfo);
+            }
+            map_View_Texts->insert(viewid,list_textinfo);
+        }
     }
 
 

@@ -127,9 +127,11 @@ private :
     QMap<quint8,QString> *map_olcid_name;
     QMap<QString,SignalBit> *map_Signal;
     QMap<QString,SignalBit> *map_OLC;
-    QMap<quint8,QList<Shape>* > *map_Template;
-    QMap<quint8,View> *map_ViewID;
+    QMap<quint16,QList<Shape>* > *map_Template;
+    QMap<quint16,View> *map_ViewID;
     QMap<QString,Entry> *map_sigentry;
+    QMap<QString,QMap<QString,QList<Shape>*>*>* map_Route;
+    QMap<quint16,QList<TextInfo>*> *map_View_Texts;
     /**********end***********/
 
     QMediaPlayer *player;

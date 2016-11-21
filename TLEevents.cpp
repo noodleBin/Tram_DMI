@@ -13,7 +13,9 @@ TLEEvents::TLEEvents(quint8 size, QWidget *parent): QWidget(parent)
     rotation = new quint8[50];
     m_bitmap=new quint8[200];
     display9cubic=false;
+    isdisplay_signame=true;
     need_paint=false;
+    need_txt=false;
     this->installEventFilter(this);
     this->show();
 }
@@ -71,12 +73,138 @@ void TLEEvents::setvalue(quint8 id,quint8 status,
     olclist=view.LCSlist;
     need_paint=true;
 
-    //    qDebug()<<"templatid"<<view.templateid;
+    if(map_View_Texts->contains(entry.viewid))
+    {
+        need_txt=true;
+    }
+    else
+    {
+        need_txt=false;
+    }
 
     update();
 }
 
+void TLEEvents::drawShape(QPainter* painter,Shape sh,QString name)
+{
 
+    if(name== "Line")
+    {
+
+        //                painter.save();
+        QString color=sh.list_Attr->value("Color");
+        QStringList colors= color.split(" ");
+
+        painter->setPen(QPen( QColor(colors.at(0).toUInt(),
+                                     colors.at(1).toUInt(),
+                                     colors.at(2).toUInt()),
+                              sh.list_Attr->value("LineStyle").toUInt()));
+
+        painter->drawLine(sh.list_Attr->value("StartX").toUInt()*grid,
+                          sh.list_Attr->value("StartY").toUInt()*grid,
+                          sh.list_Attr->value("EndX").toUInt()*grid,
+                          sh.list_Attr->value("EndY").toUInt()*grid);
+        //                painter.restore();
+    }
+    else if(name== "Bezier")
+    {
+        //                painter.save();
+        QString color=sh.list_Attr->value("Color");
+        QStringList colors= color.split(" ");
+
+        painter->setPen(QPen( QColor(colors.at(0).toUInt(),
+                                     colors.at(1).toUInt(),
+                                     colors.at(2).toUInt()),
+                              sh.list_Attr->value("LineStyle").toUInt()));
+
+        QPoint begin(sh.list_Attr->value("StartX").toUInt()*grid,
+                     sh.list_Attr->value("StartY").toUInt()*grid);
+        QPoint end( sh.list_Attr->value("EndX").toUInt()*grid,
+                    sh.list_Attr->value("EndY").toUInt()*grid);
+        QPoint c1(sh.list_Attr->value("StartX").toUInt()*grid,
+                  (sh.list_Attr->value("StartY").toUInt()+
+                   sh.list_Attr->value("EndY").toUInt())*grid/2 );
+        QPoint c2(sh.list_Attr->value("EndX").toUInt()*grid,
+                  (sh.list_Attr->value("StartY").toUInt()+
+                   sh.list_Attr->value("EndY").toUInt())*grid/2 );
+        QPainterPath pp(begin);
+        pp.cubicTo(c1,c2,end);
+        painter->drawPath(pp);
+
+    }
+    else if(name== "Rect")
+    {
+        QString brush=sh.list_Attr->value("BrushColor");
+        QStringList brushcolors=brush.split(" ");
+        painter->setBrush(QColor(brushcolors.at(0).toUInt(),
+                                 brushcolors.at(1).toUInt(),
+                                 brushcolors.at(2).toUInt()));
+        QString color=sh.list_Attr->value("PenColor");
+        QStringList colors= color.split(" ");
+
+        painter->setPen(QPen( QColor(colors.at(0).toUInt(),
+                                     colors.at(1).toUInt(),
+                                     colors.at(2).toUInt()),
+                              sh.list_Attr->value("LineStyle").toUInt()));
+
+        painter->drawRect(sh.list_Attr->value("LeftTopX").toUInt()*grid,
+                          sh.list_Attr->value("LeftTopY").toUInt()*grid,
+                          sh.list_Attr->value("RightBottomX").toUInt()*grid,
+                          sh.list_Attr->value("RightBottomY").toUInt()*grid);
+        //                for(int j=0;j<sh.list_Attr->size();j++)
+        //                    qDebug()<<j<<sh.list_Attr->at(j);
+    }
+    else if(name== "ARC")
+    {
+        QString color=sh.list_Attr->value("Color");
+        QStringList colors= color.split(" ");
+
+        painter->setPen(QPen( QColor(colors.at(0).toUInt(),
+                                     colors.at(1).toUInt(),
+                                     colors.at(2).toUInt()),
+                              sh.list_Attr->value("LineStyle").toUInt()));
+
+        //        painter->drawRect(QRect(QPoint(sh.list_Attr->value("StartX").toUInt()*grid,
+        //                                       sh.list_Attr->value("StartY").toUInt()*grid),
+        //                                QPoint(sh.list_Attr->value("EndX").toUInt()*grid,
+        //                                       sh.list_Attr->value("EndY").toUInt()*grid)));
+        painter->drawArc(QRect(QPoint(sh.list_Attr->value("StartX").toUInt()*grid,
+                                      sh.list_Attr->value("StartY").toUInt()*grid),
+                               QPoint(sh.list_Attr->value("EndX").toInt()*grid,
+                                      sh.list_Attr->value("EndY").toInt()*grid)),
+                         0,sh.list_Attr->value("Angle").toInt()*16);
+    }
+    else if(name== "Arrow")
+    {
+        QString color=sh.list_Attr->value("Color");
+        QStringList colors= color.split(" ");
+
+        painter->setPen(QPen( QColor(colors.at(0).toUInt(),
+                                     colors.at(1).toUInt(),
+                                     colors.at(2).toUInt()),
+                              sh.list_Attr->value("LineStyle").toUInt()));
+
+        QString brush=sh.list_Attr->value("BrushColor");
+        QStringList brushcolors=brush.split(" ");
+        painter->setBrush(QColor(brushcolors.at(0).toUInt(),
+                                 brushcolors.at(1).toUInt(),
+                                 brushcolors.at(2).toUInt()));
+        quint16 x=sh.list_Attr->value("X").toUInt()*grid;
+        quint16 y=sh.list_Attr->value("Y").toUInt()*grid;
+        qint16 rotate=sh.list_Attr->value("Rotate").toInt();
+        //        qDebug()<<"ang"<<x<<y<<rotate;
+        painter->save();
+        painter->translate(x,y);
+        painter->rotate(-rotate);
+        QPoint points[3];
+        points[0]=(QPoint(0,0+0.5*grid));
+        points[1]=(QPoint(0,0-0.5*grid));
+        points[2]=(QPoint(0+grid,0));
+        painter->drawPolygon(points,3);
+
+        painter->restore();
+    }
+}
 
 void TLEEvents::paintEvent(QPaintEvent *e)
 {
@@ -85,7 +213,10 @@ void TLEEvents::paintEvent(QPaintEvent *e)
 
     QPainter painter(this);
 
-    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing|QPainter::SmoothPixmapTransform|QPainter::HighQualityAntialiasing);
+    painter.setRenderHints(QPainter::Antialiasing
+                           |QPainter::TextAntialiasing|
+                           QPainter::SmoothPixmapTransform|
+                           QPainter::HighQualityAntialiasing);
 
     //    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing|QPainter::SmoothPixmapTransform);
     painter.setBrush(QColor(73,86,119));
@@ -104,12 +235,12 @@ void TLEEvents::paintEvent(QPaintEvent *e)
     }
     else
     {
-        painter.setPen(QPen( QColor(220,220,220),1,Qt::NoPen));
+        //        painter.setPen(QPen( QColor(220,220,220),1,Qt::NoPen));
 
-        for(int i=0;i<19;i++)
-            painter.drawLine(0,i*height()/18,width(),i*height()/18);
-        for(int i=0;i<19;i++)
-            painter.drawLine(0*width()/18,0,i*width()/18,height());
+        //        for(int i=0;i<19;i++)
+        //            painter.drawLine(0,i*height()/18,width(),i*height()/18);
+        //        for(int i=0;i<19;i++)
+        //            painter.drawLine(0*width()/18,0,i*width()/18,height());
     }
     if(need_paint)
     {
@@ -128,71 +259,8 @@ void TLEEvents::paintEvent(QPaintEvent *e)
                 Shape sh = tplete->at(i);
                 QString name=sh.name;
 
+                drawShape(&painter,sh,name);
 
-
-                if(name== "Line")
-                {
-
-                    //                painter.save();
-                    painter.setPen(QPen( QColor(sh.list_Attr->value("Color")),
-                                         sh.list_Attr->value("LineStyle").toUInt()));
-
-                    painter.drawLine(sh.list_Attr->value("StartX").toUInt()*grid,
-                                     sh.list_Attr->value("StartY").toUInt()*grid,
-                                     sh.list_Attr->value("EndX").toUInt()*grid,
-                                     sh.list_Attr->value("EndY").toUInt()*grid);
-                    //                painter.restore();
-                }
-                else if(name== "Bezier")
-                {
-                    //                painter.save();
-                    painter.setPen(QPen( QColor(sh.list_Attr->value("Color")),
-                                         sh.list_Attr->value("LineStyle").toUInt()));
-
-                    QPoint begin(sh.list_Attr->value("StartX").toUInt()*grid,
-                                 sh.list_Attr->value("StartY").toUInt()*grid);
-                    QPoint end( sh.list_Attr->value("EndX").toUInt()*grid,
-                                sh.list_Attr->value("EndY").toUInt()*grid);
-                    QPoint c1(sh.list_Attr->value("StartX").toUInt()*grid,
-                             (sh.list_Attr->value("StartY").toUInt()+
-                              sh.list_Attr->value("EndY").toUInt())*grid/2 );
-                    QPoint c2(sh.list_Attr->value("EndX").toUInt()*grid,
-                              (sh.list_Attr->value("StartY").toUInt()+
-                               sh.list_Attr->value("EndY").toUInt())*grid/2 );
-                    QPainterPath pp(begin);
-                    pp.cubicTo(c1,c2,end);
-                    painter.drawPath(pp);
-//                    painter.drawLine(sh.list_Attr->value("StartX").toUInt()*grid,
-//                                     sh.list_Attr->value("StartY").toUInt()*grid,
-//                                     sh.list_Attr->value("EndX").toUInt()*grid,
-//                                     sh.list_Attr->value("EndY").toUInt()*grid);
-                    //                painter.restore();
-                }
-                else if(name== "Rect")
-                {
-//                    qDebug()<<"Rect";
-                    painter.setBrush(QColor(sh.list_Attr->value("BrushColor")));
-                    painter.setPen(QPen( QColor(sh.list_Attr->value("PenColor")),
-                                         sh.list_Attr->value("LineStyle").toUInt()));
-                    painter.drawRect(sh.list_Attr->value("LeftTopX").toUInt()*grid,
-                                     sh.list_Attr->value("LeftTopY").toUInt()*grid,
-                                     sh.list_Attr->value("RightBottomX").toUInt()*grid,
-                                     sh.list_Attr->value("RightBottomY").toUInt()*grid);
-                    //                for(int j=0;j<sh.list_Attr->size();j++)
-                    //                    qDebug()<<j<<sh.list_Attr->at(j);
-                }
-                else if(name== "ARC")
-                {
-                    painter.setPen(QPen( QColor(sh.list_Attr->value("Color")),
-                                         sh.list_Attr->value("LineStyle").toUInt()));
-                    painter.drawArc(QRect(QPoint(sh.list_Attr->value("StartX").toUInt()*grid,
-                                          sh.list_Attr->value("StartY").toUInt()*grid),
-                                          QPoint(sh.list_Attr->value("EndX").toUInt()*grid,
-                                          sh.list_Attr->value("EndY").toUInt()*grid)),
-                                    0,sh.list_Attr->value("Angle").toInt()*16);
-//painter.drawRect(0,0,5*grid,5*grid);
-//                    painter.drawArc(QRect(QPoint(1*grid,7*grid),QPoint(7*grid,13*grid)),0,180*16);
-                }
             }
         }
 
@@ -209,12 +277,19 @@ void TLEEvents::paintEvent(QPaintEvent *e)
             for(int i=0;i<siglist->size();i++)
             {
                 SignalInfo s=siglist->at(i);
+
+
                 painter.save();
+
+
                 if(s.name==entryname)
+                {
                     drawSignal(s.x,
                                s.y,
-                               s.rotate,sigstatus,
+                               s.Rotate,sigstatus,
                                &painter);
+
+                }
                 else
                 {
                     SignalBit b= map_Signal->value(s.name);
@@ -272,15 +347,121 @@ void TLEEvents::paintEvent(QPaintEvent *e)
 
                     drawSignal(s.x,
                                s.y,
-                               s.rotate,status,
+                               s.Rotate,status,
                                &painter);
+
+
                 }
-                painter.setPen(QPen(QColor(Qt::black),1));
-                painter.drawText(QRect(-2*grid-2,0,grid*2,grid),Qt::AlignLeft,s.name);
-                //            painter.drawRect(0,0,grid,grid);
+
+                //                painter.setPen(QPen(QColor(Qt::black),1));
+                //                switch(s.Rotate)
+                //                {
+                //                case 0:
+                //                    painter.drawText(QRect((-1)*grid,-grid,grid*2,grid),Qt::AlignLeft,s.name);
+                //                    break;
+                //                case 90:
+                //                    painter.drawText(QRect((-1)*grid,-grid,grid*2,grid),Qt::AlignLeft,s.name);
+                //                    break;
+                //                case -90:
+                //                    painter.drawText(QRect((-1)*grid,-grid,grid*2,grid),Qt::AlignLeft,s.name);
+                //                    break;
+                //                case 180:
+                //                    painter.drawText(QRect((-1)*grid,2*grid,grid*2,grid),Qt::AlignLeft,s.name);
+                //                    break;
+                //                }
+
                 painter.restore();
 
             }
+
+            if(isdisplay_signame)
+            {
+                for(int i=0;i<siglist->size();i++)
+                {
+                    SignalInfo s=siglist->at(i);
+
+                    painter.setPen(QPen(QColor(Qt::black),1));
+                    //                    qDebug()<<s.name<<s.Rotate;
+                    switch(s.Rotate)
+                    {
+                    case 0:
+                        painter.drawText(QRect((s.x-1)*grid,(s.y-1)*grid,grid*2,grid),Qt::AlignLeft,s.name);
+                        break;
+                    case 90:
+                        painter.drawText(QRect((s.x)*grid+5,(s.y)*grid-7,grid*2,grid),Qt::AlignLeft,s.name);
+                        break;
+                    case -90:
+                        painter.drawText(QRect((s.x-1)*grid-20,(s.y)*grid-8,grid*2,grid),Qt::AlignLeft,s.name);
+                        break;
+                    case 180:
+                        painter.drawText(QRect((s.x-1)*grid,(s.y+1)*grid-15,grid*2,grid),Qt::AlignLeft,s.name);
+                        break;
+
+                    }
+
+
+                }
+            }
+
+
+
+            for(int i=0;i<siglist->size();i++)
+            {
+                SignalInfo s=siglist->at(i);
+
+
+                painter.save();
+
+
+                if(s.name==entryname)
+                {
+
+                    drawRoute(s.name,sigstatus,
+                              &painter);
+                }
+                else
+                {
+                    SignalBit b= map_Signal->value(s.name);
+
+                    quint8 status;
+
+                    quint8 left = (m_bitmap[b.left/8]);
+                    left&=1<<b.left%8;
+                    quint8 right = (m_bitmap[b.right/8]);
+                    right&=1<<b.right%8;
+                    quint8 permiss = (m_bitmap[b.permiss/8]);
+                    permiss&=1<<b.permiss%8;
+                    quint8 restric = (m_bitmap[b.restric/8]);
+                    restric&=1<<b.restric%8;
+                    if(b.restric!=0&&restric)
+                    {
+                        status=1;
+                    }
+                    else if(b.permiss!=0&&permiss)
+                    {
+                        status=2;
+                    }
+                    else   if(b.left!=0&&left)
+                    {
+                        status=3;
+                    }
+                    else   if(b.right!=0&&right)
+                    {
+                        status=4;
+                    }
+                    else
+                    {
+                        status=1;
+                    }
+
+                    drawRoute(s.name,status,&painter);
+                }
+
+                painter.restore();
+
+            }
+
+
         }
         painter.restore();
         //    if(olclist->size()>0)
@@ -297,12 +478,48 @@ void TLEEvents::paintEvent(QPaintEvent *e)
 
         //        }
         //    }
-        QRect rect=QRect(entry.tramx*grid-8,entry.tramy*grid,16,66);
+        QRect rect=QRect(entry.tramx*grid-7,entry.tramy*grid,16,66);
         painter.drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        painter.setPen(QPen(Qt::black,5));
-        painter.drawText(QRect(0,0,10*grid,4*grid),Qt::AlignLeft,view.name);
+        //        painter.setPen(QPen(Qt::black,5));
+        //        painter.drawText(QRect(0,0,10*grid,4*grid),Qt::AlignLeft,view.name);
+        if(need_txt)
+        {
+            QList<TextInfo>* list_txt=map_View_Texts->value(entry.viewid);
+            for(int i=0;i<list_txt->size();i++)
+            {
+                TextInfo t=list_txt->at(i);
+                QFont f(t.Font,t.Size);
 
-        //        painter.drawText(rect,Qt::AlignLeft,view.name);
+                painter.setFont(f);
+
+
+
+                QString color=t.Color;
+                QStringList colors= color.split(" ");
+
+                painter.setPen(QPen( QColor(colors.at(0).toUInt(),
+                                            colors.at(1).toUInt(),
+                                            colors.at(2).toUInt()),
+                                     2));
+
+                painter.save();
+
+
+                painter.translate(t.x*grid,t.y*grid);
+
+                if(t.Rotate>0)
+                {
+
+                    painter.rotate(t.Rotate);
+
+
+                }
+                painter.drawText(QRect(0,0,5*grid,5*grid),t.txt);
+                painter.restore();
+            }
+
+        }
+
     }
     else
     {
@@ -313,7 +530,48 @@ void TLEEvents::paintEvent(QPaintEvent *e)
 
 }
 
-void TLEEvents:: drawSignal(quint8 x,quint8 y,quint8 rotate,quint8 status,QPainter *painter)
+void TLEEvents::drawRoute(QString signame,quint8 status,QPainter *painter)
+{
+    QMap<QString,QList<Shape>*>* m=  map_Route->value(signame);
+    QList<Shape>* s;
+    painter->setPen(QPen(QColor(Qt::green),4));
+    switch(status)
+    {
+    case 2:
+        if(m->contains("Permiss"))
+        {
+            s =   m->value("Permiss");
+            for(int i=0;i<s->size();i++)
+            {
+                drawShape(painter,s->at(i),s->at(i).name);
+                //            painter->drawLine(0,0,500,500);
+            }
+        }
+        break;
+    case 3:
+        if(m->contains("Left"))
+        {
+            s=   m->value("Left");
+            for(int i=0;i<s->size();i++)
+            {
+                drawShape(painter,s->at(i),s->at(i).name);
+            }
+        }
+        break;
+    case 4:
+        if(m->contains("Right"))
+        {
+            s=   m->value("Right");
+            for(int i=0;i<s->size();i++)
+            {
+                drawShape(painter,s->at(i),s->at(i).name);
+            }
+        }
+        break;
+    }
+}
+
+void TLEEvents:: drawSignal(quint8 x,quint8 y,qint16 rotate,quint8 status,QPainter *painter)
 {
     //    qDebug()<<"x"<<x<<y<<grid<<width()/18;
     //    painter->save();
@@ -324,6 +582,7 @@ void TLEEvents:: drawSignal(quint8 x,quint8 y,quint8 rotate,quint8 status,QPaint
     painter->drawEllipse(0-grid/2,0,grid,grid);
     painter->drawLine(0,grid,0,grid+grid/2);
     painter->drawLine(0-grid/2,grid+grid/2,grid/2,grid+grid/2);
+
     switch(status)
     {
     case 1:
@@ -343,6 +602,7 @@ void TLEEvents:: drawSignal(quint8 x,quint8 y,quint8 rotate,quint8 status,QPaint
         painter->drawLine(grid/4,grid/4,0-grid/4,3*grid/4);
         break;
     }
+    //    painter->drawLine(0,0,2*grid,2*grid);
     //    painter->restore();
 }
 
@@ -389,7 +649,7 @@ void TLEEvents::drawArrow(QPainter *painter, QPoint &end,QColor color)
 
 
 
-void TLEEvents::setMap(QMap<quint8, QString> *mapsigidname, QMap<quint8, QString> *mapolcidname, QMap<QString, SignalBit> *mapsignal, QMap<QString, SignalBit> *mapolc, QMap<quint8, QList<Shape> *> *mapTemplate, QMap<quint8, View> *mapViewID, QMap<QString, Entry> *mapsigentry)
+void TLEEvents::setMap(QMap<quint8, QString> *mapsigidname, QMap<quint8, QString> *mapolcidname, QMap<QString, SignalBit> *mapsignal, QMap<QString, SignalBit> *mapolc, QMap<quint16, QList<Shape> *> *mapTemplate, QMap<quint16, View> *mapViewID, QMap<QString, Entry> *mapsigentry, QMap<QString, QMap<QString, QList<Shape> *> *> *mapRoute, QMap<quint16, QList<TextInfo> *> *mapViewTexts)
 {
     map_sigid_name=mapsigidname;
     map_olcid_name=mapolcidname;
@@ -398,6 +658,8 @@ void TLEEvents::setMap(QMap<quint8, QString> *mapsigidname, QMap<quint8, QString
     map_Template=mapTemplate;
     map_ViewID=mapViewID;
     map_sigentry=mapsigentry;
+    map_Route=mapRoute;
+    map_View_Texts=mapViewTexts;
 }
 
 
