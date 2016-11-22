@@ -221,8 +221,8 @@ void Casco_DMI::initialNormalControl()
 
     wid->findChild<QLabel*>("lbl_namesch")->setText(tr("sch"));
     wid->findChild<QLabel*>("lbl_namedes")->setText(tr("des"));
-    wid->findChild<QLabel*>("lbl_namedownstream")->setText(tr("downstream"));
-    wid->findChild<QLabel*>("lbl_nameupstream")->setText(tr("upstream"));
+//    wid->findChild<QLabel*>("lbl_namedownstream")->setText(tr("downstream"));
+//    wid->findChild<QLabel*>("lbl_nameupstream")->setText(tr("upstream"));
 
 
 
@@ -333,28 +333,28 @@ void Casco_DMI::initialControl()
 #endif
 
     lblLocStatus=wid->findChild<QLabel*>("pic_traloc");
-    lblPassengerType=wid->findChild<QLabel*>("pic_passertype");
-    lblRunningType=wid->findChild<QLabel*>("pic_runningtype");
+//    lblPassengerType=wid->findChild<QLabel*>("pic_passertype");
+//    lblRunningType=wid->findChild<QLabel*>("pic_runningtype");
     lblSystemOK=wid->findChild<QLabel*>("pic_pantostatus");
 
 #ifdef Baseline_2_0
     lblSystemOK->installEventFilter(this);
-    lblActiveEnd=wid->findChild<QLabel*>("pic_activeend");
+//    lblActiveEnd=wid->findChild<QLabel*>("pic_activeend");
 
-    switch(m_activeEnd)
-    {
-    case 1:lblActiveEnd->setPixmap(resPath+"Cab1.png");
-        break;
-    case 2:lblActiveEnd->setPixmap(resPath+"Cab2.png");
-        break;
-    default:lblActiveEnd->setPixmap(resPath+"Cab1.png");
-        break;
-    }
+//    switch(m_activeEnd)
+//    {
+//    case 1:lblActiveEnd->setPixmap(resPath+"Cab1.png");
+//        break;
+//    case 2:lblActiveEnd->setPixmap(resPath+"Cab2.png");
+//        break;
+//    default:lblActiveEnd->setPixmap(resPath+"Cab1.png");
+//        break;
+//    }
 
 #endif
     //    lblShutdownStatus=wid->findChild<QLabel*>("pic_working");
 
-    lblEb=wid->findChild<QLabel*>("pic_eb");
+//    lblEb=wid->findChild<QLabel*>("pic_eb");
     lblSb=wid->findChild<QLabel*>("pic_sb");
     lblTurnback=wid->findChild<QLabel*>("pic_turnback");
     lblSkip=wid->findChild<QLabel*>("pic_skip");
@@ -376,18 +376,18 @@ void Casco_DMI::initialControl()
     lblCPRemainunit= wid->findChild<QLabel*>("lbl_CPRemainUnit");
 
     //Operate area
-    btnleft=wid->findChild<QLabel*>("btn_left");
-    btnstra= wid->findChild<QLabel*>("btn_stra");
-    btnright= wid->findChild<QLabel*>("btn_right");
+//    btnleft=wid->findChild<QLabel*>("btn_left");
+//    btnstra= wid->findChild<QLabel*>("btn_stra");
+//    btnright= wid->findChild<QLabel*>("btn_right");
     frameRR =wid->findChild<QFrame*>("frame_RR");
-    btncp=wid->findChild<QLabel*>("btn_cp");
+//    btncp=wid->findChild<QLabel*>("btn_cp");
     btninput=wid->findChild<QLabel*>("btn_input");
 
     btninput->installEventFilter(this);
-    btnleft->installEventFilter(this);
-    btnstra->installEventFilter(this);
-    btnright->installEventFilter(this);
-    btncp->installEventFilter(this);
+//    btnleft->installEventFilter(this);
+//    btnstra->installEventFilter(this);
+//    btnright->installEventFilter(this);
+//    btncp->installEventFilter(this);
 
     //tab Mission
     lblNameDepTime=  wid->findChild<QLabel*>("lbl_namedeptime");
@@ -424,8 +424,8 @@ void Casco_DMI::initialControl()
 #ifdef Baseline_2_0
     widcurrentpsr=wid->findChild<QWidget*>("widget_currentpsr");
     widnextpsr=wid->findChild<QWidget*>("widget_nextpsr");
-    currentpsr=new LimitSpeed(widcurrentpsr);
-    nextpsr=new LimitSpeed(widnextpsr);
+    currentpsr=new LimitSpeed(1,widcurrentpsr);
+    nextpsr=new LimitSpeed(2,widnextpsr);
 #endif
 
     //    mygeoevents = new MyGeoEvents(screenmode,widGeo);
@@ -1764,7 +1764,7 @@ void Casco_DMI::refreshUI()
     refreshATP();
     refreshMission();
     refreshRRCP();
-    refreshOperation();
+//    refreshOperation();
     refreshTabMission();
     refreshGeoEvents();
     refreshMaintence();
@@ -2604,30 +2604,30 @@ void Casco_DMI::refreshMission()
     }
 #endif
 
-    switch(els_dmi_data->Running_Type)
-    {
+//    switch(els_dmi_data->Running_Type)
+//    {
 
-    case 0:
-        lblRunningType->setPixmap(resPath+"Running_Type0.png");
-        break;
-    case 1:
-        lblRunningType->setPixmap(resPath+"Running_Type1.png");
-        break;
-    case 2:
-        lblRunningType->setPixmap(resPath+"Running_Type2.png");
-        break;
-    case 3:
-        lblRunningType->setPixmap(resPath+"Running_Type3.png");
-        break;
-    default:
-        lblRunningType->setPixmap(resPath+"Running_Type0.png");
-        QString content=QString("recv Running_Type error value ")+QString::number(els_dmi_data->Running_Type);
-        if(!log->writeLog(content))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-        break;
-    }
+//    case 0:
+//        lblRunningType->setPixmap(resPath+"Running_Type0.png");
+//        break;
+//    case 1:
+//        lblRunningType->setPixmap(resPath+"Running_Type1.png");
+//        break;
+//    case 2:
+//        lblRunningType->setPixmap(resPath+"Running_Type2.png");
+//        break;
+//    case 3:
+//        lblRunningType->setPixmap(resPath+"Running_Type3.png");
+//        break;
+//    default:
+//        lblRunningType->setPixmap(resPath+"Running_Type0.png");
+//        QString content=QString("recv Running_Type error value ")+QString::number(els_dmi_data->Running_Type);
+//        if(!log->writeLog(content))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//        break;
+//    }
 
     switch(els_dmi_data->Train_Location_Status)
     {
@@ -2650,26 +2650,26 @@ void Casco_DMI::refreshMission()
         break;
     }
 
-    switch(els_dmi_data->Passenger_Mission)
-    {
-    case 0:
-        lblPassengerType->setPixmap(resPath+"Passenger_Mission0.png");
-        break;
-    case 1:
-        lblPassengerType->setPixmap(resPath+"Passenger_Mission1.png");
-        break;
-    case 2:
-        lblPassengerType->setPixmap(resPath+"Passenger_Mission2.png");
-        break;
-    default:
-        lblPassengerType->setPixmap(resPath+"Passenger_Mission0.png");
-        QString content=QString("recv Passenger_Mission error value ")+QString::number(els_dmi_data->Passenger_Mission);
-        if(!log->writeLog(content))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-        break;
-    }
+//    switch(els_dmi_data->Passenger_Mission)
+//    {
+//    case 0:
+//        lblPassengerType->setPixmap(resPath+"Passenger_Mission0.png");
+//        break;
+//    case 1:
+//        lblPassengerType->setPixmap(resPath+"Passenger_Mission1.png");
+//        break;
+//    case 2:
+//        lblPassengerType->setPixmap(resPath+"Passenger_Mission2.png");
+//        break;
+//    default:
+//        lblPassengerType->setPixmap(resPath+"Passenger_Mission0.png");
+//        QString content=QString("recv Passenger_Mission error value ")+QString::number(els_dmi_data->Passenger_Mission);
+//        if(!log->writeLog(content))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//        break;
+//    }
 
     switch(els_dmi_data->System_Ok)
     {
@@ -2727,24 +2727,24 @@ void Casco_DMI::refreshMission()
     }
 #endif
 
-    switch(els_dmi_data->Emergency_Braking_Applied)
-    {
-    case 0:
-        lblEb->setPixmap(resPath+"Emergency_Braking_Applied0.png");
-        break;
-    case 1:
-        lblEb->setPixmap(resPath+"Emergency_Braking_Applied1.png");
-        refreshAlarmQue(3,"[车载] ");
-        break;
-    default:
-        lblEb->setPixmap(resPath+"Emergency_Braking_Applied0.png");
-        QString content=QString("recv Emergency_Braking_Applied error value ")+QString::number(els_dmi_data->Emergency_Braking_Applied);
-        if(!log->writeLog(content))
-        {
-            popFaultBox("fail to write log, now exit");
-        }
-        break;
-    }
+//    switch(els_dmi_data->Emergency_Braking_Applied)
+//    {
+//    case 0:
+//        lblEb->setPixmap(resPath+"Emergency_Braking_Applied0.png");
+//        break;
+//    case 1:
+//        lblEb->setPixmap(resPath+"Emergency_Braking_Applied1.png");
+//        refreshAlarmQue(3,"[车载] ");
+//        break;
+//    default:
+//        lblEb->setPixmap(resPath+"Emergency_Braking_Applied0.png");
+//        QString content=QString("recv Emergency_Braking_Applied error value ")+QString::number(els_dmi_data->Emergency_Braking_Applied);
+//        if(!log->writeLog(content))
+//        {
+//            popFaultBox("fail to write log, now exit");
+//        }
+//        break;
+//    }
 
     switch(els_dmi_data->Service_Braking_Applied)
     {
@@ -2869,124 +2869,108 @@ void Casco_DMI::refreshRRCP()
 
 
     //RR
-    switch(els_dmi_data->Right_Route_Status)
-    {
+//    switch(els_dmi_data->Right_Route_Status)
+//    {
 
-    case 0:
-    case 2:
-        needrightflash=false;
-        btnright->setPixmap(resPath+"Right_Route_Status0.png");
-        break;
-    case 1:
-        needrightflash=true;
-        break;
-    case 3:
-        needrightflash=false;
-        btnright->setPixmap(resPath+"Right_Route_Status3.png");
-        break;
-    case 4:
-        needrightflash=false;
-        btnright->setPixmap(resPath+"Right_Route_Status4.png");
-        break;
-    default:
-        needrightflash=false;
-        btnright->setPixmap(resPath+"Right_Route_Status0.png");
-        //        QString content=QString("recv Right_Route_Status error value ")+QString::number(els_dmi_data->Right_Route_Status);
-        //        if(!log->writeLog(content))
-        //        {
-        //            popFaultBox("fail to write log, now exit");
-        //        }
-        break;
-    }
-    switch(els_dmi_data->Left_Route_Status)
-    {
+//    case 0:
+//    case 2:
+//        needrightflash=false;
+//        btnright->setPixmap(resPath+"Right_Route_Status0.png");
+//        break;
+//    case 1:
+//        needrightflash=true;
+//        break;
+//    case 3:
+//        needrightflash=false;
+//        btnright->setPixmap(resPath+"Right_Route_Status3.png");
+//        break;
+//    case 4:
+//        needrightflash=false;
+//        btnright->setPixmap(resPath+"Right_Route_Status4.png");
+//        break;
+//    default:
+//        needrightflash=false;
+//        btnright->setPixmap(resPath+"Right_Route_Status0.png");
 
-    case 0:
-    case 2:
-        needleftflash=false;
-        btnleft->setPixmap(resPath+"Left_Route_Status0.png");
-        break;
-    case 1:needleftflash=true;
-        break;
-    case 3:
-        needleftflash=false;
-        btnleft->setPixmap(resPath+"Left_Route_Status3.png");
-        break;
-    case 4:
-        needleftflash=false;
-        btnleft->setPixmap(resPath+"Left_Route_Status4.png");
-        break;
-    default:
-        needleftflash=false;
-        btnleft->setPixmap(resPath+"Left_Route_Status0.png");
-        //        QString content=QString("recv Left_Route_Status error value ")+QString::number(els_dmi_data->Left_Route_Status);
-        //        if(!log->writeLog(content))
-        //        {
-        //            popFaultBox("fail to write log, now exit");
-        //        }
-        break;
+//        break;
+//    }
+//    switch(els_dmi_data->Left_Route_Status)
+//    {
 
-    }
+//    case 0:
+//    case 2:
+//        needleftflash=false;
+//        btnleft->setPixmap(resPath+"Left_Route_Status0.png");
+//        break;
+//    case 1:needleftflash=true;
+//        break;
+//    case 3:
+//        needleftflash=false;
+//        btnleft->setPixmap(resPath+"Left_Route_Status3.png");
+//        break;
+//    case 4:
+//        needleftflash=false;
+//        btnleft->setPixmap(resPath+"Left_Route_Status4.png");
+//        break;
+//    default:
+//        needleftflash=false;
+//        btnleft->setPixmap(resPath+"Left_Route_Status0.png");
 
-    switch(els_dmi_data->Straight_Route_Status)
-    {
+//        break;
 
-    case 0:
-    case 2:
-        needstraflash=false;
-        btnstra->setPixmap(resPath+"Straight_Route_Status0.png");
-        break;
-    case 1:needstraflash=true;
-        break;
-    case 3:
-        needstraflash=false;
-        btnstra->setPixmap(resPath+"Straight_Route_Status3.png");
-        break;
-    case 4:
-        needstraflash=false;
-        btnstra->setPixmap(resPath+"Straight_Route_Status4.png");
-        break;
-    default:
-        needstraflash=false;
-        btnstra->setPixmap(resPath+"Straight_Route_Status0.png");
-        //        QString content=QString("recv Straight_Route_Status error value ")+QString::number(els_dmi_data->Straight_Route_Status);
-        //        if(!log->writeLog(content))
-        //        {
-        //            popFaultBox("fail to write log, now exit");
-        //        }
-        break;
+//    }
 
-    }
+//    switch(els_dmi_data->Straight_Route_Status)
+//    {
+
+//    case 0:
+//    case 2:
+//        needstraflash=false;
+//        btnstra->setPixmap(resPath+"Straight_Route_Status0.png");
+//        break;
+//    case 1:needstraflash=true;
+//        break;
+//    case 3:
+//        needstraflash=false;
+//        btnstra->setPixmap(resPath+"Straight_Route_Status3.png");
+//        break;
+//    case 4:
+//        needstraflash=false;
+//        btnstra->setPixmap(resPath+"Straight_Route_Status4.png");
+//        break;
+//    default:
+//        needstraflash=false;
+//        btnstra->setPixmap(resPath+"Straight_Route_Status0.png");
+
+//        break;
+
+//    }
 
 
 }
 
-void Casco_DMI::refreshOperation()
-{
-    switch (els_dmi_data->CP_Area_Status)
-    {
-    case 0:
-    case 4:
-    case 5:
-        btncp->setPixmap(resPath+"CP_Area_Status0.png");
-        break;
-    case 1:
-    case 2:
-    case 3:
-        btncp->setPixmap(resPath+"CP_Area_Status1.png");
-        break;
+//void Casco_DMI::refreshOperation()
+//{
+//    switch (els_dmi_data->CP_Area_Status)
+//    {
+//    case 0:
+//    case 4:
+//    case 5:
+//        btncp->setPixmap(resPath+"CP_Area_Status0.png");
+//        break;
+//    case 1:
+//    case 2:
+//    case 3:
+//        btncp->setPixmap(resPath+"CP_Area_Status1.png");
+//        break;
 
-    default:
-        btncp->setPixmap(resPath+"CP_Area_Status0.png");
-        //        QString content=QString("recv CP_Area_Status error value ")+QString::number(els_dmi_data->CP_Area_Status);
-        //        if(!log->writeLog(content))
-        //        {
-        //            popFaultBox("fail to write log, now exit");
-        //        }
-        break;
-    }
+//    default:
+//        btncp->setPixmap(resPath+"CP_Area_Status0.png");
 
-}
+//        break;
+//    }
+
+//}
 
 void Casco_DMI::refreshTabMission()
 {

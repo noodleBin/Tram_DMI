@@ -26,7 +26,7 @@ QSize MyDashboard::sizeHint() const
     }
     else if(m_size==4)
     {
-        return QSize(320,320);
+        return QSize(360,360);
     }
     return QSize(100,100);
 }

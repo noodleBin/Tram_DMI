@@ -9,8 +9,9 @@ class LimitSpeed : public QWidget
 {
     Q_OBJECT
 public:
-    explicit LimitSpeed(QWidget *parent = 0);
+    explicit LimitSpeed(quint8 size,QWidget *parent = 0);
     void setSpeed(quint8 speed);
+    quint8 m_size;
 
 private:
     quint8 m_speed;

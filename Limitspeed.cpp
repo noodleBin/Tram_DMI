@@ -1,9 +1,9 @@
 #include "Limitspeed.h"
 
-LimitSpeed::LimitSpeed(QWidget *parent) : QWidget(parent)
+LimitSpeed::LimitSpeed(quint8 size, QWidget *parent) : QWidget(parent)
 {
     m_speed=0;
-
+    m_size=size;
     this->show();
 }
 
@@ -50,6 +50,18 @@ void LimitSpeed::paintEvent(QPaintEvent *)
 
 QSize LimitSpeed::sizeHint() const
 {
-    return QSize(64,64);
+    switch (m_size)
+    {
+    case 1:
+        return QSize(64,64);
+        break;
+    case 2:
+        return QSize(48,48);
+        break;
+    default:
+        return QSize(48,48);
+        break;
+    }
+
 }
 
