@@ -320,7 +320,7 @@ void TLEEvents::drawAllSignals(QPainter *painter)
     QList<SignalInfo> *sl;
     if(m_rtu_id==1)
         sl=siglist;
-    else if(m_rtu_id==2)
+    else
         sl=olclist;
     for(int i=0;i<sl->size();i++)
     {
@@ -356,7 +356,7 @@ void TLEEvents::drawAllRoutes(QPainter *painter)
     QList<SignalInfo> *sl;
     if(m_rtu_id==1)
         sl=siglist;
-    else if(m_rtu_id==2)
+    else
         sl=olclist;
     for(int i=0;i<sl->size();i++)
     {
@@ -507,7 +507,7 @@ void TLEEvents::drawSigName(QPainter* painter)
         QList<SignalInfo>* s;
         if(m_rtu_id==1)
             s=siglist;
-        else if(m_rtu_id==2)
+        else
             s=olclist;
         for(int i=0;i<s->size();i++)
         {
