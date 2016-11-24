@@ -13,7 +13,7 @@
 
 
 
-#define LONG 15
+#define LONG 21
 #define OK 10
 #define SHORT 8
 #define SPACE 5

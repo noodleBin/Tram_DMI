@@ -6,7 +6,7 @@ TLEEvents::TLEEvents(quint8 size, QWidget *parent): QWidget(parent)
 {
 
     m_size=size;
-    grid=27.7;
+    grid=24;
     xpos = new quint16[50];
     ypos = new quint16[50];
     status = new quint8[50];
@@ -28,12 +28,13 @@ TLEEvents::~TLEEvents()
     delete[] rotation;
 }
 
-void TLEEvents::setvalue(quint8 id,quint8 status,
+void TLEEvents::setvalue(quint8 id,quint8 rtu_id,quint8 status,
                          quint16 bitmaplength,
                          quint8* bitmap)
 {
 
     sigid =id;
+    m_rtu_id=rtu_id;
     sigstatus=status;
     m_bitmaplength=bitmaplength;
     for(int i=0;i<m_bitmaplength;i++)
@@ -41,7 +42,10 @@ void TLEEvents::setvalue(quint8 id,quint8 status,
         m_bitmap[i]=bitmap[i];
     }
 
-    entryname=map_sigid_name->value(id);
+    if(m_rtu_id==1)
+        entryname=map_sigid_name->value(id);
+    else
+        entryname=map_olcid_name->value(id);
     //    qDebug()<<"signame"<<name;
     if(!map_sigentry->contains(entryname))
     {
@@ -172,7 +176,8 @@ void TLEEvents::drawShape(QPainter* painter,Shape sh,QString name)
                                       sh.list_Attr->value("StartY").toUInt()*grid),
                                QPoint(sh.list_Attr->value("EndX").toInt()*grid,
                                       sh.list_Attr->value("EndY").toInt()*grid)),
-                         0,sh.list_Attr->value("Angle").toInt()*16);
+                         sh.list_Attr->value("StartAngle").toInt()*16,
+                         sh.list_Attr->value("SpanAngle").toInt()*16);
     }
     else if(name== "Arrow")
     {
@@ -223,315 +228,54 @@ void TLEEvents::paintEvent(QPaintEvent *e)
     painter.drawRect(0,0,this->width(),this->height());
 
 
-
-    if(display9cubic)
-    {
-        painter.setPen(QPen( QColor(220,220,220),1,Qt::DotLine));
-
-        for(int i=0;i<19;i++)
-            painter.drawLine(0,i*height()/18,width(),i*height()/18);
-        for(int i=0;i<19;i++)
-            painter.drawLine(i*width()/18,0,i*width()/18,height());
-    }
-    else
-    {
-        //        painter.setPen(QPen( QColor(220,220,220),1,Qt::NoPen));
-
-        //        for(int i=0;i<19;i++)
-        //            painter.drawLine(0,i*height()/18,width(),i*height()/18);
-        //        for(int i=0;i<19;i++)
-        //            painter.drawLine(0*width()/18,0,i*width()/18,height());
-    }
+    draw18Grid(&painter);
     if(need_paint)
     {
         painter.save();
-        if(entry.rotate>0)
+        if(entry.rotate!=0)
         {
+            //            qDebug()<<entry.rotate<<entry.viewid;
+            //            painter.rotate(entry.rotate);
+            painter.translate(width()/2,height()/2);
+            //
+
             painter.rotate(entry.rotate);
-            painter.translate(-width(),-height());
-        }
-
-        if(tplete->size()>0)
-        {
-
-            for(int i=0;i<tplete->size();i++)
-            {
-                Shape sh = tplete->at(i);
-                QString name=sh.name;
-
-                drawShape(&painter,sh,name);
-
-            }
-        }
-
-        if(siglist->size()>0)
-
-        {
-            QByteArray bytes((char*)m_bitmap,m_bitmaplength);
-
-            //        for(int i=0;i<m_bitmaplength;i++)
-            //        {
-            //            qDebug()<<"bytes["<<i<<"]"<<(quint8)bytes.at(i);
-            //        }
-
-            for(int i=0;i<siglist->size();i++)
-            {
-                SignalInfo s=siglist->at(i);
-
-
-                painter.save();
-
-
-                if(s.name==entryname)
-                {
-                    drawSignal(s.x,
-                               s.y,
-                               s.Rotate,sigstatus,
-                               &painter);
-
-                }
-                else
-                {
-                    SignalBit b= map_Signal->value(s.name);
-
-
-                    quint8 status;
-                    //                qDebug()<<"signal"<<s.name<< b.left
-                    //                       <<b.right
-                    //                      <<b.permiss
-                    //                     <<b.restric;
-                    quint8 left = (m_bitmap[b.left/8]);
-                    left&=1<<b.left%8;
-                    quint8 right = (m_bitmap[b.right/8]);
-                    right&=1<<b.right%8;
-                    quint8 permiss = (m_bitmap[b.permiss/8]);
-                    permiss&=1<<b.permiss%8;
-                    quint8 restric = (m_bitmap[b.restric/8]);
-                    restric&=1<<b.restric%8;
-                    //                qDebug()<<"left"<<left;
-
-                    //                quint8 red=(m_bitmap[b.restric/8]&=(1<<b.restric%8))>>b.restric%8;
-                    //                quint8 green=(m_bitmap[b.permiss/8]&=(1<<b.permiss%8))>>b.permiss%8;
-                    //                quint8 left=(m_bitmap[b.left/8]&=(1<<b.left%8))>>b.left%8;
-                    //                quint8 right=(m_bitmap[b.right/8]&=(1<<b.right%8))>>b.right%8;
-                    //                qDebug()<<"red"<<red<<green<<left<<right;
-                    //                qDebug()<<m_bitmap[b.left/8]
-                    //                        <<m_bitmap[b.right/8]
-                    //                        <<m_bitmap[b.permiss/8]
-                    //                        <<m_bitmap[b.restric/8];
-
-                    //                qDebug()<<"bit"<<b.left   <<"="<<(m_bitmap[b.left/8]&=(1<<b.left%8));
-                    //                qDebug()<<"bit"<<b.right  <<"="<<(m_bitmap[b.right/8]&=(1<<b.right%8));
-                    //                qDebug()<<"bit"<<b.permiss<<"="<<(m_bitmap[b.permiss/8]&=(1<<b.permiss%8));
-                    //                qDebug()<<"bit"<<b.restric<<"="<<(m_bitmap[b.restric/8]&=(1<<b.restric%8));
-                    if(b.restric!=0&&restric)
-                    {
-                        status=1;
-                    }
-                    else if(b.permiss!=0&&permiss)
-                    {
-                        status=2;
-                    }
-                    else   if(b.left!=0&&left)
-                    {
-                        status=3;
-                    }
-                    else   if(b.right!=0&&right)
-                    {
-                        status=4;
-                    }
-                    else
-                    {
-                        status=1;
-                    }
-
-                    drawSignal(s.x,
-                               s.y,
-                               s.Rotate,status,
-                               &painter);
-
-
-                }
-
-                //                painter.setPen(QPen(QColor(Qt::black),1));
-                //                switch(s.Rotate)
-                //                {
-                //                case 0:
-                //                    painter.drawText(QRect((-1)*grid,-grid,grid*2,grid),Qt::AlignLeft,s.name);
-                //                    break;
-                //                case 90:
-                //                    painter.drawText(QRect((-1)*grid,-grid,grid*2,grid),Qt::AlignLeft,s.name);
-                //                    break;
-                //                case -90:
-                //                    painter.drawText(QRect((-1)*grid,-grid,grid*2,grid),Qt::AlignLeft,s.name);
-                //                    break;
-                //                case 180:
-                //                    painter.drawText(QRect((-1)*grid,2*grid,grid*2,grid),Qt::AlignLeft,s.name);
-                //                    break;
-                //                }
-
-                painter.restore();
-
-            }
-
-            if(isdisplay_signame)
-            {
-                for(int i=0;i<siglist->size();i++)
-                {
-                    SignalInfo s=siglist->at(i);
-
-                    painter.setPen(QPen(QColor(Qt::black),1));
-                    //                    qDebug()<<s.name<<s.Rotate;
-                    switch(s.Rotate)
-                    {
-                    case 0:
-                        painter.drawText(QRect((s.x-1)*grid,(s.y-1)*grid,grid*2,grid),Qt::AlignLeft,s.name);
-                        break;
-                    case 90:
-                        painter.drawText(QRect((s.x)*grid+5,(s.y)*grid-7,grid*2,grid),Qt::AlignLeft,s.name);
-                        break;
-                    case -90:
-                        painter.drawText(QRect((s.x-1)*grid-20,(s.y)*grid-8,grid*2,grid),Qt::AlignLeft,s.name);
-                        break;
-                    case 180:
-                        painter.drawText(QRect((s.x-1)*grid,(s.y+1)*grid-15,grid*2,grid),Qt::AlignLeft,s.name);
-                        break;
-
-                    }
-
-
-                }
-            }
-
-
-
-            for(int i=0;i<siglist->size();i++)
-            {
-                SignalInfo s=siglist->at(i);
-
-
-                painter.save();
-
-
-                if(s.name==entryname)
-                {
-
-                    drawRoute(s.name,sigstatus,
-                              &painter);
-                }
-                else
-                {
-                    SignalBit b= map_Signal->value(s.name);
-
-                    quint8 status;
-
-                    quint8 left = (m_bitmap[b.left/8]);
-                    left&=1<<b.left%8;
-                    quint8 right = (m_bitmap[b.right/8]);
-                    right&=1<<b.right%8;
-                    quint8 permiss = (m_bitmap[b.permiss/8]);
-                    permiss&=1<<b.permiss%8;
-                    quint8 restric = (m_bitmap[b.restric/8]);
-                    restric&=1<<b.restric%8;
-                    if(b.restric!=0&&restric)
-                    {
-                        status=1;
-                    }
-                    else if(b.permiss!=0&&permiss)
-                    {
-                        status=2;
-                    }
-                    else   if(b.left!=0&&left)
-                    {
-                        status=3;
-                    }
-                    else   if(b.right!=0&&right)
-                    {
-                        status=4;
-                    }
-                    else
-                    {
-                        status=1;
-                    }
-
-                    drawRoute(s.name,status,&painter);
-                }
-
-                painter.restore();
-
-            }
-
+            painter.translate(-width()/2,-height()/2);
 
         }
-        painter.restore();
-        //    if(olclist->size()>0)
-        //    {
-        //        for(int i=0;i<olclist->size();i++)
+
+        drawTemplate(&painter);
+
+
+        QByteArray bytes((char*)m_bitmap,m_bitmaplength);
+
+        //        for(int i=0;i<m_bitmaplength;i++)
         //        {
-        //            SignalInfo s=olclist->at(i);
-        //            painter.save();
-        //            drawSignal(s.x,
-        //                       s.y,
-        //                       s.rotate,sigstatus,
-        //                       &painter);
-        //            painter.restore();
-
+        //            qDebug()<<"bytes["<<i<<"]"<<(quint8)bytes.at(i);
         //        }
-        //    }
-        QRect rect=QRect(entry.tramx*grid-7,entry.tramy*grid,16,66);
-        painter.drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
-        //        painter.setPen(QPen(Qt::black,5));
-        //        painter.drawText(QRect(0,0,10*grid,4*grid),Qt::AlignLeft,view.name);
-        if(need_txt)
-        {
-            QList<TextInfo>* list_txt=map_View_Texts->value(entry.viewid);
-            for(int i=0;i<list_txt->size();i++)
-            {
-                TextInfo t=list_txt->at(i);
-                QFont f(t.Font,t.Size);
-
-                painter.setFont(f);
 
 
-
-                QString color=t.Color;
-                QStringList colors= color.split(" ");
-
-                painter.setPen(QPen( QColor(colors.at(0).toUInt(),
-                                            colors.at(1).toUInt(),
-                                            colors.at(2).toUInt()),
-                                     2));
-
-                painter.save();
+        drawAllSignals(&painter);
+        drawAllRoutes(&painter);
+        drawSigName(&painter);
+        painter.restore();
 
 
-                painter.translate(t.x*grid,t.y*grid);
-
-                if(t.Rotate>0)
-                {
-
-                    painter.rotate(t.Rotate);
+        drawTram(&painter);
+        drawTxt(&painter);
 
 
-                }
-                painter.drawText(QRect(0,0,5*grid,5*grid),t.txt);
-                painter.restore();
-            }
-
-        }
 
     }
-    else
-    {
 
-        //        qDebug()<<"need painter paint false";
-    }
     painter.end();
 
 }
 
 void TLEEvents::drawRoute(QString signame,quint8 status,QPainter *painter)
 {
+    if(!map_Route->contains(signame))
+        return;
     QMap<QString,QList<Shape>*>* m=  map_Route->value(signame);
     QList<Shape>* s;
     painter->setPen(QPen(QColor(Qt::green),4));
@@ -571,10 +315,231 @@ void TLEEvents::drawRoute(QString signame,quint8 status,QPainter *painter)
     }
 }
 
+void TLEEvents::drawAllSignals(QPainter *painter)
+{
+    QList<SignalInfo> *sl;
+    if(m_rtu_id==1)
+        sl=siglist;
+    else if(m_rtu_id==2)
+        sl=olclist;
+    for(int i=0;i<sl->size();i++)
+    {
+        SignalInfo s=sl->at(i);
+        painter->save();
+
+        if(s.name==entryname)
+        {
+            drawSignal(s.x,
+                       s.y,
+                       s.Rotate,sigstatus,
+                       painter);
+
+        }
+        else
+        {
+            quint8 status=parserBitMap(s);
+
+            drawSignal(s.x,
+                       s.y,
+                       s.Rotate,status,
+                       painter);
+
+        }
+
+        painter->restore();
+
+    }
+}
+
+void TLEEvents::drawAllRoutes(QPainter *painter)
+{
+    QList<SignalInfo> *sl;
+    if(m_rtu_id==1)
+        sl=siglist;
+    else if(m_rtu_id==2)
+        sl=olclist;
+    for(int i=0;i<sl->size();i++)
+    {
+        SignalInfo s=sl->at(i);
+
+
+        painter->save();
+
+
+        if(s.name==entryname)
+        {
+
+            drawRoute(s.name,sigstatus,
+                      painter);
+        }
+        else
+        {
+            quint8 status=parserBitMap(s);
+            drawRoute(s.name,status,painter);
+        }
+
+        painter->restore();
+
+    }
+}
+
+void TLEEvents::draw18Grid(QPainter *painter)
+{
+    if(display9cubic)
+    {
+        painter->setPen(QPen( QColor(220,220,220),1,Qt::DotLine));
+
+        for(int i=0;i<19;i++)
+            painter->drawLine(0,i*grid,width(),i*grid);
+        for(int i=0;i<19;i++)
+            painter->drawLine(i*grid,0,i*grid,height());
+    }
+}
+
+void TLEEvents::drawTemplate(QPainter *painter)
+{
+    if(tplete->size()>0)
+    {
+
+        for(int i=0;i<tplete->size();i++)
+        {
+            Shape sh = tplete->at(i);
+            QString name=sh.name;
+
+            drawShape(painter,sh,name);
+
+        }
+    }
+}
+
+void TLEEvents::drawTram(QPainter* painter)
+{
+    QRect rect=QRect(entry.tramx*grid-7,entry.tramy*grid,16,66);
+    painter->drawPixmap(rect,QPixmap("res/Tram_Tracklayout.png"));
+}
+
+void TLEEvents::drawTxt(QPainter* painter)
+{
+    if(need_txt)
+    {
+        QList<TextInfo>* list_txt=map_View_Texts->value(entry.viewid);
+        for(int i=0;i<list_txt->size();i++)
+        {
+            TextInfo t=list_txt->at(i);
+            QFont f(t.Font,t.Size);
+
+            painter->setFont(f);
+
+
+
+            QString color=t.Color;
+            QStringList colors= color.split(" ");
+
+            painter->setPen(QPen( QColor(colors.at(0).toUInt(),
+                                         colors.at(1).toUInt(),
+                                         colors.at(2).toUInt()),
+                                  2));
+
+            painter->save();
+
+
+            painter->translate(t.x*grid,t.y*grid);
+
+            if(t.Rotate>0)
+            {
+
+                painter->rotate(t.Rotate);
+
+
+            }
+            painter->drawText(QRect(0,0,5*grid,5*grid),t.txt);
+            painter->restore();
+        }
+
+    }
+}
+
+quint8 TLEEvents::parserBitMap(SignalInfo s)
+{
+    SignalBit b;
+    if(m_rtu_id==1)
+        b= map_Signal->value(s.name);
+    else
+        b= map_OLC->value(s.name);
+
+    quint8 status;
+
+    quint8 left = (m_bitmap[b.left/8]);
+    left&=1<<b.left%8;
+    quint8 right = (m_bitmap[b.right/8]);
+    right&=1<<b.right%8;
+    quint8 permiss = (m_bitmap[b.permiss/8]);
+    permiss&=1<<b.permiss%8;
+    quint8 restric = (m_bitmap[b.restric/8]);
+    restric&=1<<b.restric%8;
+    if(b.restric!=0&&restric)
+    {
+        status=1;
+    }
+    else if(b.permiss!=0&&permiss)
+    {
+        status=2;
+    }
+    else   if(b.left!=0&&left)
+    {
+        status=3;
+    }
+    else   if(b.right!=0&&right)
+    {
+        status=4;
+    }
+    else
+    {
+        status=1;
+    }
+    return status;
+}
+
+void TLEEvents::drawSigName(QPainter* painter)
+{
+    if(isdisplay_signame)
+    {
+        QList<SignalInfo>* s;
+        if(m_rtu_id==1)
+            s=siglist;
+        else if(m_rtu_id==2)
+            s=olclist;
+        for(int i=0;i<s->size();i++)
+        {
+            SignalInfo si=s->at(i);
+
+            painter->setPen(QPen(QColor(Qt::black),1));
+            //                    qDebug()<<s.name<<s.Rotate;
+            switch(si.Rotate)
+            {
+            case 0:
+                painter->drawText(QRect((si.x-1)*grid,(si.y-1)*grid,grid*3,grid),Qt::AlignLeft,si.name);
+                break;
+            case 90:
+                painter->drawText(QRect((si.x)*grid+5,(si.y)*grid-7,grid*3,grid),Qt::AlignLeft,si.name);
+                break;
+            case -90:
+                painter->drawText(QRect((si.x-1)*grid-20,(si.y)*grid-8,grid*3,grid),Qt::AlignLeft,si.name);
+                break;
+            case 180:
+                painter->drawText(QRect((si.x-1)*grid,(si.y+1)*grid-15,grid*3,grid),Qt::AlignLeft,si.name);
+                break;
+
+            }
+
+
+        }
+    }
+}
+
 void TLEEvents:: drawSignal(quint8 x,quint8 y,qint16 rotate,quint8 status,QPainter *painter)
 {
-    //    qDebug()<<"x"<<x<<y<<grid<<width()/18;
-    //    painter->save();
+
     painter->translate(x*grid,y*grid);
     painter->rotate(rotate);
     painter->setBrush(Qt::black);
@@ -586,19 +551,19 @@ void TLEEvents:: drawSignal(quint8 x,quint8 y,qint16 rotate,quint8 status,QPaint
     switch(status)
     {
     case 1:
-        painter->setPen(QPen(QColor(Qt::red),4));
-        painter->drawLine(0-grid/2+3,grid/2,grid/2-2,grid/2);
+        painter->setPen(QPen(QColor(Qt::red),6));
+        painter->drawLine(0-grid/2+4,grid/2,grid/2-4,grid/2);
         break;
     case 2:
-        painter->setPen(QPen(QColor(Qt::green),4));
-        painter->drawLine(0,0+3,0,grid-3);
+        painter->setPen(QPen(QColor(Qt::green),6));
+        painter->drawLine(0,0+4,0,grid-4);
         break;
     case 3:
-        painter->setPen(QPen(QColor(Qt::yellow),4));
+        painter->setPen(QPen(QColor(Qt::yellow),6));
         painter->drawLine(0-grid/4,grid/4,grid/4,3*grid/4);
         break;
     case 4 :
-        painter->setPen(QPen(QColor(Qt::yellow),4));
+        painter->setPen(QPen(QColor(Qt::yellow),6));
         painter->drawLine(grid/4,grid/4,0-grid/4,3*grid/4);
         break;
     }
@@ -618,7 +583,7 @@ QSize TLEEvents::sizeHint() const
     }
     else if(m_size==3)
     {
-        return QSize(500,500);
+        return QSize(432,432);
     }
     return QSize(100,100);
 }

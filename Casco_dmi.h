@@ -283,6 +283,8 @@ private:
     needcurpsrflash,iscurpsrflash,
     neednextpsrflash,isnextpsrflash;
     QLabel *btnRadarSetting ;
+    QTabWidget *tabmaintance,*tabwork;
+    quint16 oritaby,oritabh,longy,longh,oritabworky,oritabworkh,shorty,shorth;
 #endif
     //tab maintence
     //    QTableWidget* tblwidgetMaintance;
@@ -338,6 +340,10 @@ private:
     quint8 m_checktime;
     quint8 m_sendTime;
     quint8 m_activeEnd;
+    quint16 m_todown;
+    quint16 m_difftime;
+    quint16 m_advance;
+    quint16 m_delay;
     quint8 m_cp_sendtime,m_elsmode_sendtime,m_timeshift_sendtime,
     m_driverid_sendtime,
     m_scheduleid_sendtime,
@@ -368,6 +374,8 @@ private:
     quint8 timerdisconnect;
     QString exePath;
     QString resPath;
+    quint8 last_turnback,last_skip,last_hold,last_curpsr;
+
 
     QQueue<QByteArray> *que_els_dmi,*que_dms_dmi;
     QByteArray last_els_dmi_data,last_dms_dmi_data;

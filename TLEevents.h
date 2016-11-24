@@ -14,7 +14,7 @@ public:
     explicit TLEEvents(quint8 size, QWidget *parent = 0);
     ~TLEEvents();
 
-    void setvalue(quint8 id, quint8 status, quint16 bitmaplength, quint8 *bitmap);
+    void setvalue(quint8 id, quint8 rtu_id, quint8 status, quint16 bitmaplength, quint8 *bitmap);
     bool display9cubic;
     bool isdisplay_signame;
 
@@ -36,6 +36,7 @@ private:
     bool need_paint,need_txt;
 
     quint8 sigid,sigstatus;
+    quint8 m_rtu_id;
     quint16 m_bitmaplength;
     quint8* m_bitmap;
 
@@ -62,6 +63,16 @@ private:
     void drawSignal(quint8 x,quint8 y,qint16 rotate,quint8 status,QPainter *painter);
     void drawShape(QPainter *, Shape, QString name);
     void drawRoute(QString signame, quint8 status, QPainter *painter);
+
+    void drawAllSignals(QPainter* painter);
+    void drawAllRoutes(QPainter* painter);
+    void draw18Grid(QPainter* painter);
+    void drawTemplate(QPainter *painter);
+    void drawTram(QPainter *painter);
+    void drawTxt(QPainter *painter);
+    quint8 parserBitMap(SignalInfo s);
+    void drawSigName(QPainter *painter);
+
     QMap<quint8,QString> *map_sigid_name;
     QMap<quint8,QString> *map_olcid_name;
     QMap<QString,SignalBit> *map_Signal;

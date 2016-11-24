@@ -53,10 +53,10 @@ QSize LimitSpeed::sizeHint() const
     switch (m_size)
     {
     case 1:
-        return QSize(64,64);
+        return QSize(80,80);
         break;
     case 2:
-        return QSize(48,48);
+        return QSize(64,64);
         break;
     default:
         return QSize(48,48);

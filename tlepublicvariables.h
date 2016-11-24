@@ -34,7 +34,7 @@ struct View
 struct Entry
 {
     quint8 viewid;
-    quint8 rotate;
+    qint16 rotate;
     quint8 tramx;
     quint8 tramy;
 };

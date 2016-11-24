@@ -36,7 +36,7 @@ void MyDashboard::setValue(quint8 curvalue, quint8 limitvalue,quint8 lblvalue)
     m_limitSpeedValue=limitvalue;
     m_lblvalue=lblvalue; //lbl_txt的显示值
 
-//    qDebug()<<"in dashborad setvalue"<<m_currentValue<<m_limitSpeedValue<<m_lblvalue;
+    //    qDebug()<<"in dashborad setvalue"<<m_currentValue<<m_limitSpeedValue<<m_lblvalue;
     update();
 }
 
@@ -52,7 +52,7 @@ void MyDashboard::paintEvent(QPaintEvent *)
     drawIndicator(&painter);
     drawLimitSpeed(&painter);
     drawCoverBall(&painter);
-//    drawTextRect(&painter);
+    //    drawTextRect(&painter);
     painter.end();
 }
 
@@ -211,7 +211,10 @@ void MyDashboard::drawCoverBall(QPainter *painter)
     painter->setFont(font);
 
     painter->setOpacity(1.0);
-    painter->setPen(Qt::yellow);
+    if(m_currentValue<24)
+        painter->setPen(Qt::green);
+    else
+        painter->setPen(Qt::red);
     QString strValue;
     strValue=tr("%1").arg(m_currentValue);
     painter->drawText(textRect,Qt::AlignHCenter|Qt::AlignVCenter,strValue);
