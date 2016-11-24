@@ -518,16 +518,16 @@ void TLEEvents::drawSigName(QPainter* painter)
             switch(si.Rotate)
             {
             case 0:
-                painter->drawText(QRect((si.x-1)*grid,(si.y-1)*grid,grid*3,grid),Qt::AlignLeft,si.name);
+                painter->drawText(QRect((si.x-1)*grid,(si.y-1)*grid,width(),grid),Qt::AlignLeft,si.name);
                 break;
             case 90:
-                painter->drawText(QRect((si.x)*grid+5,(si.y)*grid-7,grid*3,grid),Qt::AlignLeft,si.name);
+                painter->drawText(QRect((si.x)*grid+5,(si.y)*grid-7,width(),grid),Qt::AlignLeft,si.name);
                 break;
             case -90:
-                painter->drawText(QRect((si.x-1)*grid-20,(si.y)*grid-8,grid*3,grid),Qt::AlignLeft,si.name);
+                painter->drawText(QRect((si.x-1)*grid-20,(si.y)*grid-8,width(),grid),Qt::AlignLeft,si.name);
                 break;
             case 180:
-                painter->drawText(QRect((si.x-1)*grid,(si.y+1)*grid-15,grid*3,grid),Qt::AlignLeft,si.name);
+                painter->drawText(QRect((si.x-1)*grid,(si.y+1)*grid-15,width(),grid),Qt::AlignLeft,si.name);
                 break;
 
             }

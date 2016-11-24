@@ -576,6 +576,11 @@ void Casco_DMI::getAlarmOutQue()
                     return;
             }
 #endif
+            if(alarm.id==13)
+            {
+                isdidi=true;
+                //                                    qDebug()<<"aa"<<alarm.str;
+            }
             emit ttsConvertNow(alarm.str,m_alarm_filename);
         }
         else if(!ttsthreadisstart) //不能打断tts，需要tts完成后才能再次tts
@@ -609,6 +614,11 @@ void Casco_DMI::getAlarmOutQue()
                     m_Alarm_Record_map->insert(modify_alarm.id,modify_alarm);
 
                     //                    qDebug()<<"in playing media"<<alarm.str<<alarm.couldplay<<alarm.current_playtick;
+                    //                    if(alarm.id==13)
+                    //                    {
+                    //                        isdidi=true;
+                    //                        qDebug()<<"aa"<<alarm.str;
+                    //                    }
                     emit ttsConvertNow(alarm.str,m_alarm_filename);
                 }
                 else
@@ -638,7 +648,15 @@ void Casco_DMI::playMediaNow()
 {
     ttsthreadisstart=false;
     player->stop();
-    player->setMedia(QUrl::fromLocalFile(QDir::currentPath()+ "/"+"tmp"));
+    if(isdidi)
+    {
+        isdidi=false;
+        player->setMedia(QUrl::fromLocalFile(QDir::currentPath()+ "/"+"didi"));
+    }
+    else
+    {
+        player->setMedia(QUrl::fromLocalFile(QDir::currentPath()+ "/"+"tmp"));
+    }
     player->play();
 
 }
@@ -761,6 +779,7 @@ void Casco_DMI::initialVariable()
     map_sigentry=new QMap<QString,Entry>;
     map_Route=new QMap<QString,QMap<QString,QList<Shape>*>*>;
     map_View_Texts=new QMap<quint16,QList<TextInfo>*>;
+    isdidi=false;
 #endif
 
 }
@@ -3518,7 +3537,7 @@ void Casco_DMI::refreshSMS()
     {
         QString tmptxt=QString::fromUtf8((char*)els_dmi_data->Driver_Message_Text);
         refreshAlarmQue(9,"[调度] ",tmptxt);
-        //        qDebug()<<"dd"<<tmptxt;
+        //                qDebug()<<"dd"<<tmptxt;
 
     }
     else
@@ -4429,6 +4448,41 @@ int Casco_DMI::initSignal(QString path)
                 view.LCSlist->append(sig);
                 //                qDebug()<<"lcslist"<<sig.name<<sig.x
                 //                       <<sig.y<<sig.rotate<<i;
+
+
+                QDomNodeList routes=lcssignals.at(i).childNodes();
+                QMap<QString,QList<Shape>*> *childroute=new QMap<QString,QList<Shape>*>;
+                for(int j=0;j<routes.size();j++)
+                {
+                    //                    qDebug()<<"routes"<<sig.name
+                    //                           <<routes.at(j).toElement().tagName()<<j;
+
+                    QDomNodeList s=routes.at(j).childNodes();
+                    QList<Shape> * shapes=new QList<Shape>;
+                    for(int k=0;k<s.size();k++)
+                    {
+                        //                        qDebug()<<s.at(k).toElement().tagName();
+
+                        QDomElement e=s.at(k).toElement();
+                        Shape x;
+                        x.name=e.tagName();
+                        x.list_Attr=new QMap<QString,QString>;
+                        QDomNamedNodeMap atts=e.attributes();
+                        for(int l=0;l<atts.size();l++)
+                        {
+                            x.list_Attr->insert(atts.item(l).toAttr().name(),
+                                                atts.item(l).toAttr().value());
+
+                        }
+                        shapes->append(x);
+                    }
+                    childroute->insert(routes.at(j).toElement().tagName(),
+                                       shapes);
+
+
+
+                }
+                map_Route->insert(sig.name,childroute);
             }
 
         }

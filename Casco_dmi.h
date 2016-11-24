@@ -285,6 +285,7 @@ private:
     QLabel *btnRadarSetting ;
     QTabWidget *tabmaintance,*tabwork;
     quint16 oritaby,oritabh,longy,longh,oritabworky,oritabworkh,shorty,shorth;
+    bool isdidi;
 #endif
     //tab maintence
     //    QTableWidget* tblwidgetMaintance;
