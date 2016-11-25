@@ -13,7 +13,7 @@ TLEEvents::TLEEvents(quint8 size, QWidget *parent): QWidget(parent)
     rotation = new quint8[50];
     m_bitmap=new quint8[200];
     display9cubic=false;
-    isdisplay_signame=true;
+    isdisplay_signame=false;
     need_paint=false;
     need_txt=false;
     this->installEventFilter(this);
